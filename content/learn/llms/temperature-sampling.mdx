@@ -1,0 +1,97 @@
+---
+id: temperature-sampling
+slug: temperature-sampling
+title: Temperature & Sampling
+category: llms
+level: intermediate
+summary: Sampling is how an LLM picks the next token from its probabilities; temperature, top-p, and top-k control how random or focused that choice is.
+keywords: [temperature, sampling, top-p, top-k, nucleus sampling, randomness, greedy]
+prerequisites: [what-is-llm]
+next: [structured-output]
+related: [prompt-engineering, what-is-token]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-temperature-sampling
+estimatedMinutes: 8
+---
+
+<OneLine>An LLM predicts a probability for every possible next token; sampling settings like temperature decide how boldly it picks among them — from safe and repeatable to creative and surprising.</OneLine>
+
+## Explain like I'm new to AI
+
+At every step, an LLM doesn't output one word — it outputs a **probability for every token** it knows. Something has to choose which one to actually use. That choosing step is **sampling**, and **temperature** is its main dial.
+
+- **Low temperature** → the model almost always picks the most likely token. Focused, consistent, a bit repetitive.
+- **High temperature** → less likely tokens get a real chance. Creative, varied, sometimes off the rails.
+
+Drag the slider and watch the probabilities reshape:
+
+<TemperatureSampling />
+
+## Mental model
+
+Imagine rolling a **weighted die** where each face is a possible next word. Temperature reshapes the weights: turn it down and the die almost always lands on the favorite; turn it up and the long shots start winning too.
+
+## How it works
+
+1. The model produces raw scores (**logits**) for every token.
+2. **Temperature** divides the logits before **softmax**: dividing by a small number sharpens the distribution; a large number flattens it.
+3. **Top-k** keeps only the k most likely tokens; **top-p (nucleus)** keeps the smallest set of tokens whose probabilities add up to p.
+4. A token is **sampled** from what remains.
+
+```text
+temperature → how sharp/flat the probabilities are
+top-k       → keep only the k most likely tokens
+top-p       → keep the top tokens that sum to probability p
+```
+
+## Real-world example
+
+- **Extracting data / writing code / following strict formats?** Use **low** temperature (often 0–0.3) so results are reliable and repeatable.
+- **Brainstorming names, stories, or marketing copy?** Use **higher** temperature (0.8–1.2) for variety.
+
+This is also why the same prompt can give different answers each time: with temperature above 0, generation is **stochastic**.
+
+## Technical explanation
+
+With temperature `T`, probabilities are `softmax(logits / T)`. As `T → 0` this approaches **greedy decoding** (always the argmax); as `T` grows, it approaches uniform. **Top-p** adapts the candidate set to the distribution's shape (unlike fixed top-k), which is why nucleus sampling is a common default. Other controls include **repetition/frequency penalties** (discourage repeating tokens) and a fixed **seed** (reproducible sampling). Note: even at temperature 0, outputs aren't always perfectly deterministic across hardware/implementations.
+
+## Common mistakes
+
+<CommonMistake>
+Thinking higher temperature makes the model "smarter" or "more knowledgeable." It only makes choices more
+random. For factual or structured tasks, high temperature usually makes results <em>worse</em>.
+</CommonMistake>
+
+- Cranking temperature up to fix a wrong answer — lower it (or improve the prompt) instead.
+- Combining aggressive top-k/top-p with high temperature and being surprised by incoherent output.
+
+## When to use it
+
+- Tune temperature per task: low for precision and formats, higher for creativity.
+
+## When NOT to use it
+
+- Don't raise temperature for tasks needing exactness (data extraction, code, JSON).
+
+## Alternatives
+
+- **Greedy** (T=0) and **beam search** are lower-randomness decoding strategies for deterministic tasks.
+
+<MemoryCard>
+LLMs output a probability over all next tokens; **sampling** picks one. **Temperature** sharpens (low)
+or flattens (high) those probabilities; **top-p/top-k** limit the candidates. Low = precise, high = creative.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-temperature-sampling" />

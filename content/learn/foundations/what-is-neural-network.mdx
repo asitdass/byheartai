@@ -1,0 +1,89 @@
+---
+id: what-is-neural-network
+slug: what-is-neural-network
+title: What is a Neural Network?
+category: foundations
+level: beginner
+summary: A neural network is a web of simple math units ("neurons") that transform inputs into outputs and learn by adjusting connection weights.
+keywords: [neural network, neuron, weights, activation, layers]
+prerequisites: [what-is-deep-learning]
+next: [what-is-model]
+related: [what-is-deep-learning, what-is-transformer]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-what-is-neural-network
+estimatedMinutes: 6
+---
+
+<OneLine>A neural network is a layered web of tiny math units that pass numbers forward, and it learns by tuning the strength of its connections.</OneLine>
+
+## Explain like I'm new to AI
+
+A **neural network** is loosely inspired by the brain. It's made of many small units called **neurons**, connected in **layers**. Each connection has a **weight** (how strongly one neuron influences the next).
+
+Numbers flow in on one side (say, the pixels of an image), get transformed layer by layer, and a prediction comes out the other side (say, "this is a cat"). Learning means **adjusting the weights** until the outputs are correct.
+
+## Mental model
+
+Imagine a huge network of **water pipes with adjustable valves**. Water (data) flows in; each valve (weight) controls how much passes through. Training is turning the valves until the right amount of water reaches the right outputs.
+
+## How it works
+
+1. **Input layer** receives the raw numbers.
+2. Each neuron computes a **weighted sum** of its inputs, adds a **bias**, and passes it through an **activation function** (which adds non-linearity so the network can learn complex patterns).
+3. This repeats through **hidden layers** until the **output layer** produces a result.
+4. During training, **backpropagation** measures how each weight contributed to the error, and **gradient descent** nudges weights to reduce it.
+
+A simplified neuron:
+
+```text
+output = activation( w1*x1 + w2*x2 + ... + wn*xn + bias )
+```
+
+## Real-world example
+
+A digit recognizer takes the pixels of a handwritten number, passes them through its layers, and lights up one of ten outputs (0-9). After training on thousands of labeled digits, its weights encode what each digit "looks like."
+
+## Technical explanation
+
+Neural networks are **universal function approximators**: with enough neurons and the right weights, they can approximate very complex input-output mappings. **Activation functions** (ReLU, GELU, etc.) introduce non-linearity; without them, stacked layers would collapse into a single linear function. Training optimizes a **loss** over the weights via **backpropagation**, the algorithm that efficiently computes gradients through every layer.
+
+## Common mistakes
+
+<CommonMistake>
+Taking the "brain" analogy literally. Artificial neurons are simple math functions — they don't
+work like biological neurons, and the network isn't "thinking."
+</CommonMistake>
+
+- Forgetting activation functions are what make networks powerful (not just the layers).
+- Confusing more neurons with more intelligence — capacity must match data and task.
+
+## When to use it
+
+- As the core building block for deep learning on images, audio, and language.
+
+## When NOT to use it
+
+- Tiny problems solvable with a formula or simple model — a neural network is overkill.
+
+## Alternatives
+
+- Linear/logistic regression and tree-based models for simpler, structured problems.
+
+<MemoryCard>
+A **neural network** is layers of simple units connected by **weights**. It learns by adjusting
+those weights (via backpropagation) so its outputs match the training data.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-neural-network" />

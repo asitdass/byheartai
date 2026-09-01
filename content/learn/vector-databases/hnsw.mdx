@@ -1,0 +1,100 @@
+---
+id: hnsw
+slug: hnsw
+title: What is HNSW?
+category: vector-databases
+level: advanced
+summary: HNSW is a graph-based ANN index that searches from sparse top layers down to dense bottom layers, giving fast, high-recall nearest-neighbor search.
+keywords: [hnsw, graph index, ann, nearest neighbor, skip list, recall]
+prerequisites: [ann-vs-exact]
+next: [ivf-and-quantization]
+related: [ann-vs-exact, ivf-and-quantization]
+alternatives: [ivf-and-quantization]
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Efficient and robust ANN search using HNSW graphs (Malkov & Yashunin, 2016)"
+    url: "https://arxiv.org/abs/1603.09320"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-hnsw
+estimatedMinutes: 8
+---
+
+<OneLine>HNSW is the most popular approximate-nearest-neighbor index: a layered graph you search top-down — big jumps in sparse upper layers, fine refinement in the dense bottom layer.</OneLine>
+
+## Explain like I'm new to AI
+
+**HNSW** (Hierarchical Navigable Small World) is the index behind most fast vector search today. The idea is a **multi-layer map of shortcuts**.
+
+- The **top layer** has only a few points connected by **long-distance links** — great for covering ground quickly.
+- Each layer below adds more points and **shorter links**.
+- The **bottom layer** contains **every** point with fine-grained local links.
+
+Search starts at the top, jumps close to the target, then drops down layer by layer to zero in. Step through it:
+
+<HnswVisualizer />
+
+## Mental model
+
+Think of travel: first take a **plane** across the country (top layer, long jumps), then a **train** to the city (middle layer), then **walk** to the exact address (bottom layer). Each level gets you closer with finer movements — far faster than walking the whole way.
+
+## How it works
+
+1. **Enter** at a single point in the top (sparsest) layer.
+2. **Greedily** move to whichever neighbor is closer to the query.
+3. When no neighbor is closer, **drop down** one layer and continue.
+4. At the **bottom layer**, the greedy walk lands on the nearest neighbors → return top-k.
+
+This "coarse-to-fine" navigation is why HNSW is both **fast and high-recall**.
+
+## Real-world example
+
+HNSW (via the popular open-source implementation used by many vector databases) powers low-latency semantic search over millions of documents. You typically get **95–99%+ recall** with millisecond queries — the reason it's the default index in so many systems.
+
+## Technical explanation
+
+HNSW generalizes the **skip-list** idea to a graph. Key parameters:
+
+- **M** — links per node. Higher M → better recall and connectivity, but more memory.
+- **efConstruction** — search breadth while **building** the graph; higher → better graph quality, slower build.
+- **efSearch** — candidate list size at **query** time; higher → better recall, higher latency.
+
+Strengths: excellent recall/latency, supports incremental **inserts**. Trade-offs: it's **memory-hungry** (the graph lives in RAM) and deletions are awkward. That memory cost is often addressed by combining HNSW with **quantization**. Complexity is roughly **O(log N)** search vs. brute force's O(N).
+
+## Common mistakes
+
+<CommonMistake>
+Leaving <em>efSearch</em> at its default and wondering why recall is low (or latency is high). This one knob
+directly trades recall for speed at query time — tune it to your target.
+</CommonMistake>
+
+- Ignoring HNSW's RAM footprint when planning capacity.
+- Expecting cheap deletions — heavy churn may require periodic rebuilds.
+
+## When to use it
+
+- The default choice for fast, high-recall vector search when data fits in memory.
+
+## When NOT to use it
+
+- Extremely memory-constrained or billion-scale settings where IVF + quantization is more economical.
+
+## Alternatives
+
+- **IVF** (cluster-based) and **quantization (PQ)** — often combined for very large, memory-tight indexes.
+
+<MemoryCard>
+**HNSW** is a layered graph index: search top (sparse, long jumps) to bottom (dense, fine links) for
+fast, high-recall ANN. Tune **M**, **efConstruction**, **efSearch**; watch its **RAM** cost.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-hnsw" />

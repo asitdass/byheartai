@@ -1,0 +1,99 @@
+---
+id: structured-output
+slug: structured-output
+title: What is Structured Output?
+category: llms
+level: intermediate
+summary: Structured output makes an LLM return data in a strict format like JSON that follows a schema, so software can reliably use its answers.
+keywords: [structured output, json, json schema, json mode, constrained decoding, function calling]
+prerequisites: [what-is-llm]
+next: [function-calling]
+related: [function-calling, prompt-engineering]
+alternatives: []
+confusedWith: [function-calling]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-structured-output
+estimatedMinutes: 7
+---
+
+<OneLine>Structured output forces an LLM to answer in a strict, machine-readable format (usually JSON matching a schema) so your code can trust and parse it every time.</OneLine>
+
+## Explain like I'm new to AI
+
+LLMs love to reply in friendly prose: "Sure! The customer seems pretty happy 😊". That's lovely for humans but **useless for software**, which needs predictable fields.
+
+**Structured output** solves this: you give the model a **schema** (the exact shape you want), and it returns data that fits — like:
+
+```json
+{ "sentiment": "positive", "confidence": 0.92, "topics": ["delivery", "support"] }
+```
+
+Now your app can read `sentiment` directly, with no fragile text-parsing.
+
+## Mental model
+
+It's the difference between a **handwritten note** and a **filled-in form**. Free text is a note you have to interpret; structured output is a form with labeled boxes, filled in exactly where you expect.
+
+## How it works
+
+1. You describe the desired shape — often a **JSON Schema** (fields, types, which are required, allowed values).
+2. You ask the model to respond **only** in that format.
+3. Strong APIs enforce it with **constrained decoding**, so the output is *guaranteed* valid against the schema — not just "usually valid."
+4. Your code parses the result with confidence.
+
+## Real-world example
+
+- **Extraction:** turn a messy invoice into `{ vendor, date, total, lineItems[] }`.
+- **Classification:** label a support ticket as `{ category, priority, needsHuman }`.
+- **UI generation:** produce a config object your frontend renders directly.
+
+These power real pipelines because the output slots straight into databases, APIs, and UIs.
+
+## Technical explanation
+
+Approaches, from weakest to strongest guarantee:
+
+- **Prompt-only:** ask for JSON. Easy, but the model may add prose or break format.
+- **JSON mode:** the API guarantees *syntactically* valid JSON (but not your schema).
+- **Schema-constrained / "Structured Outputs":** the decoder is restricted to tokens that keep the output valid against your **JSON Schema**, guaranteeing the shape. This uses **grammar-constrained decoding** under the hood.
+
+Structured output is also the foundation of **function calling** — the model emits a structured set of arguments for a tool. Best practice: pair it with **validation** (e.g. a schema validator) and keep temperature low.
+
+## Common mistakes
+
+<CommonMistake>
+Assuming "please reply in JSON" always yields valid JSON. Without enforced constraints, models can add
+explanations, trailing commas, or markdown fences. Use schema-constrained mode or validate and retry.
+</CommonMistake>
+
+- Not handling the rare invalid response — always validate before trusting it.
+- Over-nesting schemas; simpler shapes are more reliable and cheaper.
+
+## When to use it
+
+- Any time another program will consume the model's output: extraction, classification, tool inputs, configs.
+
+## When NOT to use it
+
+- Open-ended writing for humans (essays, chat replies) where rigid structure adds no value.
+
+## Alternatives
+
+- **Function calling** (structured output aimed at tools) and plain prose for human-facing text.
+
+<MemoryCard>
+**Structured output** makes an LLM return data in a strict format (usually **JSON Schema**) so software
+can parse it reliably. Schema-**constrained** decoding guarantees the shape; always validate.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-structured-output" />

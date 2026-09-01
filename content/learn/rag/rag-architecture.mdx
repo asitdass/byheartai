@@ -1,0 +1,103 @@
+---
+id: rag-architecture
+slug: rag-architecture
+title: RAG Architecture
+category: rag
+level: intermediate
+summary: RAG has two phases — offline ingestion (chunk, embed, store) and per-query answering (retrieve, rerank, generate) — connected by a vector store.
+keywords: [rag architecture, pipeline, ingestion, retrieval, generation, grounding]
+prerequisites: [what-is-rag]
+next: [chunking]
+related: [what-is-rag, chunking, reranking]
+alternatives: []
+confusedWith: []
+frameworks: [langchain, llamaindex]
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-rag-architecture
+estimatedMinutes: 8
+---
+
+<OneLine>A RAG system has two phases: an offline ingestion pipeline that makes your documents searchable, and a per-query pipeline that retrieves the right chunks and grounds the model's answer.</OneLine>
+
+## Explain like I'm new to AI
+
+RAG isn't one step — it's a small **assembly line** with two halves that run at different times:
+
+- **Ingestion** happens **ahead of time**: you prepare your documents once so they can be searched.
+- **Answering** happens **every time** a user asks a question: you find the right pieces and hand them to the model.
+
+<RagArchitecture />
+
+Understanding these two phases (and where things go wrong in each) is the key to building RAG that actually works.
+
+## Mental model
+
+Think of a **library**. First, a librarian catalogs every book so it can be found later (ingestion). Then, when you ask a question, they fetch the most relevant books, pick the best passages, and summarize them for you (answering). Same library, two very different jobs.
+
+## How it works
+
+**Phase 1 — Ingestion (offline):**
+
+1. **Parse & clean** raw documents (PDFs, HTML, docs) into text.
+2. **Chunk** the text into passages, attaching **metadata** (source, title, date).
+3. **Embed** each chunk into a vector.
+4. **Store** vectors + metadata in a vector database (build the index).
+
+**Phase 2 — Answering (per query):**
+
+1. **Transform** the query if needed (rewrite/expand).
+2. **Retrieve** the top-k chunks (vector + often keyword = **hybrid**), applying **metadata filters**.
+3. **Rerank** the shortlist so the best chunks come first.
+4. **Construct the context** and prompt the model to answer **only** from it, with **citations**.
+5. **Generate** the grounded answer.
+
+## Real-world example
+
+A company knowledge assistant ingests thousands of internal docs overnight (chunk → embed → store). During the day, each employee question triggers the answering pipeline: retrieve the few relevant chunks, rerank, and generate a cited answer. Update a doc, re-ingest just that doc, and the assistant is instantly current — no model retraining.
+
+## Technical explanation
+
+The vector store is the **seam** between phases. Most failures trace to one side:
+
+- **Retrieval failures** (wrong chunks) → fix chunking, embeddings, hybrid search, filters, reranking.
+- **Generation failures** (right chunks, wrong answer) → fix the prompt, context construction, grounding instructions, or citations.
+
+That's why you **evaluate the two halves separately** (retrieval metrics vs. generation metrics). Production systems add **caching**, **observability/tracing**, and re-ingestion pipelines to keep the index in sync with source data. Frameworks like **LangChain** and **LlamaIndex** provide building blocks, but the architecture above is framework-agnostic.
+
+## Common mistakes
+
+<CommonMistake>
+Treating RAG as a single black box. When answers are bad, you must know <em>which</em> phase failed —
+did retrieval bring the wrong chunks, or did the model ignore the right ones? Debug each phase separately.
+</CommonMistake>
+
+- Skipping metadata at ingestion, then being unable to filter or cite later.
+- Never re-ingesting, so the index drifts out of date with the source documents.
+
+## When to use it
+
+- Any non-trivial RAG system — the two-phase structure is the standard blueprint.
+
+## When NOT to use it
+
+- Tiny, static knowledge that already fits in the context window needs no ingestion pipeline.
+
+## Alternatives
+
+- Long-context "stuff everything in the prompt" for small corpora; fine-tuning for behavior/style.
+
+<MemoryCard>
+RAG = **ingestion** (parse → chunk → embed → store) done offline, plus **answering** (transform →
+retrieve → rerank → generate) per query. Debug retrieval and generation **separately**.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-rag-architecture" />

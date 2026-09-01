@@ -1,0 +1,97 @@
+---
+id: rag-evaluation
+slug: rag-evaluation
+title: How to Evaluate RAG
+category: rag
+level: advanced
+summary: RAG evaluation measures retrieval quality (context precision/recall) and generation quality (faithfulness, answer relevance) separately to find and fix failures.
+keywords: [rag evaluation, faithfulness, context precision, context recall, hallucination, metrics]
+prerequisites: [rag-architecture]
+next: [rag-vs-fine-tuning]
+related: [rag-architecture, agentic-rag]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-rag-evaluation
+estimatedMinutes: 8
+---
+
+<OneLine>Evaluating RAG means measuring its two halves separately — did retrieval fetch the right context, and did the model faithfully use it — so you know exactly what to fix.</OneLine>
+
+## Explain like I'm new to AI
+
+"The answers seem bad" isn't actionable. To improve RAG you must know **which part** failed: did the system **retrieve the wrong information**, or did it **retrieve the right information but answer badly**?
+
+So RAG evaluation splits into two halves — **retrieval quality** and **generation quality**:
+
+<RagEvaluation />
+
+## Mental model
+
+An open-book exam has two ways to fail: you **flipped to the wrong page** (retrieval), or you **read the right page but wrote a wrong answer** (generation). Grading both separately tells you whether to study your search or your writing.
+
+## How it works — the core metrics
+
+**Retrieval quality:**
+
+- **Context precision:** of the chunks retrieved, how many are actually relevant? (Low = too much noise.)
+- **Context recall:** of the chunks needed to answer, how many did we retrieve? (Low = missing information.)
+
+**Generation quality:**
+
+- **Faithfulness / groundedness:** is every claim in the answer supported by the retrieved context? (Low = **hallucination**.)
+- **Answer relevance:** does the answer actually address the question?
+- **Answer correctness:** does it match the known ground-truth answer (when you have one)?
+
+## Real-world example
+
+Your bot gives a wrong refund policy. Evaluation shows **context recall is low** — the right chunk was never retrieved. Now you know to fix **retrieval** (chunking, hybrid search, reranking), not the prompt. In another case, faithfulness is low while context recall is high: the right chunk *was* retrieved, but the model ignored it — fix the **prompt/grounding** instead. Same symptom, opposite fixes — only measurement tells them apart.
+
+## Technical explanation
+
+Build a **test set** of representative questions with (ideally) reference answers and/or the "gold" chunks. Then:
+
+- Score retrieval with precision/recall (needs labeled relevant chunks).
+- Score generation with **LLM-as-a-judge** for faithfulness/relevance (a strong model grades each answer against the context), plus human review on a sample.
+- Track metrics **over time** and in **CI** so changes (new embeddings, chunking, prompts) can't silently regress quality.
+
+Open frameworks (e.g. RAGAS-style toolkits) automate many of these metrics. Golden rule: **evaluate retrieval and generation independently** — averaging them hides which stage is broken.
+
+## Common mistakes
+
+<CommonMistake>
+Only looking at the final answer. If you don't measure retrieval separately, you can't tell whether a bad
+answer came from bad context or bad generation — and you'll "fix" the wrong thing.
+</CommonMistake>
+
+- Testing on a handful of cherry-picked questions instead of a representative set.
+- No regression testing, so an "improvement" quietly degrades another metric.
+
+## When to use it
+
+- Before and continuously after shipping any RAG system — evaluation is how you improve it safely.
+
+## When NOT to use it
+
+- Never skip it for production; only throwaway prototypes can defer formal evaluation.
+
+## Alternatives
+
+- There's no substitute for measurement; the choice is only *which* metrics and how much automation vs. human review.
+
+<MemoryCard>
+Evaluate RAG in two halves: **retrieval** (context precision & recall) and **generation** (faithfulness,
+answer relevance). Use a test set + LLM-as-a-judge, track in CI, and never average away which stage failed.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-rag-evaluation" />

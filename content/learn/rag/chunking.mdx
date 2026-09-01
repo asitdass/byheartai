@@ -1,0 +1,96 @@
+---
+id: chunking
+slug: chunking
+title: What is Chunking?
+category: rag
+level: intermediate
+summary: Chunking splits documents into smaller passages so they can be embedded and retrieved precisely; chunk size and overlap are key tuning knobs for RAG quality.
+keywords: [chunking, chunk size, chunk overlap, semantic chunking, retrieval]
+prerequisites: [what-is-rag]
+next: [query-transformation]
+related: [rag-architecture, contextual-retrieval, what-are-embeddings]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+dateUpdated: 2026-09-01
+lastReviewed: 2026-09-01
+version: 2
+quizId: quiz-chunking
+estimatedMinutes: 7
+---
+
+<OneLine>Chunking breaks big documents into bite-sized passages so retrieval can find the exact relevant part — and chunk size and overlap make or break RAG quality.</OneLine>
+
+## Explain like I'm new to AI
+
+A whole 50-page manual is too big to hand a model for one question. **Chunking** slices it into smaller passages so the system can retrieve just the paragraph that answers the question — not the entire book.
+
+But *how* you slice matters enormously. Chunks too big bury the answer in noise; too small and they lose the context needed to make sense. Play with the size and overlap:
+
+<ChunkingVisualizer />
+
+## Mental model
+
+Think of chunking like adding **bookmarks and page breaks** to a long document, so you can flip straight to the relevant snippet instead of re-reading everything. **Overlap** is like letting each bookmarked section share a sentence or two with its neighbor, so no idea gets cut in half at the boundary.
+
+## How it works
+
+1. Split each document into passages (**chunks**).
+2. Choose a **chunk size** (how long each passage is) and **overlap** (how much neighboring chunks share).
+3. Attach **metadata** (source, title, section) to each chunk.
+4. Embed each chunk and store it for retrieval.
+
+**Semantic chunking** splits along meaning boundaries (sentences, sections, topics) instead of fixed character counts, so each chunk is a coherent idea.
+
+## Real-world example
+
+A support bot chunks each help article by section. When asked about billing, it retrieves only the "Billing" chunk — precise and cheap — instead of the whole article. If the article's steps span a boundary, a bit of **overlap** ensures step 3 isn't orphaned from steps 1–2.
+
+## Technical explanation
+
+Chunk size trades **precision vs. context**: small chunks give sharp retrieval but may lack surrounding meaning; large chunks carry context but dilute relevance and waste context-window tokens. Overlap (often ~10–20% of chunk size) preserves continuity across boundaries. Strategies, from simple to smart:
+
+- **Fixed-size** (by tokens/characters) — simple, fast baseline.
+- **Recursive/structure-aware** — split on paragraphs, headings, or markdown/code structure.
+- **Semantic chunking** — split where the topic shifts (using embedding similarity between sentences).
+- **Parent-child** — retrieve small precise chunks but feed the model their larger parent for context.
+
+The right choice depends on your content and embedding model's max input length — **measure retrieval quality** and tune.
+
+## Common mistakes
+
+<CommonMistake>
+Using one fixed chunk size for everything. Dense reference docs, chatty transcripts, and code all chunk
+differently. The right size depends on your content and model — measure retrieval quality and tune it.
+</CommonMistake>
+
+- Zero overlap, so key sentences get split awkwardly across chunk boundaries.
+- Chunks larger than the embedding model's input limit (silently truncated).
+- Dropping metadata, losing the ability to filter and cite later.
+
+## When to use it
+
+- Any time documents are larger than what you want to retrieve or fit in context.
+
+## When NOT to use it
+
+- When each item is already small and self-contained (e.g. FAQ entries or short product descriptions).
+
+## Alternatives
+
+- **Parent-child** and **contextual retrieval** refine how chunks are stored and expanded for better results.
+
+<MemoryCard>
+**Chunking** splits documents into passages sized for **precise retrieval**. **Size** trades precision vs.
+context; **overlap** preserves continuity. Prefer structure/semantic splits and always measure quality.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-chunking" />

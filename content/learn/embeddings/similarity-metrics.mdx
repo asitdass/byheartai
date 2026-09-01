@@ -1,0 +1,98 @@
+---
+id: similarity-metrics
+slug: similarity-metrics
+title: "Similarity: Cosine, Dot Product & Euclidean"
+category: embeddings
+level: intermediate
+summary: Similarity metrics measure how close two embedding vectors are; cosine similarity compares direction, dot product adds magnitude, and Euclidean measures distance.
+keywords: [cosine similarity, dot product, euclidean distance, similarity, vector, normalization]
+prerequisites: [what-are-embeddings]
+next: [embedding-models]
+related: [what-are-embeddings, vector-search]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-similarity-metrics
+estimatedMinutes: 8
+---
+
+<OneLine>Similarity metrics are the math for "how close are these two vectors?" — cosine looks at direction, dot product mixes in magnitude, and Euclidean measures straight-line distance.</OneLine>
+
+## Explain like I'm new to AI
+
+Embeddings put meaning into vectors. But to actually *use* them, you need to measure **how close two vectors are**. That's what a similarity metric does — it turns "are these two things similar?" into a single number.
+
+There are three you'll meet constantly. Play with them — adjust the angle and length of vector B and watch each metric react:
+
+<SimilarityMetrics />
+
+Notice the key lesson: when you change **only the length** of B, **cosine stays the same** but the others change. Cosine cares about *direction*; the others care about *size* too.
+
+## Mental model
+
+Think of two arrows from the same starting point:
+
+- **Cosine** asks: *are they pointing the same way?* (ignores how long they are)
+- **Dot product** asks: *same way AND how strong?* (longer arrows score higher)
+- **Euclidean** asks: *how far apart are the arrowheads?* (straight-line gap)
+
+## How it works
+
+- **Cosine similarity** ranges from **−1** (opposite) through **0** (unrelated) to **1** (identical direction). It's `dot(A, B) / (|A| × |B|)` — the angle between vectors.
+- **Dot product** multiplies matching components and sums them; it grows with both alignment **and** magnitude.
+- **Euclidean distance** is the straight-line distance; **smaller = more similar** (opposite direction from the others).
+
+```text
+cosine(A,B)    = (A · B) / (|A| |B|)     # −1 … 1, higher = closer
+dot(A,B)       =  A · B                   # unbounded, higher = closer
+euclidean(A,B) = |A − B|                  # 0 … ∞, lower = closer
+```
+
+## Real-world example
+
+Most **semantic search** uses **cosine similarity**, because you care whether two texts *mean* the same thing, not whether one is longer. A short question and a long paragraph can be a perfect match in direction even though their magnitudes differ wildly.
+
+## Technical explanation
+
+Here's the crucial optimization: if all vectors are **normalized** to length 1 ("unit vectors"), then **cosine similarity and dot product become identical**, and cosine ranking matches Euclidean ranking. That's why many embedding models output normalized vectors and vector databases default to **dot product** on them — it's cheaper to compute while giving cosine's behavior. Choosing a metric usually means: **use the one the embedding model was trained/recommended for** (often cosine). Mixing metrics inconsistently between indexing and querying silently ruins results.
+
+## Common mistakes
+
+<CommonMistake>
+Forgetting that for Euclidean distance, <em>smaller means more similar</em>, while for cosine and dot product,
+<em>larger means more similar</em>. Sorting the wrong direction returns the least relevant results.
+</CommonMistake>
+
+- Comparing vectors with a different metric than the model expects.
+- Using dot product on **un-normalized** vectors and being surprised that long documents dominate.
+
+## When to use it
+
+- **Cosine:** default for semantic text search (meaning over magnitude).
+- **Dot product:** fast equivalent to cosine on normalized vectors; used when magnitude is meaningful.
+- **Euclidean:** clustering and some vision tasks where absolute distance matters.
+
+## When NOT to use it
+
+- Don't switch metrics between building the index and querying it — keep them consistent.
+
+## Alternatives
+
+- Manhattan distance and others exist, but cosine/dot/Euclidean cover almost all embedding use.
+
+<MemoryCard>
+**Cosine** = direction only (−1…1). **Dot product** = direction + magnitude. **Euclidean** = distance
+(lower = closer). On **normalized** vectors, cosine and dot product are equivalent.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-similarity-metrics" />

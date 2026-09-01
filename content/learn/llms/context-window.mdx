@@ -1,0 +1,91 @@
+---
+id: context-window
+slug: context-window
+title: What is a Context Window?
+category: llms
+level: beginner
+summary: The context window is the maximum number of tokens an LLM can consider at once — its working memory for a single request.
+keywords: [context window, context length, tokens, memory, long context]
+prerequisites: [what-is-token]
+next: [temperature-sampling]
+related: [what-is-token, kv-cache, tokenization]
+alternatives: []
+confusedWith: [kv-cache]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-context-window
+estimatedMinutes: 7
+---
+
+<OneLine>The context window is the most tokens a model can "see" at once — its short-term working memory for a single request, covering both your input and its output.</OneLine>
+
+## Explain like I'm new to AI
+
+An LLM has no memory of past conversations by default. For each request, everything it can consider must fit inside its **context window** — a fixed budget measured in **tokens**.
+
+That budget holds *everything*: the system instructions, the whole conversation so far, any documents you paste, **and** the reply it's generating. Go over the limit, and the oldest content falls out of view — the model effectively **forgets** it. Watch it happen:
+
+<ContextWindowVisualizer />
+
+## Mental model
+
+Think of a **whiteboard** of fixed size. You can write anything on it, but once it's full, you must erase something to add more. The model can only reason about what's currently on the whiteboard — not what was wiped off.
+
+## How it works
+
+- Every message and document is converted to tokens and placed in the window.
+- The model attends over **all** tokens currently in the window to produce the next token.
+- When the conversation grows past the limit, apps must **drop, summarize, or retrieve** older content to make room.
+- Both **input tokens** and **output tokens** count against the window.
+
+## Real-world example
+
+Paste a 500-page book into a chat with a small window and ask about page 1 — the model may have "lost" the beginning by the time it reaches the end. Apps solve this with **summarization** (compress old turns), **retrieval / RAG** (fetch only relevant chunks), or **memory** systems (store facts outside the window and re-inject them).
+
+## Technical explanation
+
+Context length ranges from a few thousand to **millions** of tokens in frontier models. But bigger isn't free:
+
+- Self-attention cost grows **quadratically** with length, and the **KV cache** grows linearly — so long context is expensive to serve.
+- Models often show a **"lost in the middle"** effect: information at the very start or end is used more reliably than material buried in the middle.
+- **Effective** context (what the model uses well) can be smaller than the **advertised** maximum.
+
+Long-context techniques (e.g. **RoPE**-based position scaling, efficient attention) push these limits, but good context *engineering* still matters.
+
+## Common mistakes
+
+<CommonMistake>
+Confusing the context window with long-term memory. The window is <em>temporary</em> working space for one
+request. Anything you want the model to "remember" later must be stored outside and re-supplied.
+</CommonMistake>
+
+- Forgetting that the response shares the same budget as the prompt.
+- Assuming a huge window means the model uses every token equally — the middle is often weakest.
+
+## When to use it
+
+- Every request — plan what to include so the most important tokens are present.
+
+## When NOT to use it
+
+- When information exceeds the window: prefer **retrieval** or **summarization** over stuffing everything in.
+
+## Alternatives
+
+- **RAG**, summarization, and external **memory** extend what a model can effectively use beyond one window.
+
+<MemoryCard>
+The **context window** is the max tokens a model can consider at once (input **+** output). Overflow it
+and old tokens are forgotten. Bigger windows cost more and aren't used evenly ("lost in the middle").
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-context-window" />

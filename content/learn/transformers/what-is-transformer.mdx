@@ -1,0 +1,105 @@
+---
+id: what-is-transformer
+slug: what-is-transformer
+title: What is a Transformer?
+category: transformers
+level: intermediate
+summary: A transformer is the neural network architecture behind modern AI, using attention to process all words at once and learn how they relate.
+keywords: [transformer, attention, architecture, encoder, decoder, self-attention]
+prerequisites: [what-is-neural-network]
+next: [what-is-attention]
+related: [what-is-attention, self-attention, what-is-llm]
+alternatives: []
+confusedWith: [what-is-llm]
+frameworks: []
+products: []
+papers:
+  - title: "Attention Is All You Need (Vaswani et al., 2017)"
+    url: "https://arxiv.org/abs/1706.03762"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-what-is-transformer
+estimatedMinutes: 8
+---
+
+<OneLine>A transformer is the neural network design that reads all words at once and uses "attention" to figure out how they relate — the engine inside virtually every modern AI model.</OneLine>
+
+## Explain like I'm new to AI
+
+Before transformers, AI read text like a person reading through a straw — **one word at a time**, left to right. By the end of a long sentence, it had often forgotten the beginning.
+
+The **transformer** (introduced in 2017) changed everything: it looks at **all the words at once** and, for each word, decides which other words matter most. That mechanism is called **attention**. This made models dramatically better at understanding context — and much faster to train, because the work can be done in parallel.
+
+Almost everything you hear about today — LLMs, chatbots, image and video models, coding assistants — is built on transformers.
+
+<TransformerArchitecture />
+
+## Mental model
+
+Imagine reading a mystery novel where, for every sentence, you can **instantly glance back at any earlier clue** that's relevant. You're not limited to what you just read — you can connect "it" on page 200 to "the butler" on page 3. A transformer gives the model that power for every word.
+
+## How it works
+
+A transformer processes text in a few stages:
+
+1. **Tokenize** — split the text into **tokens** (word-pieces) and map each to an ID.
+2. **Embed + add position** — turn each token ID into a vector (**embedding**), and add **positional information** so the model knows word order.
+3. **Stack of blocks (×N)** — the vectors flow through many identical **transformer blocks**. Each block does two things:
+   - **Self-attention:** every token gathers context from the other tokens it finds relevant.
+   - **Feed-forward network:** each token's vector is refined individually.
+   - Both steps use **residual connections** ("add") and **normalization** to train stably.
+4. **Output** — the final vectors are used to **predict the next token** (in an LLM) or produce another result.
+
+Stacking many blocks lets early layers capture simple patterns and later layers capture abstract meaning.
+
+## Real-world example
+
+When ChatGPT-style models answer you, a transformer reads your entire prompt at once, uses attention to link related words (so "she" connects to the right name, "it" to the right object), and then generates a reply one token at a time — each new token attending back over everything so far.
+
+## Technical explanation
+
+The transformer replaced recurrence (RNNs/LSTMs) with **self-attention**, enabling full parallelism over a sequence and constant path length between any two tokens (better long-range dependencies). A block is:
+
+```text
+x = x + SelfAttention(LayerNorm(x))     # mix in context
+x = x + FeedForward(LayerNorm(x))       # refine each token
+```
+
+Variants exist: **encoder-only** (e.g. for understanding/embeddings), **decoder-only** (most LLMs, generate text), and **encoder-decoder** (e.g. translation). Key components include **multi-head attention**, **positional encoding**, and the **KV cache** used to speed up generation.
+
+## Common mistakes
+
+<CommonMistake>
+Confusing "transformer" with "LLM". A transformer is the <em>architecture</em>; an LLM is a large
+model <em>built using</em> that architecture. Image and audio models also use transformers.
+</CommonMistake>
+
+- Thinking transformers read strictly left-to-right — they attend to all positions at once.
+- Assuming attention "understands" like a human; it computes weighted relevance, not meaning.
+
+## When to use it
+
+- Sequence and language tasks, and increasingly vision, audio, and multimodal tasks — it is the default modern architecture.
+
+## When NOT to use it
+
+- Tiny/tabular problems where simpler models are cheaper and just as good.
+- Extremely long sequences where attention's cost becomes prohibitive without specialized variants.
+
+## Alternatives
+
+- RNNs/LSTMs (older, sequential), CNNs (great for local patterns), and newer efficient-sequence models — but transformers dominate general-purpose AI today.
+
+<MemoryCard>
+A **transformer** processes all tokens in parallel and uses **attention** to let each token pull
+context from the others. It's the architecture behind LLMs and most modern AI.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-transformer" />

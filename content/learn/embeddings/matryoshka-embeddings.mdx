@@ -1,0 +1,94 @@
+---
+id: matryoshka-embeddings
+slug: matryoshka-embeddings
+title: What are Matryoshka Embeddings?
+category: embeddings
+level: advanced
+summary: Matryoshka embeddings pack the most important information into the first dimensions, so you can shorten the vector to save space and speed with minimal quality loss.
+keywords: [matryoshka embeddings, mrl, dimensions, truncation, adaptive, storage]
+prerequisites: [embedding-models]
+next: [what-is-vector-database]
+related: [embedding-models, dense-vs-sparse-embeddings]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Matryoshka Representation Learning (Kusupati et al., 2022)"
+    url: "https://arxiv.org/abs/2205.13147"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-matryoshka-embeddings
+estimatedMinutes: 7
+---
+
+<OneLine>Matryoshka embeddings are trained so the most important information sits in the first dimensions — so you can chop the vector shorter to save storage and speed while keeping most of the quality.</OneLine>
+
+## Explain like I'm new to AI
+
+Normally an embedding is all-or-nothing: a 1536-number vector is only useful if you keep all 1536 numbers. **Matryoshka embeddings** change that.
+
+They're trained so the **beginning of the vector carries the most important meaning**, and later numbers add finer detail. That means you can **truncate** — keep just the first 256 or 512 numbers — and still get good results, using a fraction of the space.
+
+Drag the slider to keep fewer dimensions and watch size shrink while quality barely moves:
+
+<MatryoshkaVisualizer />
+
+## Mental model
+
+Like the Russian nesting dolls they're named after, a Matryoshka embedding contains **smaller complete embeddings inside it**. The full 1536-dim vector holds a good 768-dim vector, which holds a decent 256-dim vector — each usable on its own.
+
+## How it works
+
+1. The model is trained with a special objective (**Matryoshka Representation Learning**) so early dimensions are the most informative.
+2. To use a shorter vector, you simply **keep the first *k* numbers** (and re-normalize).
+3. Shorter vectors mean **less storage**, **less memory**, and **faster** similarity search — with only a small accuracy drop.
+
+## Real-world example
+
+A common pattern is **two-stage ("adaptive") retrieval**:
+
+1. **Shortlist** with truncated 256-dim vectors — fast and cheap over millions of items.
+2. **Re-rank** the top candidates with the full-length vectors for accuracy.
+
+You get most of the speed of small vectors and most of the quality of large ones. Several leading embedding APIs now expose a `dimensions` parameter precisely because their models are Matryoshka-trained.
+
+## Technical explanation
+
+MRL adds loss terms at multiple nested dimensionalities during training, so each prefix of the vector is itself a valid embedding. Truncation is a plain slice followed by L2 re-normalization; no re-embedding needed. Trade-offs: quality **degrades gracefully** as you shrink (e.g. keeping half the dimensions often costs only a couple of percent of accuracy), letting teams tune the storage/quality/latency balance per use case. It pairs naturally with **quantization** (lower-precision numbers) for even smaller indexes.
+
+## Common mistakes
+
+<CommonMistake>
+Truncating a <em>non-Matryoshka</em> embedding. Ordinary embeddings spread information across all dimensions,
+so chopping them destroys quality. Truncation only works for models trained with MRL.
+</CommonMistake>
+
+- Forgetting to **re-normalize** after truncating.
+- Mixing truncated and full-length vectors in the same index/comparison.
+
+## When to use it
+
+- Large-scale search where storage and speed matter, or adaptive shortlist-then-rerank retrieval.
+
+## When NOT to use it
+
+- When your model isn't Matryoshka-trained, or the dataset is small enough that full vectors are cheap.
+
+## Alternatives
+
+- **Quantization** and **dimensionality reduction (PCA)** also shrink vectors, but MRL is built-in and lossless to slice.
+
+<MemoryCard>
+**Matryoshka embeddings** put the most important info first, so you can **truncate** to fewer dimensions
+for big storage/speed savings with minimal quality loss. Only works for **MRL-trained** models; re-normalize after.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-matryoshka-embeddings" />

@@ -1,0 +1,92 @@
+---
+id: tokenization
+slug: tokenization
+title: What is Tokenization?
+category: llms
+level: beginner
+summary: Tokenization is the process of splitting text into tokens using a learned subword vocabulary before a model can read it.
+keywords: [tokenization, bpe, byte-pair encoding, subword, vocabulary, tokens]
+prerequisites: [what-is-token]
+next: [context-window]
+related: [what-is-token, what-are-embeddings]
+alternatives: []
+confusedWith: [what-is-token, what-are-embeddings]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-tokenization
+estimatedMinutes: 7
+---
+
+<OneLine>Tokenization is the step that turns your raw text into the tokens a model can read, using a learned vocabulary of word-pieces.</OneLine>
+
+## Explain like I'm new to AI
+
+Before an LLM can do anything with your text, that text has to be **converted into tokens**. That conversion is **tokenization**.
+
+It's not as simple as "split on spaces." A good tokenizer keeps common words whole, breaks rare words into reusable pieces, and handles spaces, punctuation, emoji, and code. Try it yourself:
+
+<TokenizationDemo />
+
+## Mental model
+
+Imagine a translator who only knows a fixed **phrasebook**. To translate anything, they break your sentence into phrases the book contains. Frequent phrases are one entry; unusual words get spelled out from smaller entries. Tokenization is that phrasebook lookup.
+
+## How it works
+
+The dominant method is **Byte-Pair Encoding (BPE)**:
+
+1. Start with individual characters.
+2. Repeatedly find the **most frequent adjacent pair** and merge it into a new token.
+3. Repeat thousands of times to build a **vocabulary** of common pieces.
+
+The result: frequent words ("the", "and") become single tokens, while rare words ("antidisestablishmentarianism") split into several known pieces. At runtime, the tokenizer greedily matches your text against this vocabulary and outputs token IDs.
+
+```text
+"lower", "lowest"  →  shared piece "low" + "er" / "est"
+```
+
+## Real-world example
+
+Code and non-English text often tokenize **inefficiently**: a Python snippet or a sentence in a low-resource language can use far more tokens per character than plain English. That directly affects cost and how much fits in the context window — which is why some models ship improved tokenizers to handle code and multilingual text better.
+
+## Technical explanation
+
+Related algorithms include **WordPiece** (BERT) and **Unigram/SentencePiece** (used by many multilingual models). Modern tokenizers operate on **bytes**, so they can represent *any* input (emoji, unusual scripts) without an "unknown token." Key trade-off: a **larger vocabulary** yields shorter sequences (cheaper attention) but a bigger embedding table. The tokenizer is fixed at training time — the model and its tokenizer are a matched pair.
+
+## Common mistakes
+
+<CommonMistake>
+Treating tokenization and embeddings as the same step. Tokenization splits text into discrete token IDs;
+<em>embedding</em> then maps each ID to a meaning-carrying vector. First one, then the other.
+</CommonMistake>
+
+- Assuming whitespace doesn't matter — leading spaces are usually part of the token.
+- Expecting token counts to match word counts, especially for code or other languages.
+
+## When to use it
+
+- Always — every LLM input passes through tokenization first.
+
+## When NOT to use it
+
+- Not applicable; it's a required preprocessing step.
+
+## Alternatives
+
+- BPE, WordPiece, and Unigram/SentencePiece are the main schemes; all produce subword tokens.
+
+<MemoryCard>
+**Tokenization** splits text into tokens using a learned vocabulary (usually **BPE**). Frequent words
+stay whole; rare words split into pieces. It happens **before** embedding.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-tokenization" />

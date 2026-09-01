@@ -1,0 +1,95 @@
+---
+id: multi-head-attention
+slug: multi-head-attention
+title: What is Multi-Head Attention?
+category: transformers
+level: intermediate
+summary: Multi-head attention runs several attention computations in parallel, each learning to focus on a different kind of relationship.
+keywords: [multi-head attention, heads, attention, transformer, parallel]
+prerequisites: [self-attention]
+next: [positional-encoding]
+related: [self-attention, what-is-attention]
+alternatives: []
+confusedWith: [self-attention]
+frameworks: []
+products: []
+papers:
+  - title: "Attention Is All You Need (Vaswani et al., 2017)"
+    url: "https://arxiv.org/abs/1706.03762"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-multi-head-attention
+estimatedMinutes: 7
+---
+
+<OneLine>Multi-head attention runs several attention "heads" in parallel, each learning to focus on a different kind of relationship, then combines them.</OneLine>
+
+## Explain like I'm new to AI
+
+One attention calculation can only focus on so much at once. So transformers run **several in parallel** — called **heads** — and let each specialize.
+
+One head might learn to link **subjects to verbs**, another to track **pronouns** ("it" → "animal"), another to watch **nearby phrasing**, and another to follow the **overall topic**. Combine all their findings and each word ends up with a much richer understanding.
+
+<MultiHeadAttention />
+
+## Mental model
+
+Imagine editing an essay with a **panel of specialists**: a grammar checker, a pronoun-tracker, a tone reader, and a fact-linker — all reading at the same time. Each notices different things; you merge their notes into one improved draft. That panel is multi-head attention.
+
+## How it works
+
+1. Split each token's vector into **h** smaller pieces (one per head).
+2. Run **self-attention independently** in each head — each with its own learned Q/K/V projections, so each head can focus differently.
+3. **Concatenate** the heads' outputs back together.
+4. Pass through a final linear layer to **combine** them into one vector.
+
+Each head works in a smaller space, so running many heads costs about the same as one big attention — but captures far more.
+
+```text
+headᵢ = Attention(xWᵠᵢ, xWᴷᵢ, xWⱽᵢ)
+MultiHead(x) = Concat(head₁, …, head_h) · Wᴼ
+```
+
+## Real-world example
+
+In "The lawyer told the client that **she** would win the case," different heads help resolve who "she" is by weighing "lawyer" vs "client," while other heads track the verb "win" and the object "case." The combination yields a coherent reading.
+
+## Technical explanation
+
+With model dimension `d_model` and `h` heads, each head uses dimension `d_k = d_model / h`. All heads run in parallel; the concatenated result (size `d_model`) is projected by `Wᴼ`. Modern LLMs often use efficiency variants: **Multi-Query Attention (MQA)** and **Grouped-Query Attention (GQA)** share keys/values across heads to shrink the **KV cache** and speed up inference with minimal quality loss.
+
+## Common mistakes
+
+<CommonMistake>
+Thinking more heads always means better results. Beyond a point, extra heads add cost with little
+gain — and some heads end up redundant. It's a balance, not "more is always better."
+</CommonMistake>
+
+- Assuming humans assign each head a job — specializations *emerge* from training, they aren't hand-coded.
+- Confusing multi-head attention with stacking layers; heads are parallel *within* a layer, layers are sequential.
+
+## When to use it
+
+- Always, in practice — it's a standard part of every transformer block.
+
+## When NOT to use it
+
+- Only when using deliberate efficiency variants (MQA/GQA) to reduce memory at scale.
+
+## Alternatives
+
+- MQA and GQA are optimized forms of multi-head attention for faster, cheaper inference.
+
+<MemoryCard>
+**Multi-head attention** = several attention heads in parallel, each focusing on a different relationship,
+then concatenated and combined. Cheap variants (**MQA/GQA**) share keys/values to speed up inference.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-multi-head-attention" />

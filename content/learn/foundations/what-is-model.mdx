@@ -1,0 +1,83 @@
+---
+id: what-is-model
+slug: what-is-model
+title: What is a Model?
+category: foundations
+level: beginner
+summary: A model is the trained artifact that stores what an AI system learned and turns new inputs into predictions.
+keywords: [model, parameters, weights, checkpoint, ai model]
+prerequisites: [what-is-machine-learning]
+next: [training-vs-inference]
+related: [what-is-machine-learning, training-vs-inference, what-is-neural-network]
+alternatives: []
+confusedWith: [training-vs-inference]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-what-is-model
+estimatedMinutes: 5
+---
+
+<OneLine>A model is the trained "brain" of an AI system — a file full of learned numbers that turns inputs into predictions.</OneLine>
+
+## Explain like I'm new to AI
+
+When people say "the AI model," they mean the **result of training**: a package of everything the system learned, saved so it can be reused.
+
+Concretely, a model is mostly a big collection of numbers (**parameters** or **weights**) plus the structure that says how to use them. Give the model an input, and it runs a calculation using those numbers to produce an output.
+
+## Mental model
+
+Think of a model as a **recipe that has been perfected**. Training is all the tasting and tweaking. The final, written-down recipe — the exact quantities — is the model. Anyone with the recipe can reproduce the dish (prediction) without redoing all the experimentation.
+
+## How it works
+
+1. You pick an **architecture** (the shape of the network — the empty recipe).
+2. **Training** fills in the parameters by learning from data.
+3. The finished set of parameters is saved as a **model file** (a "checkpoint").
+4. To use it, you **load the model** and feed it new inputs — it computes predictions (this is **inference**).
+
+## Real-world example
+
+An image model is a file of learned weights. A photo app loads that file once, then uses it to tag every new photo you take — "beach," "dog," "sunset" — without ever retraining.
+
+## Technical explanation
+
+A model = **architecture + learned parameters**. Its **size** is often described by parameter count (millions to billions+). Larger models can capture more, but cost more to run. Practical concerns include the **format/checkpoint**, **precision** (e.g. fp16, int8 via **quantization** to shrink it), and how it's **served** for inference. The same architecture can yield different models depending on the data it was trained on.
+
+## Common mistakes
+
+<CommonMistake>
+Confusing the <em>model</em> (the trained parameters) with the <em>architecture</em> (the empty
+structure) or the <em>training process</em>. The model is the finished, reusable artifact.
+</CommonMistake>
+
+- Assuming a bigger model is always better — bigger costs more and isn't always more accurate for your task.
+- Thinking a model "knows" facts like a database; it encodes patterns as numbers.
+
+## When to use it
+
+- Any time you deploy AI: you ship and run a trained model to make predictions.
+
+## When NOT to use it
+
+- N/A as a concept — but you may choose a *smaller* model when cost, speed, or privacy matter.
+
+## Alternatives
+
+- Different model sizes/families for the same task (e.g. a small model for speed vs a large one for quality).
+
+<MemoryCard>
+A **model** is the trained artifact — an architecture plus learned **parameters** — that turns new
+inputs into predictions. Training creates it; inference uses it.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-model" />

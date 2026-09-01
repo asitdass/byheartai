@@ -1,0 +1,92 @@
+---
+id: what-is-machine-learning
+slug: what-is-machine-learning
+title: What is Machine Learning?
+category: foundations
+level: beginner
+summary: Machine learning is AI that learns patterns from data instead of being explicitly programmed with rules.
+keywords: [machine learning, ml, supervised learning, training data]
+prerequisites: [what-is-ai]
+next: [what-is-deep-learning]
+related: [what-is-deep-learning, what-is-model, training-vs-inference]
+alternatives: []
+confusedWith: [what-is-ai, what-is-deep-learning]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-what-is-machine-learning
+estimatedMinutes: 6
+---
+
+<OneLine>Machine learning is how computers learn to do a task by studying examples, instead of being told the exact rules.</OneLine>
+
+## Explain like I'm new to AI
+
+Normally, software follows rules a human wrote. **Machine learning (ML)** flips this: you give the computer lots of **examples**, and it figures out the rules by itself.
+
+Want to detect cats in photos? Instead of describing "a cat has pointy ears, whiskers...", you show the system thousands of labeled cat and non-cat photos, and it *learns* what makes a cat a cat.
+
+## Mental model
+
+Think of ML as **learning by example, like a child**. Show a toddler enough dogs and cats, and eventually they generalize — they can identify a breed they've never seen. ML does the same: it generalizes from examples to handle new, unseen cases.
+
+## How it works
+
+1. **Collect data** — many examples (often with labels, like "spam" / "not spam").
+2. **Choose a model** — a flexible math function with adjustable knobs (**parameters**).
+3. **Train** — the model makes predictions, measures how wrong it is (the **loss**), and adjusts its parameters to do better. Repeat many times.
+4. **Evaluate** — test it on data it hasn't seen to check it actually generalized.
+5. **Predict (inference)** — use the trained model on new, real inputs.
+
+## Real-world example
+
+A bank predicts whether a loan will be repaid. It trains an ML model on years of past loans (each labeled "repaid" or "defaulted"). The model learns which patterns of income, history, and amount predict repayment, then scores new applicants.
+
+## Technical explanation
+
+ML comes in three broad flavors:
+
+- **Supervised learning** — learn from labeled examples (input → correct output). Most common.
+- **Unsupervised learning** — find structure in unlabeled data (e.g. clustering).
+- **Reinforcement learning** — learn by trial and error via rewards.
+
+Training minimizes a **loss function** using **optimization** (typically gradient descent), adjusting parameters until predictions match the data well without **overfitting** (memorizing) the training set.
+
+## Common mistakes
+
+<CommonMistake>
+Believing more data always beats a better approach. Garbage or biased data produces a garbage
+model — data <em>quality</em> and representativeness matter as much as quantity.
+</CommonMistake>
+
+- Confusing memorizing the training data (**overfitting**) with truly learning.
+- Skipping evaluation on unseen data, then being surprised it fails in production.
+
+## When to use it
+
+- The task has patterns in data but no clean rulebook (vision, language, recommendations, forecasting).
+- You have (or can get) enough representative examples.
+
+## When NOT to use it
+
+- A simple deterministic rule already solves the problem.
+- You have too little data, or you need fully explainable, guaranteed outputs.
+
+## Alternatives
+
+- Rule-based systems and classic algorithms for well-specified problems.
+
+<MemoryCard>
+**Machine learning** learns patterns from **data** by adjusting a model's parameters to reduce
+error — instead of a human writing the rules. It's the engine behind modern AI.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-machine-learning" />

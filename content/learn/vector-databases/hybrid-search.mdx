@@ -1,0 +1,94 @@
+---
+id: hybrid-search
+slug: hybrid-search
+title: What is Hybrid Search?
+category: vector-databases
+level: intermediate
+summary: Hybrid search combines dense (semantic) and sparse (keyword) retrieval and fuses their rankings, getting meaning-based recall plus exact-term precision.
+keywords: [hybrid search, dense, sparse, bm25, reciprocal rank fusion, rrf, retrieval]
+prerequisites: [vector-search, dense-vs-sparse-embeddings]
+next: [what-is-rag]
+related: [dense-vs-sparse-embeddings, metadata-filtering, vector-search]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-hybrid-search
+estimatedMinutes: 7
+---
+
+<OneLine>Hybrid search runs both semantic (dense) and keyword (sparse) retrieval and fuses their results — so you get meaning-based recall and exact-term precision at the same time.</OneLine>
+
+## Explain like I'm new to AI
+
+Dense vector search understands **meaning** (great for synonyms and paraphrases) but can miss **exact terms** like product codes and names. Keyword search nails **exact terms** but misses meaning. Why choose?
+
+**Hybrid search** runs **both** and merges their rankings. Documents that score well in *either* — especially in *both* — rise to the top:
+
+<HybridSearchFusion />
+
+## Mental model
+
+Two expert scouts rank candidates: one judges by **meaning**, the other by **exact words**. Hybrid search is the manager who **combines both scorecards** into a final ranking — catching what either scout alone would miss.
+
+## How it works
+
+1. Run **dense** (embedding) search → one ranked list.
+2. Run **sparse** (keyword, e.g. **BM25**) search → another ranked list.
+3. **Fuse** the two into a single ranking. A popular, simple method is **Reciprocal Rank Fusion (RRF)**:
+
+```text
+score(doc) = Σ  1 / (k + rank_in_list)     # k ≈ 60, sum over each list the doc appears in
+```
+
+Because RRF uses **ranks** (not raw scores), it sidesteps the problem that dense and sparse scores aren't on the same scale.
+
+## Real-world example
+
+Query: **"login bug on iPhone 15"**.
+
+- **Dense** finds "Resolving sign-in failures on iOS" (different words, right meaning).
+- **Sparse** guarantees the doc literally mentioning "iPhone 15" isn't missed.
+- **Hybrid** returns both, ranked sensibly — the safest default for real-world RAG.
+
+## Technical explanation
+
+Fusion approaches include **RRF** (rank-based, robust, no tuning) and **weighted score fusion** (needs score normalization and a tunable dense/sparse weight — `alpha`). Hybrid search pairs naturally with two neighbors: **metadata filtering** (scope results to valid items) and a **reranker/cross-encoder** as a final precision pass over the fused shortlist. Modern vector databases increasingly offer hybrid search **built in**. Always evaluate on your own data — the ideal dense/sparse balance depends on how keyword-heavy your content and queries are.
+
+## Common mistakes
+
+<CommonMistake>
+Directly adding raw dense and sparse scores. They live on different scales, so naive addition is
+meaningless — use rank-based fusion (RRF) or properly normalize before weighting.
+</CommonMistake>
+
+- Assuming dense-only search is always best — it frequently misses exact identifiers.
+- Skipping evaluation; the right fusion weight is data-dependent.
+
+## When to use it
+
+- Most production RAG and search, especially content rich in names, codes, or jargon.
+
+## When NOT to use it
+
+- Purely conversational corpora with no exact-term needs, where dense alone may suffice.
+
+## Alternatives
+
+- Pure dense or pure sparse when the content strongly favors one — but hybrid is the robust default.
+
+<MemoryCard>
+**Hybrid search** = dense (meaning) + sparse (keywords), fused into one ranking (often **RRF**:
+score = Σ 1/(k+rank)). It gets semantic recall *and* exact-term precision — the safe default for RAG.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-hybrid-search" />

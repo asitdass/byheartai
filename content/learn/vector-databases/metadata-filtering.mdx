@@ -1,0 +1,87 @@
+---
+id: metadata-filtering
+slug: metadata-filtering
+title: What is Metadata Filtering?
+category: vector-databases
+level: intermediate
+summary: Metadata filtering restricts vector search to items matching structured rules (tags, dates, permissions), so results are both semantically relevant and valid.
+keywords: [metadata filtering, filters, pre-filter, post-filter, permissions, vector search]
+prerequisites: [vector-search]
+next: [hybrid-search]
+related: [vector-search, hybrid-search]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-metadata-filtering
+estimatedMinutes: 6
+---
+
+<OneLine>Metadata filtering combines structured rules (like tags, dates, or permissions) with vector similarity, so search returns results that are both semantically relevant and actually allowed.</OneLine>
+
+## Explain like I'm new to AI
+
+Pure similarity isn't always enough. You often need results that also satisfy **hard rules**: only *this* user's documents, only articles from *2026*, only *published* content, only the *English* version.
+
+**Metadata filtering** stores structured fields alongside each vector and lets you restrict search to items that match. Toggle filters and watch the candidate pool shrink before the nearest match is chosen:
+
+<MetadataFiltering />
+
+## Mental model
+
+Vector similarity is "**find things that mean this**." Metadata filtering adds "**…but only the ones that qualify**." Meaning + rules = the right results.
+
+## How it works
+
+Each vector is stored with **metadata** (e.g. `type: docs`, `lang: en`, `date`, `ownerId`). A filtered query says "find the nearest vectors **where** these conditions hold." There are two strategies:
+
+- **Pre-filtering:** apply the rules **first**, then run similarity over the survivors. Accurate, but can be slow if filters are complex.
+- **Post-filtering:** run similarity first, then drop non-matching results. Fast, but may return **too few** items if matches are rare.
+
+Modern vector databases optimize this with **filter-aware indexes** that blend the two.
+
+## Real-world example
+
+A multi-tenant SaaS **must** only return each customer's own data. Metadata filtering on `tenantId` makes similarity search return semantically relevant results **scoped to that tenant** — a correctness and **security** requirement, not just a nicety. Same pattern enforces permissions, recency, and language.
+
+## Technical explanation
+
+The classic pitfall is **post-filtering starvation**: if you retrieve top-50 by similarity and *then* filter, a rare attribute may leave you with 2 results. **Pre-filtering** avoids this but is harder to make fast with ANN indexes, since the graph/clusters weren't built around your filter. Engines address it with **filtered ANN** (filter during traversal) and by indexing common metadata fields. Best practices: index the fields you filter on, keep metadata **in sync** with vectors, and decide pre- vs. post-filtering based on how **selective** your filters are.
+
+## Common mistakes
+
+<CommonMistake>
+Relying on post-filtering for highly selective rules. If only 0.1% of items match, filtering <em>after</em>
+a top-k similarity search can return almost nothing. Pre-filter (or use filtered ANN) instead.
+</CommonMistake>
+
+- Treating permission filters as optional — for multi-tenant apps they're a security boundary.
+- Letting metadata drift out of sync with the vectors it describes.
+
+## When to use it
+
+- Multi-tenant apps, permissions, recency/language/type constraints — almost every production RAG system.
+
+## When NOT to use it
+
+- Single, uniform corpora with no access rules or attributes to constrain on.
+
+## Alternatives
+
+- None really — for structured constraints you need metadata; combine with **hybrid search** for exact terms.
+
+<MemoryCard>
+**Metadata filtering** limits vector search to items matching structured rules (tags, dates,
+permissions). Choose **pre-filter** for selective rules, **post-filter** for loose ones; it's often a **security** requirement.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-metadata-filtering" />

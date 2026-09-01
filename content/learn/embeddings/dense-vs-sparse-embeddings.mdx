@@ -1,0 +1,94 @@
+---
+id: dense-vs-sparse-embeddings
+slug: dense-vs-sparse-embeddings
+title: Dense vs Sparse Embeddings
+category: embeddings
+level: intermediate
+summary: Dense embeddings capture meaning in a few hundred numbers; sparse vectors capture exact keywords across a huge vocabulary. Hybrid search combines both.
+keywords: [dense embeddings, sparse embeddings, hybrid search, bm25, splade, keyword]
+prerequisites: [what-are-embeddings]
+next: [matryoshka-embeddings]
+related: [embedding-models, vector-search]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-dense-vs-sparse
+estimatedMinutes: 7
+---
+
+<OneLine>Dense embeddings pack meaning into a few hundred numbers; sparse vectors have one slot per vocabulary word and capture exact terms — and the best systems combine both.</OneLine>
+
+## Explain like I'm new to AI
+
+There are two very different ways to turn text into numbers:
+
+- **Dense embeddings** — a short list (say 768 numbers) where **every value matters** and the whole thing captures *meaning*. Great for synonyms and paraphrases.
+- **Sparse vectors** — a very long list (one slot per word in a big vocabulary) that is **mostly zeros**, with nonzero values marking which exact words appear. Great for precise keyword matches.
+
+<DenseVsSparse />
+
+## Mental model
+
+- **Dense = understanding the gist.** It knows "car" and "automobile" mean the same thing.
+- **Sparse = matching the exact words.** It knows you literally typed "error code E-4021".
+
+You often want *both*: the gist **and** the exact terms.
+
+## How it works
+
+- A **dense** embedding comes from a neural model; similarity is by cosine/dot product in a low-dimensional space.
+- A **sparse** representation comes from term-based methods (classic **BM25**, or learned sparse models like **SPLADE**); similarity is dominated by shared, important terms.
+- **Hybrid search** runs both and **fuses** the scores (e.g. with Reciprocal Rank Fusion) to get the best of each.
+
+## Real-world example
+
+Search "how to fix login bug on iPhone 15":
+
+- **Dense** finds an article titled "Resolving sign-in failures on iOS devices" (different words, same meaning).
+- **Sparse** guarantees a doc that literally mentions "iPhone 15" isn't missed.
+- **Hybrid** returns both — semantic recall *plus* exact-term precision. This is why hybrid search is a common default in modern RAG.
+
+## Technical explanation
+
+Dense vectors are **low-dimensional and continuous**; sparse vectors are **high-dimensional and mostly zero** (stored efficiently as term→weight maps). Dense excels at **recall** for meaning but can miss rare exact tokens (names, IDs, codes); sparse excels at **precision** on exact terms but misses synonyms. Learned sparse models (SPLADE) add term **expansion** so sparse can capture some semantics too. Production retrieval increasingly uses **hybrid** + a **reranker** to reorder the merged candidates for maximum relevance.
+
+## Common mistakes
+
+<CommonMistake>
+Assuming dense embeddings make keyword search obsolete. Dense models frequently miss exact identifiers,
+product codes, and rare names — exactly where sparse/keyword matching shines.
+</CommonMistake>
+
+- Using dense-only search for content full of codes, SKUs, or names.
+- Comparing dense and sparse scores directly without a proper fusion method.
+
+## When to use it
+
+- **Dense:** meaning-based search, paraphrase matching, multilingual.
+- **Sparse:** exact terms, identifiers, compliance/keyword requirements.
+- **Hybrid:** most real-world RAG — combine both for the best relevance.
+
+## When NOT to use it
+
+- Tiny, exact-lookup datasets where plain keyword search alone is sufficient.
+
+## Alternatives
+
+- Pure lexical (BM25) or pure dense, when the content strongly favors one — but hybrid is the safe default.
+
+<MemoryCard>
+**Dense** = short, meaningful vectors (great for synonyms). **Sparse** = long, mostly-zero, keyword-exact
+(great for names/codes). **Hybrid search** fuses both for the best relevance.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-dense-vs-sparse" />

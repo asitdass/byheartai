@@ -1,0 +1,88 @@
+---
+id: vector-search
+slug: vector-search
+title: What is Vector Search?
+category: vector-databases
+level: intermediate
+summary: Vector search finds the stored items whose embeddings are closest to a query embedding — the nearest-neighbor operation behind semantic search.
+keywords: [vector search, similarity search, nearest neighbor, top-k, semantic search]
+prerequisites: [what-is-vector-database]
+next: [ann-vs-exact]
+related: [what-is-vector-database, similarity-metrics, ann-vs-exact]
+alternatives: []
+confusedWith: [what-is-vector-database]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+dateUpdated: 2026-09-01
+lastReviewed: 2026-09-01
+version: 2
+quizId: quiz-vector-search
+estimatedMinutes: 6
+---
+
+<OneLine>Vector search finds the stored items whose meaning is closest to your query's meaning — its nearest neighbors in the embedding space.</OneLine>
+
+## Explain like I'm new to AI
+
+Once everything is an **embedding** (a point on the "meaning map"), searching becomes a geometry problem: **which stored points are closest to my query's point?**
+
+That's vector search. You embed the query, then find its **nearest neighbors** among all the stored vectors. Move the query below and watch the nearest results change:
+
+<NearestNeighborSearch />
+
+## Mental model
+
+Drop your question as a pin on the meaning map. Vector search hands you the nearest pins — the most semantically similar items — ranked by closeness.
+
+## How it works
+
+1. Every item is stored as a **vector**.
+2. The query is **embedded** into a vector.
+3. The system computes **similarity** (e.g. cosine) between the query and stored vectors.
+4. It returns the **top-k** closest matches.
+
+Because comparing against millions of vectors exactly is slow, real systems use an **approximate nearest neighbor (ANN)** index like **HNSW** to stay fast.
+
+## Real-world example
+
+A documentation site embeds every paragraph. When you search "my app keeps crashing on startup," vector search returns paragraphs about "application fails to launch" — closest in meaning, even with entirely different wording.
+
+## Technical explanation
+
+Exact nearest-neighbor search is **O(n)** per query — you compare against every stored vector. ANN indexes trade a tiny bit of accuracy (**recall**) for massive speed, enabling low-latency search over huge collections. Key parameters: **k** (how many results), the **similarity metric** (must match how the embeddings were trained), and index settings that balance **recall vs. latency**. Vector search is the retrieval engine behind **RAG**, recommendations, and deduplication.
+
+## Common mistakes
+
+<CommonMistake>
+Ignoring <em>recall</em>. Approximate search can miss relevant results if the index is tuned purely for
+speed. Measure retrieval quality against a known set — don't assume it.
+</CommonMistake>
+
+- Using a different similarity metric than the embedding model expects.
+- Requesting too small a **k** for RAG, starving the model of useful context.
+
+## When to use it
+
+- Semantic search and the retrieval step of a RAG system; recommendations and near-duplicate detection.
+
+## When NOT to use it
+
+- When exact keyword matching is required and sufficient — use full-text search, or combine both as **hybrid search**.
+
+## Alternatives
+
+- Keyword/full-text search (lexical); hybrid search fuses lexical and vector results.
+
+<MemoryCard>
+**Vector search** returns the **nearest** stored vectors to your query vector (top-k by similarity).
+At scale it uses **ANN** indexes for speed, trading a little **recall**. It's the retrieval engine for RAG.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-vector-search" />

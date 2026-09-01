@@ -1,0 +1,87 @@
+---
+id: what-is-deep-learning
+slug: what-is-deep-learning
+title: What is Deep Learning?
+category: foundations
+level: beginner
+summary: Deep learning is machine learning using many-layered neural networks that learn features automatically.
+keywords: [deep learning, neural networks, layers, representation learning]
+prerequisites: [what-is-machine-learning]
+next: [what-is-neural-network]
+related: [what-is-neural-network, what-is-machine-learning]
+alternatives: []
+confusedWith: [what-is-machine-learning]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-what-is-deep-learning
+estimatedMinutes: 6
+---
+
+<OneLine>Deep learning is machine learning with many-layered neural networks that discover useful features on their own.</OneLine>
+
+## Explain like I'm new to AI
+
+**Deep learning** is a powerful *kind* of machine learning. The "deep" refers to using **neural networks with many layers** stacked on top of each other.
+
+Its superpower: it figures out the important **features** by itself. In older ML, humans had to hand-craft what to look for (edges, shapes, keywords). Deep learning learns those features automatically, straight from raw data like pixels or text.
+
+## Mental model
+
+Picture an **assembly line of understanding**. Early layers spot tiny details (edges, curves). Middle layers combine them into parts (an eye, a wheel). Later layers assemble parts into whole concepts (a face, a car). Each layer builds on the one before.
+
+## How it works
+
+1. Raw data (pixels, audio, text tokens) enters the first layer.
+2. Each layer transforms the input into a slightly more abstract representation.
+3. Stacking many layers lets the network learn very complex patterns.
+4. Training uses **backpropagation** + **gradient descent** to adjust millions or billions of parameters across all layers.
+
+More layers + more data + more compute is what unlocked today's breakthroughs.
+
+## Real-world example
+
+Voice assistants convert your speech to text with deep learning. Early layers detect raw sound patterns; deeper layers assemble them into phonemes, then words, then sentences — no human hand-coded "what a word sounds like."
+
+## Technical explanation
+
+Deep learning uses **artificial neural networks** with multiple hidden layers to perform **representation learning** — automatically transforming raw inputs into increasingly abstract, task-useful representations. Architectures are specialized: **CNNs** for images, **RNNs/LSTMs** historically for sequences, and **transformers** for language and beyond. It thrives on large datasets and hardware accelerators (GPUs/TPUs).
+
+## Common mistakes
+
+<CommonMistake>
+Reaching for deep learning by default. For small, tabular datasets, simpler models (like gradient
+boosting) are often faster, cheaper, and just as accurate.
+</CommonMistake>
+
+- Assuming "deeper is always better" — more layers need more data and compute, and can overfit.
+- Forgetting deep learning is still machine learning: it needs good data and evaluation.
+
+## When to use it
+
+- Rich, high-dimensional data: images, audio, video, and language.
+- Large datasets where learning features automatically pays off.
+
+## When NOT to use it
+
+- Small or simple tabular datasets (classic ML often wins).
+- Tight compute/latency budgets where a lighter model suffices.
+
+## Alternatives
+
+- Classical ML (decision trees, gradient boosting, linear models) for structured/tabular data.
+
+<MemoryCard>
+**Deep learning** = machine learning with **many-layered neural networks** that learn features
+automatically from raw data. Depth + data + compute is what powers modern AI.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-deep-learning" />

@@ -1,0 +1,86 @@
+---
+id: query-transformation
+slug: query-transformation
+title: What is Query Transformation?
+category: rag
+level: intermediate
+summary: Query transformation rewrites, expands, or reframes the user's question before retrieval so the search finds better chunks.
+keywords: [query transformation, query rewriting, query expansion, multi-query, hyde, retrieval]
+prerequisites: [rag-architecture]
+next: [reranking]
+related: [rag-architecture, hybrid-search]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-query-transformation
+estimatedMinutes: 7
+---
+
+<OneLine>Query transformation improves what you search with — cleaning up, expanding, or reframing the user's question before retrieval so the right chunks actually come back.</OneLine>
+
+## Explain like I'm new to AI
+
+RAG retrieves based on the user's question — but real questions are often **vague, messy, or worded differently** from your documents. "It broke after the update, help" won't match a doc titled "Resolving crashes following version upgrades."
+
+**Query transformation** fixes the query *before* searching, so retrieval has a fair chance:
+
+<QueryTransformation />
+
+## Mental model
+
+Before sending a rookie to the library, a good mentor first helps them **ask a better question**. "I need help" becomes "Where are the 2026 tax filing deadlines for freelancers?" A sharper question finds sharper results — that's query transformation.
+
+## How it works — the main techniques
+
+- **Rewriting:** turn a vague or conversational query into a clear, standalone one (also resolves "it"/"that" using chat history).
+- **Expansion:** add synonyms or related terms so more relevant chunks match.
+- **Multi-query:** generate several phrasings, retrieve for each, then merge the results — better **recall**.
+- **HyDE (Hypothetical Document Embeddings):** ask the model to draft a *hypothetical answer*, then embed **that** to search — draft answers often resemble the target documents more than the question does.
+- **Decomposition:** break a complex, multi-part question into sub-questions and retrieve for each.
+
+## Real-world example
+
+A user asks a chatbot: "and what about the annual one?" Alone, this retrieves nothing useful. **Rewriting** with chat history turns it into "What is the price of the annual subscription plan?" — which retrieves the correct pricing chunk. In a research tool, **decomposition** splits "Compare the refund policies of Plan A and Plan B" into two retrievals, one per plan.
+
+## Technical explanation
+
+These techniques cost an **extra LLM call (latency + tokens)** before retrieval, so use them where they pay off. **Multi-query** and **decomposition** boost recall for broad or multi-part questions but require **de-duplicating** merged results (and pair naturally with **reranking**). **HyDE** shines when queries are short and documents are verbose. **Rewriting** is almost always worth it in **multi-turn chat**, where the latest message is meaningless without context. As always, measure: transformations can occasionally *hurt* if they drift from user intent.
+
+## Common mistakes
+
+<CommonMistake>
+Retrieving directly on raw follow-up messages in a chat. "What about the annual one?" has no meaning
+alone — always rewrite follow-ups into standalone queries using the conversation history.
+</CommonMistake>
+
+- Adding multi-query everywhere, multiplying latency and cost for little gain.
+- Forgetting to de-duplicate chunks when merging results from several queries.
+
+## When to use it
+
+- Multi-turn chat (rewriting), broad or multi-part questions (multi-query/decomposition), short queries over verbose docs (HyDE).
+
+## When NOT to use it
+
+- Already-precise queries where the extra LLM call adds latency without improving retrieval.
+
+## Alternatives
+
+- Better chunking, hybrid search, and reranking also improve retrieval — often used together.
+
+<MemoryCard>
+**Query transformation** fixes the query before retrieval: **rewrite** (clarify), **expand** (synonyms),
+**multi-query** (variations), **HyDE** (search with a draft answer), **decompose** (sub-questions).
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-query-transformation" />

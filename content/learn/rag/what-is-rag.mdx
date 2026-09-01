@@ -1,0 +1,163 @@
+---
+id: what-is-rag
+slug: what-is-rag
+title: What is RAG?
+category: rag
+level: beginner
+summary: RAG retrieves relevant external information and gives it to a language model as context before it answers.
+keywords: [rag, retrieval augmented generation, retrieval-augmented generation, grounding]
+prerequisites: [what-is-llm, what-are-embeddings, vector-search]
+next: [rag-architecture]
+related: [rag-architecture, rag-vs-fine-tuning, hybrid-search]
+alternatives: [what-is-fine-tuning]
+confusedWith: [what-is-fine-tuning]
+frameworks: [langchain, llamaindex]
+products: []
+papers:
+  - title: "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (Lewis et al., 2020)"
+    url: "https://arxiv.org/abs/2005.11401"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-what-is-rag
+estimatedMinutes: 8
+---
+
+<OneLine>RAG lets a model answer using information it was never trained on — by looking it up first.</OneLine>
+
+## Explain like I'm new to AI
+
+Imagine you ask a very smart friend a question about *your* company's internal handbook. Your friend is brilliant, but they've never read your handbook, so they might guess — and guess wrong.
+
+Now imagine that just before answering, your friend quickly flips to the exact pages of the handbook that matter, reads them, and *then* answers using those pages.
+
+That's **RAG** — **Retrieval-Augmented Generation**. The "friend" is a language model. The "flipping to the right pages" is **retrieval**. The model still writes the answer, but now it's grounded in real information you handed it.
+
+<RagPipeline />
+
+## Mental model
+
+Picture the model as an **open-book exam taker** instead of a closed-book one.
+
+- **Closed book** (plain prompting): the model answers only from what it memorized during training.
+- **Open book** (RAG): you slip the relevant page into the exam right before the question, and the model reads it before answering.
+
+RAG does **not** change what the model knows permanently. It changes what the model can *see* at the moment it answers.
+
+## How it works
+
+A typical RAG system has two phases.
+
+**1. Ingestion (done ahead of time):**
+
+1. Take your documents (PDFs, web pages, notes).
+2. **Chunk** them into smaller passages.
+3. Convert each chunk into an **embedding** (a vector that captures meaning).
+4. Store those vectors in a database you can search.
+
+**2. Answering (done per question):**
+
+1. Turn the user's question into an embedding.
+2. **Retrieve** the most similar chunks from the database.
+3. Optionally **rerank** them so the best ones come first.
+4. Put those chunks into the model's prompt as context.
+5. The model **generates** an answer grounded in that context.
+
+## Real-world example
+
+You build a support assistant for a product. A user asks:
+
+> "How do I reset my password?"
+
+Without RAG, the model might invent steps that don't match your product. With RAG, the system retrieves your actual help article on password resets, hands it to the model, and the model replies with the *correct*, product-specific steps — and can even cite the article.
+
+## Technical explanation
+
+RAG augments a language model's context window with retrieved evidence rather than modifying model weights. Retrieval is usually **semantic**: both the query and the stored chunks are represented as vectors, and similarity (often cosine similarity) selects the top-k most relevant chunks.
+
+The retrieved chunks are concatenated into the prompt (the "context"), and the model conditions its generation on them. Because the knowledge lives *outside* the model, you can update it instantly by changing the underlying documents — no retraining required.
+
+## Code
+
+A minimal sketch of the answering phase:
+
+```python title="rag.py"
+# 1. Embed the user's question
+query_vector = embed(question)
+
+# 2. Retrieve the most similar chunks
+chunks = vector_db.search(query_vector, top_k=4)
+
+# 3. Build the prompt with retrieved context
+context = "\n\n".join(c.text for c in chunks)
+prompt = f"""Answer using ONLY the context below.
+
+Context:
+{context}
+
+Question: {question}
+"""
+
+# 4. Generate a grounded answer
+answer = llm.generate(prompt)
+```
+
+<Note>
+The model is told to answer <em>only</em> from the provided context. This is what turns a
+general chatbot into a grounded, source-backed assistant.
+</Note>
+
+## Common mistakes
+
+<CommonMistake>
+Thinking RAG "trains" or "fine-tunes" the model. It does neither — it only supplies information
+at answer time. If you need the model to learn a new <em>skill or style</em>, that's fine-tuning,
+not RAG.
+</CommonMistake>
+
+- **Retrieving too much** and burying the useful chunk in noise.
+- **Chunks that are too big or too small**, hurting retrieval quality.
+- **Not evaluating retrieval** — if the wrong chunks come back, even a great model gives wrong answers.
+
+## When to use it
+
+- Your knowledge **changes often** (docs, policies, catalogs).
+- You need answers grounded in **specific, private, or up-to-date** sources.
+- You want **citations** so users can verify answers.
+
+## When NOT to use it
+
+- The knowledge is **already** in the model and rarely changes.
+- You need a new **behavior or style** rather than new facts (use fine-tuning).
+- The whole knowledge base is tiny and fits comfortably in the context window already.
+
+## Alternatives
+
+- **Fine-tuning** — bake knowledge/behavior into the model's weights.
+- **Long context** — just paste everything into a very large context window.
+
+## Comparison
+
+<Compare
+  a="RAG"
+  b="Fine-tuning"
+  rows={[
+    { label: "Changes the model?", a: "No — supplies context at answer time", b: "Yes — updates weights" },
+    { label: "Update knowledge", a: "Instant (edit documents)", b: "Requires retraining" },
+    { label: "Best for", a: "Changing facts, private data, citations", b: "New skills, style, format" },
+    { label: "Cost to update", a: "Low", b: "Higher" },
+  ]}
+/>
+
+<MemoryCard>
+RAG does not retrain the model. It **retrieves** relevant external information and gives that
+information to the model as **context** before generating the answer.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-rag" />

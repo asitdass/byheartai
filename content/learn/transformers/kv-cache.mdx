@@ -1,0 +1,95 @@
+---
+id: kv-cache
+slug: kv-cache
+title: What is a KV Cache?
+category: transformers
+level: advanced
+summary: The KV cache stores past tokens' keys and values during text generation so each new token is produced without recomputing the whole sequence.
+keywords: [kv cache, key value cache, inference, generation, attention, latency]
+prerequisites: [self-attention, training-vs-inference]
+next: [what-is-llm]
+related: [self-attention, multi-head-attention]
+alternatives: []
+confusedWith: [context-window]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-kv-cache
+estimatedMinutes: 8
+---
+
+<OneLine>A KV cache stores the keys and values of past tokens so that, while generating text, the model only computes the newest token instead of redoing all the previous work.</OneLine>
+
+## Explain like I'm new to AI
+
+LLMs generate text **one token at a time**, and each new token needs to attend back over **all** the tokens before it. Done naively, that means re-processing the entire sentence every single step — hugely wasteful and slow.
+
+The **KV cache** is the fix. During attention, every past token produces a **key** and a **value**. Since those don't change once computed, we **store (cache) them** and reuse them for every future token. Only the brand-new token has to be computed.
+
+Step through it — watch the savings grow:
+
+<KVCacheVisualizer />
+
+## Mental model
+
+Imagine writing a long story and, before adding each new sentence, re-reading the *entire* story from the start. Exhausting. Instead, you keep a **running set of notes** (the cache) about everything so far, so you only think about the next sentence. That's the KV cache.
+
+## How it works
+
+1. As the prompt is processed, each token's **key (K)** and **value (V)** vectors are computed and **saved** in the cache.
+2. To generate the next token, the model computes a **query** for just that one new token.
+3. It attends over the **cached** K and V (all past tokens) — no recomputation.
+4. The new token's own K and V are **appended** to the cache, ready for the following step.
+
+Without the cache, generating *n* tokens costs work proportional to **1 + 2 + … + n** (≈ n²). With the cache, it's proportional to **n**. That's the difference between a chatbot that feels instant and one that crawls.
+
+## Real-world example
+
+When a chatbot streams a long answer smoothly, the KV cache is why each word appears quickly and at a steady pace — the model isn't re-reading its whole reply for every new word.
+
+## Technical explanation
+
+The KV cache trades **memory for speed**: its size grows with `batch × layers × heads × head_dim × sequence_length`, so long conversations can consume large amounts of GPU memory. This is a major reason large **context windows** are costly to serve. Mitigations include:
+
+- **GQA / MQA:** share keys/values across heads to shrink the cache.
+- **PagedAttention (vLLM):** manage cache memory in pages to reduce waste and enable more concurrent users.
+- **Quantized / windowed caches:** store the cache in lower precision or keep only recent tokens.
+
+Note the cache only helps **inference/generation** — it isn't used the same way during training, where the full sequence is processed at once.
+
+## Common mistakes
+
+<CommonMistake>
+Confusing the KV cache with the context window. The <em>context window</em> is how many tokens the model
+can consider; the <em>KV cache</em> is the stored keys/values that make generating within that window fast.
+</CommonMistake>
+
+- Assuming the cache is free — it consumes significant memory that scales with sequence length.
+- Thinking it speeds up training — it's an inference-time optimization.
+
+## When to use it
+
+- Always, for autoregressive text generation — it's standard in every serving stack.
+
+## When NOT to use it
+
+- Non-generative passes (e.g. computing a single embedding), where there's nothing to cache across steps.
+
+## Alternatives
+
+- The optimization itself is near-universal; the alternatives (GQA, MQA, paged/quantized caches) make it *cheaper*, not optional.
+
+<MemoryCard>
+The **KV cache** stores past tokens' **keys and values** so generation costs ~O(n) instead of ~O(n²).
+It speeds up **inference** at the cost of **memory**, which grows with sequence length.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-kv-cache" />

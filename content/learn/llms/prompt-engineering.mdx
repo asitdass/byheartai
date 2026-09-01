@@ -1,0 +1,101 @@
+---
+id: prompt-engineering
+slug: prompt-engineering
+title: What is Prompt Engineering?
+category: llms
+level: beginner
+summary: Prompt engineering is the craft of writing clear instructions, context, and examples so an LLM reliably produces the output you want.
+keywords: [prompt engineering, prompting, few-shot, chain of thought, system prompt, instructions]
+prerequisites: [what-is-llm]
+next: [what-are-embeddings]
+related: [temperature-sampling, structured-output, context-window]
+alternatives: []
+confusedWith: [context-engineering]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-prompt-engineering
+estimatedMinutes: 9
+---
+
+<OneLine>Prompt engineering is the skill of writing clear instructions, context, and examples so an LLM reliably gives you the result you actually want.</OneLine>
+
+## Explain like I'm new to AI
+
+An LLM will try to do whatever you ask — but it can only work with **what you give it**. Vague prompts get vague answers. **Prompt engineering** is learning to ask well: being specific, giving context, showing examples, and stating the format you want.
+
+It's less "magic words" and more **clear communication**. The same model can feel mediocre or brilliant depending on the prompt.
+
+## Mental model
+
+Think of the model as a **brilliant new intern** with no context about your world. They're capable and fast, but they can't read your mind. The more clearly you brief them — goal, background, constraints, an example of "good" — the better their work.
+
+## How it works — core techniques
+
+- **Be specific:** state the goal, audience, tone, length, and format. "Summarize in 3 bullets for a beginner" beats "summarize."
+- **Give context:** paste the relevant facts, data, or documents the model needs.
+- **Assign a role:** "You are a careful copy editor…" sets helpful behavior (often via a **system prompt**).
+- **Show examples (few-shot):** include one or more input→output pairs so the model matches the pattern.
+- **Ask for step-by-step reasoning** for hard problems ("think through it step by step") to improve accuracy on multi-step tasks.
+- **Specify the output format:** request bullets, a table, or JSON (see **structured output**).
+- **Iterate:** treat the first answer as a draft; refine the prompt based on what's wrong.
+
+<Compare
+  a="Weak prompt"
+  b="Strong prompt"
+  rows={[
+    { label: "Example", a: '"Write about dogs."', b: '"Write a 100-word intro on choosing a first dog, for busy beginners, friendly tone, 3 tips."' },
+    { label: "Specificity", a: "No audience or length", b: "Clear goal, audience, format" },
+    { label: "Result", a: "Unpredictable", b: "Reliable and useful" },
+  ]}
+/>
+
+## Real-world example
+
+**Zero-shot** ("Classify this review as positive/negative") works for easy tasks. For trickier ones, **few-shot** — showing 2–3 labeled examples — dramatically improves consistency because the model copies your pattern and edge-case handling.
+
+## Technical explanation
+
+- **Zero-shot vs. few-shot:** examples in the prompt act as in-context learning without changing model weights.
+- **Chain-of-thought (CoT):** eliciting intermediate reasoning improves multi-step tasks; some modern "reasoning" models do this internally, so you prompt them more concisely.
+- **Prompt structure:** clear sections (role, task, context, constraints, output format) and **delimiters** reduce ambiguity.
+- **Prompt vs. context engineering:** prompt engineering focuses on the wording of instructions/examples; **context engineering** is the broader discipline of choosing *what information* fills the window (via retrieval, memory, tools). Prompting is one part of it.
+- **Reliability:** pair prompts with low temperature and schema-constrained output for production tasks.
+
+## Common mistakes
+
+<CommonMistake>
+Piling on vague adjectives ("make it amazing and professional") instead of concrete instructions. Specifics
+— audience, length, format, an example — beat superlatives every time.
+</CommonMistake>
+
+- Overstuffing the prompt with irrelevant text, crowding the **context window** and diluting focus.
+- Assuming one perfect prompt exists — iteration usually beats a single guess.
+- Relying on prompt tricks for hard **facts** the model doesn't have — supply the data (RAG) instead.
+
+## When to use it
+
+- Every interaction with an LLM — it's the highest-leverage, lowest-cost way to improve results.
+
+## When NOT to use it
+
+- When the real gap is **missing knowledge or tools** — then add retrieval, tools, or fine-tuning, not just better wording.
+
+## Alternatives
+
+- **RAG** (supply facts), **function calling** (supply actions), and **fine-tuning** (bake in behavior) go beyond prompting when it isn't enough.
+
+<MemoryCard>
+**Prompt engineering** = communicating clearly with an LLM: be specific, give context, show examples
+(**few-shot**), request step-by-step reasoning for hard tasks, and state the output format. Then iterate.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-prompt-engineering" />

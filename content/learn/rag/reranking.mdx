@@ -1,0 +1,85 @@
+---
+id: reranking
+slug: reranking
+title: Reranking & Cross-Encoders
+category: rag
+level: intermediate
+summary: A reranker re-scores the shortlist of retrieved chunks by reading each query-document pair closely, pushing the most relevant results to the top.
+keywords: [reranking, rerank, cross-encoder, bi-encoder, relevance, retrieval]
+prerequisites: [rag-architecture]
+next: [contextual-retrieval]
+related: [rag-architecture, hybrid-search, query-transformation]
+alternatives: []
+confusedWith: [vector-search]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-reranking
+estimatedMinutes: 7
+---
+
+<OneLine>Reranking takes the shortlist from fast retrieval and re-scores it with a slower, sharper model that reads each query-document pair — lifting the truly best chunks to the top.</OneLine>
+
+## Explain like I'm new to AI
+
+Vector search is **fast but coarse**: it compares pre-computed embeddings, so the perfect answer sometimes lands at #3 or #7 instead of #1. Feed those slightly-wrong top results to the model and answers suffer.
+
+A **reranker** fixes the order. It takes the top ~20–100 retrieved chunks and **re-scores** each one by actually reading the **query and chunk together**, then reorders. Watch it work:
+
+<RerankingVisualizer />
+
+## Mental model
+
+Retrieval is a **quick scan** of the shelf that grabs a stack of maybe-relevant books. The reranker is the **careful reader** who skims each one against your exact question and puts the best on top. Slow to do for the whole library — perfect for a small stack.
+
+## How it works — bi-encoder vs cross-encoder
+
+- **Bi-encoder (retrieval):** embeds the query and each document **separately**, then compares vectors. Fast (documents pre-embedded), but the two never "see" each other.
+- **Cross-encoder (reranking):** feeds the query **and** a document **together** into the model, which outputs a precise relevance score. Much more accurate, but too slow to run over millions of docs.
+
+The winning pattern combines them: **retrieve** a shortlist with the fast bi-encoder, then **rerank** that shortlist with the accurate cross-encoder.
+
+## Real-world example
+
+A support bot retrieves the top 25 chunks by vector similarity, then a reranker re-scores them and keeps the top 4 for the prompt. The correct "password reset" article, originally ranked #3, jumps to #1 — so the model answers from the right source. This two-stage retrieve-then-rerank flow is standard in strong RAG systems.
+
+## Technical explanation
+
+Rerankers are cross-encoders (or increasingly **LLM-based rerankers**) that produce a relevance score per (query, chunk) pair. Because cost scales with the shortlist size, you **retrieve wide** (high recall) then **rerank narrow** (high precision) — getting the best of both. Trade-offs: extra **latency** and **cost** per query, so tune the shortlist size. Rerankers also help fuse **hybrid** results into one high-quality ordering and reduce the number of chunks you must stuff into the context window (cheaper, less "lost in the middle").
+
+## Common mistakes
+
+<CommonMistake>
+Skipping reranking and just sending the top-k vector hits to the model. Vector similarity alone often
+mis-ranks the best chunk — a reranker is one of the highest-ROI additions to a RAG pipeline.
+</CommonMistake>
+
+- Reranking too many chunks (latency blows up) or too few (the best chunk never made the shortlist).
+- Confusing retrieval (bi-encoder, fast) with reranking (cross-encoder, accurate).
+
+## When to use it
+
+- Almost every production RAG system — especially when precision of the top few chunks matters.
+
+## When NOT to use it
+
+- Ultra-low-latency paths where the extra step isn't affordable, or when retrieval is already near-perfect.
+
+## Alternatives
+
+- Better embeddings and hybrid search improve first-stage retrieval, but rarely match a reranker's top-end precision.
+
+<MemoryCard>
+**Reranking** re-scores the retrieved shortlist with a **cross-encoder** (reads query + chunk together)
+to push the best chunks to the top. Pattern: **retrieve wide, rerank narrow** for recall *and* precision.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-reranking" />

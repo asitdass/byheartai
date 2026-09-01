@@ -1,0 +1,101 @@
+---
+id: ivf-and-quantization
+slug: ivf-and-quantization
+title: IVF & Product Quantization
+category: vector-databases
+level: advanced
+summary: IVF narrows search to a few clusters; Product Quantization compresses vectors into compact codes — together they make billion-scale vector search fit in memory.
+keywords: [ivf, inverted file index, product quantization, pq, compression, quantization]
+prerequisites: [ann-vs-exact]
+next: [metadata-filtering]
+related: [hnsw, matryoshka-embeddings]
+alternatives: [hnsw]
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Product Quantization for Nearest Neighbor Search (Jégou et al., 2011)"
+    url: "https://ieeexplore.ieee.org/document/5432202"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-ivf-and-quantization
+estimatedMinutes: 8
+---
+
+<OneLine>IVF splits vectors into clusters so search only scans a few of them; Product Quantization shrinks each vector into a tiny code — together they let huge indexes fit in memory and search fast.</OneLine>
+
+## Explain like I'm new to AI
+
+HNSW is fast but **memory-hungry**. At billions of vectors, two other techniques take over — often combined.
+
+- **IVF (Inverted File index)** groups vectors into **clusters**. At query time you only search the **few nearest clusters**, not everything.
+- **Product Quantization (PQ)** **compresses** each vector into a handful of bytes, so far more vectors fit in RAM.
+
+## Mental model
+
+- **IVF** is like a library organized into **sections**: to find a book you go to the right sections, not every shelf.
+- **PQ** is like replacing each detailed book with a **short summary card** — much smaller to store, still enough to find what you need.
+
+## How it works — IVF
+
+1. **Cluster** all vectors into *k* groups (via k-means); each group has a **centroid**.
+2. Store each vector in the "inverted list" of its nearest centroid.
+3. At query time, find the **nprobe** nearest centroids and search **only those lists**.
+
+More `nprobe` → higher recall, slower; fewer → faster, more misses.
+
+## How it works — Product Quantization
+
+<ProductQuantization />
+
+1. **Split** each vector into several sub-vectors.
+2. For each slice, learn a small **codebook** of representative centroids.
+3. Replace each sub-vector with the **ID** of its nearest centroid — the vector becomes a few bytes.
+4. Compare using the codes (with precomputed distance tables) — approximate, but tiny and fast.
+
+## Real-world example
+
+To serve **a billion** vectors on limited RAM, a common recipe is **IVF + PQ**: IVF restricts the search to a few clusters, and PQ makes each stored vector ~8–32× smaller. You trade a little accuracy for the ability to run massive search economically — often with an **exact re-rank** of the finalists to recover precision.
+
+## Technical explanation
+
+- **IVF** cost/recall is set by the number of clusters and **nprobe**.
+- **PQ** trades accuracy for compression: more sub-quantizers/bits → better accuracy, less compression. **Scalar quantization** (e.g. float32 → int8) is a simpler cousin.
+- These compose with graph indexes too (e.g. HNSW over PQ-compressed vectors). **Matryoshka embeddings** offer a complementary axis: shrink dimensions *before* quantizing.
+- Standard practice: **shortlist** with the compressed/approximate index, then **re-rank** the top candidates with full-precision vectors.
+
+## Common mistakes
+
+<CommonMistake>
+Cranking compression too high and destroying recall. PQ is lossy — validate accuracy, and re-rank the
+shortlist with full-precision vectors when precision matters.
+</CommonMistake>
+
+- Setting `nprobe` too low and silently missing relevant clusters.
+- Assuming compression is free — it always costs some accuracy.
+
+## When to use it
+
+- Very large (tens of millions to billions) or memory-constrained indexes where HNSW alone is too big.
+
+## When NOT to use it
+
+- Small/medium datasets where HNSW (or even exact search) is simpler and accurate.
+
+## Alternatives
+
+- **HNSW** for in-memory, high-recall search; **scalar quantization** for simpler compression.
+
+<MemoryCard>
+**IVF** searches only the nearest clusters (tune **nprobe**); **PQ** compresses vectors into tiny codes.
+Together (**IVF+PQ**) they enable billion-scale search — trade accuracy for memory, then **re-rank**.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-ivf-and-quantization" />

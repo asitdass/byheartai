@@ -1,0 +1,93 @@
+---
+id: ann-vs-exact
+slug: ann-vs-exact
+title: Exact vs Approximate Nearest Neighbor
+category: vector-databases
+level: intermediate
+summary: Exact search compares every vector and is always right but slow; approximate (ANN) search checks a smart subset for huge speed with a small recall trade-off.
+keywords: [approximate nearest neighbor, ann, exact search, recall, latency, brute force]
+prerequisites: [vector-search]
+next: [hnsw]
+related: [vector-search, hnsw]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-ann-vs-exact
+estimatedMinutes: 7
+---
+
+<OneLine>Exact search compares your query with every stored vector (always correct, but slow); approximate search checks only a clever subset — far faster, and almost always just as good.</OneLine>
+
+## Explain like I'm new to AI
+
+To find the nearest vectors, the simplest method is **brute force**: compare the query with **every single** stored vector. That's **exact** — guaranteed correct — but with millions of vectors it's far too slow.
+
+**Approximate nearest neighbor (ANN)** search is the trick that makes vector databases fast: instead of checking everything, it checks a **smart subset** likely to contain the best matches. Toggle between the two and watch the difference:
+
+<AnnVsExact />
+
+## Mental model
+
+Finding a friend in a stadium:
+
+- **Exact** = check every seat, row by row. You'll definitely find them — eventually.
+- **Approximate** = go to their usual section and look nearby. Almost always works, in a fraction of the time.
+
+## How it works
+
+- **Exact (brute force):** compute similarity to all N vectors, sort, return top-k. Cost grows **linearly** with N.
+- **Approximate (ANN):** a pre-built **index** (like HNSW or IVF) guides the search to promising regions, comparing far fewer vectors — often **logarithmic-ish** in practice.
+- The price is **recall**: the fraction of true nearest neighbors the approximate search actually finds. Good indexes hit 95–99%+ recall while being **orders of magnitude** faster.
+
+## Real-world example
+
+Searching 100 million product embeddings, exact search might compare all 100M per query — impossibly slow for a live app. An ANN index compares maybe a few thousand, returns in milliseconds, and still finds the true best match nearly every time. That trade is almost always worth it.
+
+## Technical explanation
+
+The core tension is **recall vs. latency vs. memory**, tunable per index:
+
+- Raise ANN "effort" parameters (e.g. how many candidates to explore) → **higher recall, higher latency**.
+- Lower them → **faster, but more misses**.
+
+Measure recall by comparing ANN results against a **brute-force ground truth** on a sample. Exact search still makes sense for **small collections** or when **100% correctness** is mandatory. Many systems even do **exact re-ranking** of an ANN shortlist to combine speed and precision.
+
+## Common mistakes
+
+<CommonMistake>
+Assuming "approximate" means "unreliable." Well-tuned ANN routinely achieves 95–99%+ recall — the
+occasional miss is a deliberate, measurable trade for enormous speed gains.
+</CommonMistake>
+
+- Shipping an ANN index without ever measuring recall on your data.
+- Using brute force at scale and blaming the database for slow queries.
+
+## When to use it
+
+- **Exact:** small datasets, or when perfect recall is non-negotiable.
+- **Approximate:** anything at scale needing low latency — the default for production vector search.
+
+## When NOT to use it
+
+- Don't use exact search over millions of vectors in a latency-sensitive path.
+
+## Alternatives
+
+- Hybrid approach: ANN shortlist + exact re-rank to get both speed and top-end precision.
+
+<MemoryCard>
+**Exact** = compare all vectors (correct, slow). **Approximate (ANN)** = compare a smart subset (fast,
+~95–99% recall). The knob is **recall vs. latency** — always measure recall on your own data.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-ann-vs-exact" />

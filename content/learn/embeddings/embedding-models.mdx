@@ -1,0 +1,88 @@
+---
+id: embedding-models
+slug: embedding-models
+title: Embedding Models & Dimensions
+category: embeddings
+level: intermediate
+summary: An embedding model is the trained network that turns input into vectors; its dimensions, training, and quality determine how good your search and RAG will be.
+keywords: [embedding model, dimensions, mteb, retrieval, quality, benchmark]
+prerequisites: [what-are-embeddings]
+next: [dense-vs-sparse-embeddings]
+related: [similarity-metrics, what-are-embeddings]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-embedding-models
+estimatedMinutes: 8
+---
+
+<OneLine>An embedding model is the trained network that converts text (or images) into vectors — and choosing the right one, at the right number of dimensions, largely decides how good your search and RAG results will be.</OneLine>
+
+## Explain like I'm new to AI
+
+Embeddings don't appear by magic — they're produced by an **embedding model**. It's a neural network trained specifically to place similar meanings close together in vector space.
+
+Different models produce vectors of different **dimensions** (how many numbers per vector) and different **quality** (how well "close in vectors" matches "close in meaning"). Picking a good model is one of the highest-leverage decisions in a search or RAG system.
+
+## Mental model
+
+Think of an embedding model as a **cartographer** drawing the meaning-map. A great cartographer places every town (idea) exactly where it belongs, so nearby towns really are related. A poor one scatters them, and your "nearest neighbor" search returns nonsense. Same map idea — very different usefulness.
+
+## How it works — what to compare
+
+- **Dimensions:** the vector length (e.g. 384, 768, 1536, 3072). More dimensions can capture more nuance but cost **more storage, memory, and compute** per comparison.
+- **Quality / accuracy:** how reliably similar meanings map close together — usually judged on retrieval benchmarks.
+- **Max input length:** how much text the model can embed at once (matters for chunk size).
+- **Speed & cost:** local open models vs. hosted API models; latency and price per million tokens.
+- **Domain fit & languages:** general-purpose vs. code/legal/medical; multilingual support.
+
+## Real-world example
+
+For a support-docs search you might pick a compact 384-dimension open model that runs cheaply on your own hardware and is plenty accurate. For a nuanced legal-research tool, you might pay for a larger, higher-quality hosted model. The **right** choice is the smallest, cheapest model that hits your accuracy bar — bigger isn't automatically better.
+
+## Technical explanation
+
+Modern text embedding models are transformer encoders trained with **contrastive learning** on huge sets of related/unrelated pairs, often with **instruction prefixes** (e.g. "represent this query for retrieval:") that tune vectors for a task. Compare candidates on public leaderboards like **MTEB** (Massive Text Embedding Benchmark) — but always **re-test on your own data**, since benchmark rank rarely transfers perfectly. Practical rules:
+
+- The **same model** must embed both your documents and your queries.
+- Re-embedding everything is required if you switch models (vectors aren't cross-compatible).
+- Many current models are **Matryoshka-trained**, letting you shorten dimensions to save space with little quality loss.
+
+## Common mistakes
+
+<CommonMistake>
+Assuming more dimensions always means better results. Extra dimensions add cost and can add noise; a
+well-trained smaller model often beats a bigger one — measure on <em>your</em> data.
+</CommonMistake>
+
+- Embedding queries with a different model than the documents.
+- Trusting a leaderboard without testing on your own content and query style.
+
+## When to use it
+
+- Any semantic search / RAG system — choosing and evaluating the embedding model is step one.
+
+## When NOT to use it
+
+- Not applicable; if you use embeddings at all, you're choosing an embedding model.
+
+## Alternatives
+
+- Managed embedding APIs vs. self-hosted open models — pick based on cost, privacy, latency, and accuracy.
+
+<MemoryCard>
+An **embedding model** turns input into vectors; compare models on **dimensions, quality, length, speed,
+cost, and domain fit**. Use one model for both queries and documents, and evaluate on **your own data**.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-embedding-models" />

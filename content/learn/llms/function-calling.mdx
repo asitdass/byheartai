@@ -1,0 +1,97 @@
+---
+id: function-calling
+slug: function-calling
+title: What is Function Calling (Tool Use)?
+category: llms
+level: intermediate
+summary: Function calling lets an LLM request that your code run a real tool by emitting a structured call, then use the result to answer.
+keywords: [function calling, tool use, tools, api, agents, json schema]
+prerequisites: [structured-output]
+next: [prompt-engineering]
+related: [structured-output, prompt-engineering]
+alternatives: []
+confusedWith: [structured-output]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-function-calling
+estimatedMinutes: 8
+---
+
+<OneLine>Function calling lets an LLM use real tools: instead of guessing, it emits a structured request ("call get_weather with city=Paris"), your code runs it, and the model answers using the real result.</OneLine>
+
+## Explain like I'm new to AI
+
+On its own, an LLM only knows what it learned during training. It can't check today's weather, look up your database, or do exact math. **Function calling** (also called **tool use**) fixes that.
+
+You tell the model which **tools** exist and what inputs they take. When a question needs one, the model doesn't hallucinate an answer — it asks to **call the tool**. Your code runs it and hands back the result, which the model turns into a natural reply.
+
+<FunctionCallingFlow />
+
+## Mental model
+
+Think of the model as a **smart assistant with a phone**. It can't personally fetch a package, but it can **call the right service** and relay what they say. Function calling is that phone — it connects the model's reasoning to real actions.
+
+## How it works
+
+1. You provide **tool definitions**: name, description, and a **schema** for the arguments.
+2. The model decides *whether* and *which* tool to call, and produces the arguments as **structured output**.
+3. **Your code** executes the actual function (the model never runs it) and returns the result.
+4. The result is added to the context; the model uses it to respond — or to call another tool.
+
+This loop (call → run → observe → decide) is the foundation of **AI agents**.
+
+## Real-world example
+
+- "What's 17.5% tip on $86.40?" → calls a **calculator** for an exact number.
+- "Any meetings tomorrow?" → calls a **calendar API**.
+- "Refund order #123." → calls your **backend**, with guardrails and confirmation.
+
+The model supplies the *intent and arguments*; your systems supply the *truth and the action*.
+
+## Technical explanation
+
+Tool schemas are typically **JSON Schema**, and argument generation uses **constrained decoding** so the call is valid. Models can request **parallel** tool calls and **multi-step** sequences. Critical practices:
+
+- **Never blindly execute** model-requested actions — validate arguments, enforce permissions, and confirm destructive operations (the model's request is untrusted input).
+- Handle **errors** by returning them to the model so it can retry or adjust.
+- **Function calling vs. structured output:** structured output shapes the *final answer* for your app; function calling shapes a *request to run a tool* mid-conversation. Function calling is structured output pointed at actions.
+
+The open **Model Context Protocol (MCP)** standardizes how tools are described and exposed to models.
+
+## Common mistakes
+
+<CommonMistake>
+Believing the model runs the function. It only <em>requests</em> the call and supplies arguments — your code
+executes it. Treat those arguments as untrusted and validate before acting.
+</CommonMistake>
+
+- Exposing dangerous tools without permission checks or confirmations.
+- Vague tool descriptions — the model picks tools based on their names and docs, so write them clearly.
+
+## When to use it
+
+- Live data, precise computation, or taking actions in real systems (search, DBs, APIs, calendars).
+
+## When NOT to use it
+
+- Pure reasoning or writing tasks that need no external data or actions.
+
+## Alternatives
+
+- Plain **structured output** (no tool executed) when you just need formatted data, not an action.
+
+<MemoryCard>
+**Function calling** lets an LLM request a tool via a structured, schema-valid call; **your code** runs it
+and returns the result. It's the basis of **agents** — and you must validate every requested action.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-function-calling" />

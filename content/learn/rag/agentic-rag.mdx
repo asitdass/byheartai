@@ -1,0 +1,95 @@
+---
+id: agentic-rag
+slug: agentic-rag
+title: Agentic RAG & Advanced Patterns
+category: rag
+level: advanced
+summary: Agentic RAG turns the one-shot pipeline into a self-correcting loop that judges its own retrieval and answers, plus patterns like Graph RAG and multi-hop.
+keywords: [agentic rag, self-rag, corrective rag, graph rag, multi-hop, adaptive retrieval]
+prerequisites: [rag-architecture]
+next: [rag-evaluation]
+related: [rag-architecture, reranking, contextual-retrieval]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-agentic-rag
+estimatedMinutes: 8
+---
+
+<OneLine>Agentic RAG upgrades the fixed retrieve-then-generate pipeline into a loop where the system decides whether to retrieve, judges if the chunks are good, and re-tries until the answer is well-grounded.</OneLine>
+
+## Explain like I'm new to AI
+
+Basic RAG is **one-shot**: retrieve once, generate once. But what if the retrieved chunks are irrelevant, or the question needs *two* lookups? A one-shot pipeline just fails.
+
+**Agentic RAG** gives the system **judgment and loops**. It can decide whether it even needs to search, **grade** whether the results are good, **rewrite and retry** if they aren't, and **check** its own answer before returning it:
+
+<AgenticRag />
+
+## Mental model
+
+Basic RAG is a vending machine: one input, one output. Agentic RAG is a **research assistant** who thinks: "Do I need to look this up? Are these sources any good? Let me search again with better terms… does my draft actually match the sources? Okay, now I'll answer."
+
+## How it works — the loop
+
+1. **Decide:** does this question even need retrieval? (Simple chit-chat may not.)
+2. **Retrieve** candidate chunks.
+3. **Grade relevance:** are they good enough? If not, **rewrite the query** and retrieve again.
+4. **Generate** a draft answer.
+5. **Check grounding:** is the answer supported by the sources? If not, loop back (retrieve more or regenerate).
+6. **Return** the grounded, checked answer.
+
+## Advanced patterns
+
+- **Corrective RAG (CRAG):** grade retrieved docs; if weak, fall back to a web search or other source.
+- **Self-RAG:** the model learns to decide *when* to retrieve and to critique its own output.
+- **Multi-hop RAG:** answer questions needing several linked lookups (retrieve, reason, retrieve again).
+- **Graph RAG:** retrieve over a **knowledge graph** of entities and relationships, great for "connect the dots" questions across many documents.
+- **Adaptive RAG:** route easy questions to a quick path and hard ones to the full agentic loop.
+
+## Real-world example
+
+Ask "Which of our enterprise customers signed after our CEO change, and what plan are they on?" A one-shot RAG can't answer this. **Multi-hop / Graph RAG** first finds the CEO-change date, then finds customers who signed after it, then looks up each plan — chaining retrievals and reasoning to assemble the answer.
+
+## Technical explanation
+
+Agentic RAG is RAG expressed as an **agent loop** with tools (retrievers, web search, rerankers) and **decision nodes** (relevance grading, grounding checks) — commonly built with graph-based orchestration. The upside is far higher robustness on hard or ambiguous queries; the costs are **more LLM calls, higher latency, and more complexity**. Guardrails matter: cap the number of loops to avoid runaway cost, and log each decision for **observability**. Start simple (plain RAG + reranking) and add agentic steps only where evaluation shows they help.
+
+## Common mistakes
+
+<CommonMistake>
+Jumping straight to a complex agentic pipeline before nailing the basics. Fix chunking, hybrid search,
+and reranking first — many "hard" RAG problems disappear without any agent loop.
+</CommonMistake>
+
+- No loop limit, so a self-correcting system spirals into many expensive calls.
+- Adding agentic complexity without evaluation to prove it actually improves answers.
+
+## When to use it
+
+- Hard, multi-part, or high-stakes questions where one-shot retrieval is unreliable.
+
+## When NOT to use it
+
+- Simple lookups where plain RAG + reranking already answers well — don't pay for loops you don't need.
+
+## Alternatives
+
+- Plain (one-shot) RAG for straightforward Q&A; long-context prompting for small corpora.
+
+<MemoryCard>
+**Agentic RAG** adds loops and judgment: decide → retrieve → grade → (rewrite & retry) → generate →
+check grounding. Patterns: **Corrective, Self-RAG, multi-hop, Graph RAG**. Powerful but costlier — cap the loops.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-agentic-rag" />

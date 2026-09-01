@@ -1,0 +1,106 @@
+---
+id: self-attention
+slug: self-attention
+title: What is Self-Attention?
+category: transformers
+level: intermediate
+summary: Self-attention is attention applied within a single sequence, letting every word gather context from every other word in the same text.
+keywords: [self-attention, attention, context, transformer, causal mask]
+prerequisites: [what-is-attention]
+next: [multi-head-attention]
+related: [what-is-attention, multi-head-attention, positional-encoding]
+alternatives: []
+confusedWith: [what-is-attention, multi-head-attention]
+frameworks: []
+products: []
+papers:
+  - title: "Attention Is All You Need (Vaswani et al., 2017)"
+    url: "https://arxiv.org/abs/1706.03762"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-self-attention
+estimatedMinutes: 8
+---
+
+<OneLine>Self-attention is attention applied within one sequence — every word looks at every other word in the same sentence to build its meaning.</OneLine>
+
+## Explain like I'm new to AI
+
+Regular attention can look from one sequence to another (like matching a question to a document). **Self-attention** is the special, most important case: the sequence looks at **itself**.
+
+Every word simultaneously asks, "Which other words *in this same sentence* help me understand my role?" — and updates itself with that context. Do this for all words at once, and the whole sentence becomes context-aware in a single step.
+
+<AttentionVisualizer />
+
+## Mental model
+
+Picture everyone in a group chat reading **all** the other messages at once and updating what they mean based on the full conversation — not waiting their turn. That parallel, everyone-reads-everyone step is self-attention.
+
+## How it works
+
+For a sentence of *n* tokens, self-attention builds an **n × n grid** of relevance:
+
+1. Each token produces a **query**, **key**, and **value**.
+2. Every token's query is compared with every token's key → an **n × n attention matrix**.
+3. Softmax turns each row into weights that sum to 1.
+4. Each token's output = weighted sum of all tokens' **values**.
+
+Because all comparisons happen together, self-attention is **fully parallel** — a big reason transformers train so efficiently.
+
+```text
+For each token i:
+  look at all tokens j (including itself)
+  weight_ij = how relevant token j is to token i
+  new_i = Σ (weight_ij × value_j)
+```
+
+## Real-world example
+
+In "The trophy didn't fit in the suitcase because it was too big," self-attention lets "it" gather strong context from "trophy." Swap to "…too small," and "it" leans toward "suitcase." The **same** self-attention mechanism handles both — it learned the relationships from data.
+
+## Technical explanation
+
+Self-attention means Q, K, V are all projections of the **same** input `x`:
+
+```text
+Q = xWᵠ,  K = xWᴷ,  V = xWⱽ
+Attention(Q,K,V) = softmax(QKᵀ / √dₖ) V
+```
+
+In **decoder** (generative) transformers, a **causal mask** prevents a token from attending to future tokens — position *i* may only see positions ≤ *i*, so the model can't "cheat" while predicting the next word. Cost scales as **O(n²)** with sequence length *n*, which is why long context windows are expensive and motivate the **KV cache** and efficient-attention variants.
+
+## Common mistakes
+
+<CommonMistake>
+Assuming a token can't attend to itself. It can — and often should. A word's own value is part of
+the weighted blend.
+</CommonMistake>
+
+- Forgetting the causal mask in generative models — without it, the model would peek at future words.
+- Overlooking the O(n²) cost, which grows quickly with longer inputs.
+
+## When to use it
+
+- The default context-mixing step inside every transformer block.
+
+## When NOT to use it
+
+- Extremely long sequences on tight budgets, where sparse/linear-attention variants are preferred.
+
+## Alternatives
+
+- Sparse, sliding-window, or linear attention reduce the O(n²) cost while approximating full self-attention.
+
+<MemoryCard>
+**Self-attention** = attention within one sequence. Every token attends to every token (an n×n grid),
+in parallel. Generative models add a **causal mask** so tokens can't see the future.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-self-attention" />

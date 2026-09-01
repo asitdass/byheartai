@@ -1,0 +1,101 @@
+---
+id: positional-encoding
+slug: positional-encoding
+title: What is Positional Encoding?
+category: transformers
+level: intermediate
+summary: Positional encoding adds word-order information to a transformer, because attention alone treats input as an unordered set.
+keywords: [positional encoding, position, order, RoPE, transformer, attention]
+prerequisites: [what-is-attention]
+next: [kv-cache]
+related: [self-attention, what-is-transformer]
+alternatives: []
+confusedWith: [what-are-embeddings]
+frameworks: []
+products: []
+papers:
+  - title: "Attention Is All You Need (Vaswani et al., 2017)"
+    url: "https://arxiv.org/abs/1706.03762"
+    kind: paper
+  - title: "RoFormer: Rotary Position Embedding (Su et al., 2021)"
+    url: "https://arxiv.org/abs/2104.09864"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-positional-encoding
+estimatedMinutes: 7
+---
+
+<OneLine>Positional encoding tells a transformer the order of words — without it, attention would see the input as an unordered bag of words.</OneLine>
+
+## Explain like I'm new to AI
+
+Here's a surprising fact: attention, by itself, has **no sense of order**. It looks at all words at once and weighs their relevance — but it doesn't know which came first.
+
+That's a problem, because order carries meaning. "Man bites dog" and "Dog bites man" use the *same words* but mean opposite things. Try it:
+
+<PositionalEncoding />
+
+**Positional encoding** fixes this by adding a little "where am I?" signal to each token's embedding, so the model knows position 1 from position 2 from position 3.
+
+## Mental model
+
+Think of numbered seats in a theater. The people (words) are the same, but their **seat numbers** change the story of who's next to whom. Positional encoding hands every token its seat number.
+
+## How it works
+
+1. Start with each token's **embedding** (its meaning as a vector).
+2. Add (or blend in) a **position signal** based on where the token sits in the sequence.
+3. Now each vector carries **both meaning and position**, so attention can use order.
+
+The classic transformer used fixed **sine/cosine** waves of different frequencies as the position signal — a smooth pattern the model can read to infer distances between tokens.
+
+## Real-world example
+
+"Only I told her" vs "I only told her" vs "I told only her" — three different meanings from moving one word. Positional encoding is what lets a model register that the word "only" sits in a different place each time.
+
+## Technical explanation
+
+Approaches differ in *where* and *how* position enters:
+
+- **Sinusoidal (absolute):** fixed sine/cosine vectors added to embeddings (original transformer).
+- **Learned absolute:** a trainable vector per position.
+- **Rotary Position Embedding (RoPE):** rotates the query/key vectors by an angle proportional to position, encoding **relative** distance directly inside attention. RoPE is the dominant choice in modern LLMs because it generalizes better and supports **context-length extension**.
+- **ALiBi:** adds a distance-based bias to attention scores.
+
+Relative/rotary schemes matter for **long context**, helping models handle sequences longer than those seen in training.
+
+## Common mistakes
+
+<CommonMistake>
+Confusing positional encoding with the word embedding. The <em>embedding</em> encodes <em>what</em> a
+token means; positional encoding adds <em>where</em> it is. Both are combined per token.
+</CommonMistake>
+
+- Assuming transformers naturally know order — they don't, without this signal.
+- Thinking all models use the same scheme — modern LLMs mostly use RoPE, not the original sine waves.
+
+## When to use it
+
+- Always, in any transformer processing ordered data (text, audio, time series).
+
+## When NOT to use it
+
+- For truly unordered sets (e.g. some point-cloud tasks) where position is meaningless.
+
+## Alternatives
+
+- Sinusoidal, learned, RoPE, and ALiBi are the main options; RoPE is the current default for LLMs.
+
+<MemoryCard>
+Attention is **order-blind**, so transformers add **positional encoding** to each token. Modern LLMs
+use **RoPE**, which encodes *relative* position and helps with long context.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-positional-encoding" />

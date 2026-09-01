@@ -1,0 +1,99 @@
+---
+id: training-vs-inference
+slug: training-vs-inference
+title: Training vs Inference
+category: foundations
+level: beginner
+summary: Training is teaching a model from data; inference is using the trained model to make predictions.
+keywords: [training, inference, learning, prediction, deployment]
+prerequisites: [what-is-model]
+next: [what-is-transformer]
+related: [what-is-model, what-is-machine-learning, what-is-inference]
+alternatives: []
+confusedWith: [what-is-model]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-training-vs-inference
+estimatedMinutes: 5
+---
+
+<OneLine>Training is when a model learns from data; inference is when the finished model is used to answer new inputs.</OneLine>
+
+## Explain like I'm new to AI
+
+These are the **two phases** of an AI model's life:
+
+- **Training** = the learning phase. Slow, expensive, done once (or occasionally). The model adjusts its parameters using lots of data.
+- **Inference** = the using phase. Fast, cheap per use, done constantly. The trained model takes an input and produces an output.
+
+Every chatbot reply, image tag, or recommendation you see is **inference**. The heavy learning already happened during **training**.
+
+## Mental model
+
+Think of **studying for an exam vs taking the exam**. Training is months of studying (hard, slow, resource-heavy). Inference is answering a question on exam day (quick, using what you already learned). You study once; you answer many questions.
+
+## How it works
+
+**Training loop:**
+
+```text
+for each batch of data:
+    prediction = model(input)
+    error      = loss(prediction, correct_answer)
+    update model parameters to reduce error   # backprop + gradient descent
+```
+
+**Inference:**
+
+```text
+answer = model(new_input)   # parameters are frozen; no learning happens
+```
+
+During inference the parameters **do not change** — the model just runs its calculation.
+
+## Real-world example
+
+A translation model is trained once on huge bilingual datasets (weeks on many GPUs). After that, translating your sentence is inference — it happens in milliseconds and doesn't teach the model anything new.
+
+## Technical explanation
+
+**Training** is compute-heavy: it stores activations, computes gradients via **backpropagation**, and updates parameters over many **epochs**, usually on clusters of GPUs/TPUs. **Inference** only does the **forward pass**, so it's far cheaper per call — but at scale (millions of requests) inference becomes the dominant cost, which is why **inference optimization** (batching, KV cache, quantization, routing) is a whole discipline. Note: techniques like **RAG** add knowledge at *inference* time without any retraining.
+
+## Common mistakes
+
+<CommonMistake>
+Thinking a model "learns" from your chats in real time. Standard inference changes nothing — the
+model's parameters are frozen. Learning would require a separate training/fine-tuning run.
+</CommonMistake>
+
+- Underestimating inference cost — at scale it usually exceeds training cost.
+- Assuming you must retrain to update knowledge (often RAG or prompting is enough).
+
+## When to use it
+
+- **Train** when you need to create or adapt a model's abilities.
+- **Inference** every time you actually use the model in an app.
+
+## When NOT to use it
+
+- Don't retrain to fix things that prompting, context, or RAG can solve at inference time.
+
+## Alternatives
+
+- Instead of full training: **fine-tuning** (small targeted training) or **RAG** (add knowledge at inference).
+
+<MemoryCard>
+**Training** teaches the model (slow, expensive, parameters change). **Inference** uses the model
+(fast, cheap per call, parameters frozen). You train once and infer millions of times.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-training-vs-inference" />

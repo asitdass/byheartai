@@ -1,0 +1,108 @@
+---
+id: what-is-attention
+slug: what-is-attention
+title: What is Attention?
+category: transformers
+level: intermediate
+summary: Attention lets each word decide which other words matter most, so a model can understand context.
+keywords: [attention, self-attention, context, query key value, weights]
+prerequisites: [what-is-transformer]
+next: [self-attention]
+related: [self-attention, multi-head-attention, what-is-transformer]
+alternatives: []
+confusedWith: [self-attention]
+frameworks: []
+products: []
+papers:
+  - title: "Attention Is All You Need (Vaswani et al., 2017)"
+    url: "https://arxiv.org/abs/1706.03762"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-what-is-attention
+estimatedMinutes: 8
+---
+
+<OneLine>Attention is how each word looks at all the other words and decides which ones matter for understanding it.</OneLine>
+
+## Explain like I'm new to AI
+
+Read this sentence:
+
+> "The animal didn't cross the street because **it** was too tired."
+
+What does "it" mean — the animal or the street? You know instantly it's the *animal*. How? You **paid attention** to the right earlier word.
+
+**Attention** gives a model the same ability. For every word, it computes how much to "look at" every other word, then blends in the most relevant context. That's what lets models resolve pronouns, track topics, and understand meaning.
+
+Try it — click any word to see what it attends to:
+
+<AttentionVisualizer />
+
+## Mental model
+
+Think of attention as **spotlights**. When processing a word, the model shines brighter spotlights on the words that help explain it, and dimmer ones on the rest. The word's new meaning is a blend of everything it lit up.
+
+## How it works
+
+Attention is built from three roles for each token, all learned:
+
+- **Query (Q):** "What am I looking for?"
+- **Key (K):** "What do I offer?"
+- **Value (V):** "What information do I carry?"
+
+The steps:
+
+1. For a given word's **query**, compare it against every word's **key** to get a **score** (how relevant each word is).
+2. Turn scores into weights that add up to 1 (via **softmax**).
+3. Take a **weighted sum of the values** using those weights.
+4. The result is the word's context-aware representation.
+
+```text
+scores   = Q · Kᵀ            # relevance of every word to this one
+weights  = softmax(scores)   # normalize to add up to 1
+output   = weights · V       # blend the most relevant information
+```
+
+## Real-world example
+
+In "I poured water from the jug into the cup until **it** was full," attention helps "it" attend to "cup" (the thing being filled) rather than "jug." Change one word — "until it was empty" — and a well-trained model shifts attention toward "jug." Same words, different focus.
+
+## Technical explanation
+
+This is **scaled dot-product attention**: `softmax(QKᵀ / √dₖ) · V`, where dividing by √dₖ keeps scores from growing too large. When Q, K, and V all come from the *same* sequence, it's **self-attention** (the core of transformers). When queries come from one sequence and keys/values from another, it's **cross-attention** (used in encoder-decoder models). Running several attention computations in parallel gives **multi-head attention**.
+
+## Common mistakes
+
+<CommonMistake>
+Thinking attention weights are a full explanation of the model's reasoning. They show <em>where</em>
+the model looked, which is insightful but not a complete account of <em>why</em> it answered as it did.
+</CommonMistake>
+
+- Assuming the highest-attention word is always the "answer" — attention blends many words.
+- Confusing attention (the mechanism) with self-attention (attention applied within one sequence).
+
+## When to use it
+
+- Any time context between elements matters — language, and increasingly vision and audio.
+
+## When NOT to use it
+
+- Purely local, fixed-window problems where a convolution is cheaper, or extremely long inputs without efficient-attention variants.
+
+## Alternatives
+
+- Recurrence (RNNs) and convolutions capture context differently, but attention is the modern default.
+
+<MemoryCard>
+**Attention** lets each token compute how relevant every other token is (via **query·key**), then
+blends their **values** by those weights — giving each word a context-aware meaning.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-attention" />

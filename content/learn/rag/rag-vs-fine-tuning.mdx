@@ -1,0 +1,101 @@
+---
+id: rag-vs-fine-tuning
+slug: rag-vs-fine-tuning
+title: RAG vs Fine-tuning vs Long Context
+category: rag
+level: intermediate
+summary: RAG adds knowledge at answer time, fine-tuning bakes behavior into weights, and long context pastes everything into the prompt — each fits different problems.
+keywords: [rag vs fine-tuning, long context, when to use rag, fine-tuning, retrieval]
+prerequisites: [what-is-rag]
+next: [what-is-agent]
+related: [what-is-rag, rag-architecture]
+alternatives: [what-is-fine-tuning]
+confusedWith: [what-is-fine-tuning]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-rag-vs-fine-tuning
+estimatedMinutes: 8
+---
+
+<OneLine>RAG gives a model new knowledge at answer time, fine-tuning teaches it new behavior in its weights, and long context just pastes everything into the prompt — the trick is matching the method to the problem.</OneLine>
+
+## Explain like I'm new to AI
+
+When a model can't answer well, there are three common fixes — and people constantly confuse them:
+
+- **RAG** — look information up and hand it to the model (new **knowledge**).
+- **Fine-tuning** — further-train the model so new behavior lives in its weights (new **skill/style/format**).
+- **Long context** — just paste all the relevant text into a big prompt (simple, for **small** data).
+
+Choosing right saves enormous time and money.
+
+## Mental model
+
+- **RAG** = giving a chef **fresh ingredients** for tonight's dish (facts that change).
+- **Fine-tuning** = sending the chef to **cooking school** to learn a technique (lasting behavior).
+- **Long context** = handing them the **whole recipe book** for one meal (works if the book is short).
+
+## How it works — choosing between them
+
+<Compare
+  a="RAG"
+  b="Fine-tuning"
+  rows={[
+    { label: "Changes the model?", a: "No — supplies context at answer time", b: "Yes — updates the weights" },
+    { label: "Best for", a: "Changing/private facts, citations", b: "New skill, tone, format, structure" },
+    { label: "Update knowledge", a: "Instant (edit documents)", b: "Requires retraining" },
+    { label: "Citations?", a: "Yes — can point to sources", b: "No — knowledge is baked in" },
+    { label: "Upfront cost", a: "Low", b: "Higher (data + training)" },
+  ]}
+/>
+
+**Long context** vs RAG: pasting everything works for **small, static** corpora, but gets expensive and hits "lost in the middle" as data grows. RAG scales by retrieving only what's relevant.
+
+## Real-world example
+
+- **Support bot over changing docs?** → **RAG** (facts update daily; you want citations).
+- **Always answer in your brand's voice and a strict JSON schema?** → **Fine-tuning** (behavior/format).
+- **Answer questions about one 20-page contract?** → **Long context** (just include it).
+- **Best-in-class assistant?** Often **all three**: fine-tune the style, RAG the facts, and use enough context to hold the retrieved chunks.
+
+## Technical explanation
+
+RAG and fine-tuning are **complementary, not rivals**. RAG externalizes **knowledge** (cheap to update, auditable, grounded); fine-tuning internalizes **behavior** (consistent tone/format, can shrink prompts, works offline). Fine-tuning **cannot** reliably keep up with fast-changing facts and doesn't provide citations; RAG **cannot** teach a fundamentally new skill or style. Decision heuristic: **"Is the gap knowledge or behavior?"** Knowledge → RAG (or long context if tiny). Behavior → fine-tuning. Both → do both. Always exhaust cheaper options (better prompting, RAG) before investing in fine-tuning.
+
+## Common mistakes
+
+<CommonMistake>
+Fine-tuning to add facts. Fine-tuning teaches <em>behavior</em>, not up-to-date knowledge — it's expensive,
+can't cite sources, and goes stale. For changing facts, use RAG.
+</CommonMistake>
+
+- Pasting a giant corpus into context on every call (slow, costly) when RAG would retrieve just the relevant slice.
+- Treating RAG and fine-tuning as either/or when the best systems combine them.
+
+## When to use it
+
+- Use this decision lens whenever a model underperforms: diagnose knowledge vs. behavior vs. context size first.
+
+## When NOT to use it
+
+- Not applicable — this is a decision framework, always worth applying before building.
+
+## Alternatives
+
+- Better **prompt engineering** is the cheapest first fix; reach for RAG/fine-tuning when prompting isn't enough.
+
+<MemoryCard>
+**RAG** = new knowledge at answer time (updatable, cited). **Fine-tuning** = new behavior in the weights
+(tone/format/skill). **Long context** = paste small data in the prompt. Ask: is the gap **knowledge or behavior**?
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-rag-vs-fine-tuning" />

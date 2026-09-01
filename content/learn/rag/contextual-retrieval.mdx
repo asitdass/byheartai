@@ -1,0 +1,87 @@
+---
+id: contextual-retrieval
+slug: contextual-retrieval
+title: What is Contextual Retrieval?
+category: rag
+level: intermediate
+summary: Contextual retrieval prepends a short context blurb to each chunk before embedding, so ambiguous passages become self-explanatory and retrieve accurately.
+keywords: [contextual retrieval, parent-child, chunk context, retrieval accuracy, rag]
+prerequisites: [chunking]
+next: [agentic-rag]
+related: [chunking, reranking]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-contextual-retrieval
+estimatedMinutes: 6
+---
+
+<OneLine>Contextual retrieval adds a little surrounding context to each chunk before embedding it, so passages that would be ambiguous on their own become clear and retrievable.</OneLine>
+
+## Explain like I'm new to AI
+
+When you chunk a document, each chunk loses sight of the rest. A chunk that says *"The refund window is 30 days"* is useless if the system can't tell **which product** it's about — and it may never be retrieved for the right question.
+
+**Contextual retrieval** fixes this by adding a short, situating blurb to each chunk **before embedding**:
+
+<ContextualRetrieval />
+
+## Mental model
+
+Imagine finding a single sticky note that says *"due Friday."* Due *what*? Now imagine every sticky note started with *"Project Apollo, invoice:"* — suddenly each note stands on its own. Contextual retrieval writes that little header on every chunk.
+
+## How it works
+
+1. For each chunk, generate a **brief context** describing where it sits (document title, section, what it's about).
+2. **Prepend** that context to the chunk text (and/or index it as metadata).
+3. **Embed** the contextualized chunk, so its vector reflects both the detail *and* its situation.
+4. Retrieval now matches ambiguous chunks to the right queries far more reliably.
+
+A related technique, **parent-child retrieval**, retrieves small precise chunks but hands the model their larger **parent** section for full context.
+
+## Real-world example
+
+A financial report is chunked into hundreds of passages. Many say things like "revenue grew 12%." Without context, a query about *Q3 2026* can't distinguish them. Contextual retrieval prepends "Acme Q3 2026 earnings, Revenue section:" to each, and the correct passage is retrieved. Anthropic reported this approach substantially reduces retrieval failures, especially combined with **hybrid search** and **reranking**.
+
+## Technical explanation
+
+The context blurb is usually generated **once at ingestion** by an LLM (cost is amortized over all future queries) — often cheaply via **prompt caching** of the source document. It improves both **dense** (better embeddings) and **sparse** (better keyword signal) retrieval. Trade-offs: extra ingestion cost and storage, and the need to regenerate context if documents change. Parent-child and contextual retrieval are complementary: one enriches the chunk's meaning, the other restores its neighbors at answer time.
+
+## Common mistakes
+
+<CommonMistake>
+Embedding tiny chunks with no situating context and wondering why retrieval is noisy. A chunk that
+can't stand on its own will match the wrong queries — give it context before embedding.
+</CommonMistake>
+
+- Prepending so much context that it drowns out the chunk's actual content.
+- Forgetting to regenerate context when the underlying document changes.
+
+## When to use it
+
+- Documents with lots of ambiguous, reference-style passages (finance, legal, technical specs).
+
+## When NOT to use it
+
+- Corpora of already self-contained items (FAQs, standalone articles) where each chunk is clear alone.
+
+## Alternatives
+
+- **Parent-child retrieval** (retrieve small, feed large) and richer **metadata** address related problems.
+
+<MemoryCard>
+**Contextual retrieval** prepends a short situating blurb to each chunk **before embedding**, so ambiguous
+passages retrieve correctly. Pairs well with **hybrid search** and **reranking**; costs extra at ingestion.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-contextual-retrieval" />

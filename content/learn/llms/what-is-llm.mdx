@@ -1,0 +1,79 @@
+---
+id: what-is-llm
+slug: what-is-llm
+title: What is an LLM?
+category: llms
+level: beginner
+summary: An LLM is a large neural network trained on huge amounts of text to predict and generate language.
+keywords: [llm, large language model, language model]
+prerequisites: [what-is-neural-network]
+next: [what-is-token]
+related: [what-is-token, context-window]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Attention Is All You Need (Vaswani et al., 2017)"
+    url: "https://arxiv.org/abs/1706.03762"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+estimatedMinutes: 6
+---
+
+<OneLine>An LLM is a very large pattern-predictor for language: give it text, and it predicts what comes next.</OneLine>
+
+## Explain like I'm new to AI
+
+A **Large Language Model** (LLM) is a computer program that has read an enormous amount of text and learned the patterns of language so well that it can continue any piece of text sensibly.
+
+Ask it a question, and it doesn't "look up" an answer like a search engine. Instead, it predicts, word by word, the most plausible continuation — and that continuation turns out to be a useful answer.
+
+## Mental model
+
+Think of an LLM as **autocomplete taken to the extreme**. Your phone predicts the next word; an LLM predicts the next word so well, across so much context, that it can write essays, code, and explanations.
+
+## How it works
+
+1. Text is broken into **tokens** (small pieces of words).
+2. The model predicts the next token, one at a time.
+3. Each predicted token is fed back in, and the process repeats.
+4. During training, it saw trillions of tokens and adjusted billions of internal **parameters** to get better at prediction.
+
+## Real-world example
+
+When you type "The capital of France is", an LLM confidently predicts "Paris" — not because it stored a fact table, but because that continuation is overwhelmingly likely given everything it has read.
+
+## Technical explanation
+
+Modern LLMs are **transformer** networks trained with next-token prediction. Their **parameters** encode statistical relationships in language. At inference, sampling settings like **temperature** control how deterministic or creative the output is.
+
+## Common mistakes
+
+<CommonMistake>
+Believing an LLM "knows" facts like a database. It predicts likely text, which is why it can be
+confidently wrong — a behavior called hallucination.
+</CommonMistake>
+
+## When to use it
+
+- Generating, summarizing, translating, or transforming text.
+- Reasoning over language, code, and instructions.
+
+## When NOT to use it
+
+- When you need guaranteed, verifiable facts without grounding (pair it with RAG).
+
+## Alternatives
+
+- Classical NLP models for narrow, well-defined tasks.
+
+<MemoryCard>
+An LLM is a large neural network that predicts the next **token**. Everything it does — answering,
+writing, coding — comes from repeatedly predicting what text comes next.
+</MemoryCard>

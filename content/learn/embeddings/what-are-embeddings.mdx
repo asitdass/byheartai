@@ -1,0 +1,93 @@
+---
+id: what-are-embeddings
+slug: what-are-embeddings
+title: What are Embeddings?
+category: embeddings
+level: beginner
+summary: Embeddings turn information into numerical vectors where similar meanings sit close together, so software can compare meaning with math.
+keywords: [embedding, embeddings, vector, semantic similarity, vector space]
+prerequisites: [what-is-token]
+next: [similarity-metrics]
+related: [similarity-metrics, what-is-rag, vector-search]
+alternatives: []
+confusedWith: [tokenization]
+frameworks: []
+products: []
+papers:
+  - title: "Efficient Estimation of Word Representations (word2vec, Mikolov et al., 2013)"
+    url: "https://arxiv.org/abs/1301.3781"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+dateUpdated: 2026-09-01
+lastReviewed: 2026-09-01
+version: 2
+quizId: quiz-what-are-embeddings
+estimatedMinutes: 8
+---
+
+<OneLine>An embedding is a list of numbers (a vector) that captures the meaning of something — so a computer can measure how similar two things are with math.</OneLine>
+
+## Explain like I'm new to AI
+
+Computers don't understand words — they understand numbers. An **embedding** turns a word, sentence, image, or document into a list of numbers (a **vector**) that captures its *meaning*.
+
+The magic: things with **similar meaning get similar numbers**. So "dog" and "puppy" land close together, while "dog" and "spreadsheet" land far apart. This lets software do something powerful — compare *meaning*, not just spelling.
+
+Click around this "meaning map" — related words sit near each other:
+
+<SemanticMap />
+
+## Mental model
+
+Imagine a giant map where every idea is a dot. Related ideas cluster together; unrelated ideas are far away. An embedding is simply the **coordinates** of an idea on that map. Real maps have hundreds of dimensions, not two — but the intuition is identical.
+
+## How it works
+
+1. A trained **embedding model** reads a piece of text (or image).
+2. It outputs a fixed-length **vector** — for example 384, 768, or 1536 numbers.
+3. Similar inputs produce vectors that are **close together**, measured by **cosine similarity** or distance.
+4. To compare two things, you compare their vectors — no keywords required.
+
+The numbers themselves aren't human-readable; what matters is their **relative positions**.
+
+## Real-world example
+
+Search "how do I reset my password?" and an embedding-based system can find a help article titled "Recovering your account credentials" — even though they share **no exact words** — because their *meanings* are close. This is the engine behind semantic search, recommendations, and **RAG**.
+
+## Technical explanation
+
+Embeddings map inputs into a high-dimensional **vector space** where geometric closeness reflects semantic similarity. Modern text embeddings come from transformer models trained with **contrastive objectives** (pull similar pairs together, push dissimilar pairs apart). The same idea extends to images, audio, and code, and to **multimodal** models that place text and images in one shared space (so "a photo of a beach" lands near actual beach photos). Embeddings power semantic search, clustering, classification, deduplication, recommendations, and retrieval for RAG.
+
+## Common mistakes
+
+<CommonMistake>
+Confusing embeddings with tokenization. <em>Tokenization</em> splits text into token IDs; <em>embedding</em>
+turns those into meaning-carrying vectors. And an embedding vector represents whole <em>meaning</em>, not one number per letter.
+</CommonMistake>
+
+- Assuming keyword overlap equals similarity — two texts with no shared words can still be highly similar.
+- Comparing embeddings from **different models** — vectors are only comparable within the same model.
+
+## When to use it
+
+- Semantic search, clustering, recommendations, deduplication, and retrieval for RAG.
+
+## When NOT to use it
+
+- Exact-match lookups (IDs, SKUs, error codes) where a plain keyword index is faster and precise.
+
+## Alternatives
+
+- **Keyword / full-text search** (lexical, not semantic); often combined with embeddings in **hybrid search**.
+
+<MemoryCard>
+An **embedding** turns information into a **vector** where similar meanings sit close together. It lets
+software compare **meaning** with math — the foundation of semantic search and RAG.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-are-embeddings" />

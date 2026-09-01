@@ -1,0 +1,95 @@
+---
+id: what-is-token
+slug: what-is-token
+title: What is a Token?
+category: llms
+level: beginner
+summary: A token is the small chunk of text — often a word or word-piece — that an LLM actually reads, counts, and predicts.
+keywords: [token, tokens, llm, tokenization, context, pricing]
+prerequisites: [what-is-llm]
+next: [tokenization]
+related: [tokenization, context-window]
+alternatives: []
+confusedWith: [tokenization]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-08-30
+lastReviewed: 2026-08-30
+version: 1
+quizId: quiz-what-is-token
+estimatedMinutes: 6
+---
+
+<OneLine>A token is the small chunk of text — usually a word or piece of a word — that an LLM reads and generates; models think in tokens, not letters or words.</OneLine>
+
+## Explain like I'm new to AI
+
+An LLM doesn't see text the way you do. It doesn't read letters, and it doesn't quite read whole words either. It reads **tokens** — small chunks that are often a short word, part of a longer word, or a piece of punctuation.
+
+A rough rule of thumb in English: **1 token ≈ 4 characters ≈ ¾ of a word**. So "cat" is one token, but "unbelievable" might be split into "un", "bel", "iev", "able".
+
+Why care? Because **tokens are the unit of everything**: how much text fits in the model (context window), how fast it responds, and how much you pay.
+
+## Mental model
+
+Think of LEGO bricks. You don't describe a castle brick-color by brick-color; you build it from **standard bricks**. Tokens are the model's standard bricks of language — every input and output is assembled from them.
+
+## How it works
+
+- Your text is broken into tokens **before** the model sees it.
+- Each token maps to a number (an **ID**) the model can process.
+- The model predicts the **next token**, over and over, to generate text.
+- Common words are usually one token; rare or long words split into several.
+
+<Compare
+  a="You see"
+  b="The model sees"
+  rows={[
+    { label: "Unit", a: "Letters and words", b: "Tokens (word-pieces)" },
+    { label: "Example", a: '"I love astronomy"', b: '["I", " love", " astro", "nomy"]' },
+    { label: "Count", a: "3 words", b: "≈ 4 tokens" },
+  ]}
+/>
+
+## Real-world example
+
+API pricing is per token. If a prompt is 1,000 tokens and the reply is 500 tokens, you're billed for ~1,500 tokens. Emoji, code, and non-English text often use **more** tokens per character — which is why the same paragraph can cost more in one language than another.
+
+## Technical explanation
+
+Modern LLMs use **subword tokenization** (e.g. **Byte-Pair Encoding**). A fixed **vocabulary** (often 50k–200k+ entries) is learned so that frequent character sequences become single tokens while rare ones split into pieces. This balances a small vocabulary against short sequences. Every token maps to an embedding vector; the model's final layer outputs a probability over the **entire vocabulary** for the next token.
+
+## Common mistakes
+
+<CommonMistake>
+Assuming one word equals one token. Long or rare words split into several tokens, and a leading space is
+often part of the token (" cat" vs "cat"), which can surprise you when counting.
+</CommonMistake>
+
+- Counting characters or words to estimate cost — count **tokens** instead.
+- Forgetting that both the prompt **and** the response consume tokens.
+
+## When to use it
+
+- Any time you budget for context, latency, or cost — think in tokens.
+
+## When NOT to use it
+
+- Not applicable — tokens are fundamental to how LLMs work.
+
+## Alternatives
+
+- Character-level and word-level models exist, but subword tokens are the standard sweet spot.
+
+<MemoryCard>
+A **token** is the chunk of text an LLM reads and predicts (often a word-piece). Rule of thumb:
+**1 token ≈ 4 characters ≈ ¾ word**. Tokens drive context limits, speed, and cost.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-token" />

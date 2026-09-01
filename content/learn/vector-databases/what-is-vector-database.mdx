@@ -1,0 +1,85 @@
+---
+id: what-is-vector-database
+slug: what-is-vector-database
+title: What is a Vector Database?
+category: vector-databases
+level: beginner
+summary: A vector database stores embeddings and finds the most similar ones fast, making it the memory layer behind semantic search and RAG.
+keywords: [vector database, embeddings, similarity search, index, ann, rag]
+prerequisites: [what-are-embeddings]
+next: [vector-search]
+related: [vector-search, what-is-rag]
+alternatives: []
+confusedWith: [vector-search]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-01
+lastReviewed: 2026-09-01
+version: 1
+quizId: quiz-what-is-vector-database
+estimatedMinutes: 7
+---
+
+<OneLine>A vector database is a specialized store for embeddings that can find the most similar vectors to a query in milliseconds — the memory layer behind semantic search and RAG.</OneLine>
+
+## Explain like I'm new to AI
+
+Once you turn text into **embeddings** (vectors of meaning), you need somewhere to **keep them** and a way to **search them by similarity**. A regular database is great at exact matches ("find user id = 42") but terrible at "find the 5 things most similar in meaning to this."
+
+A **vector database** is built exactly for that: store millions (or billions) of vectors, and instantly return the ones closest to a query vector.
+
+## Mental model
+
+A normal database is a **filing cabinet** — you must know the exact label to find a file. A vector database is a **librarian who understands meaning**: hand them a sentence and they hand back the most related documents, even if the words differ.
+
+## How it works
+
+1. **Embed** your content and **store** each vector (plus metadata like title, URL, tags).
+2. Build an **index** (usually an approximate-nearest-neighbor structure like HNSW) so search stays fast at scale.
+3. At query time, **embed the query** and ask the database for the **top-k** most similar vectors.
+4. Return the matching items — often with **metadata filters** applied.
+
+Beyond search, they handle the un-glamorous but essential parts: **updates/deletes**, **scaling**, **persistence**, and **filtering**.
+
+## Real-world example
+
+A support assistant embeds every help article and stores them in a vector database. When a user asks a question, the app embeds it, retrieves the closest articles, and feeds them to an LLM to answer — that retrieval step **is** the vector database at work. This is the backbone of **RAG**.
+
+## Technical explanation
+
+Vector databases combine an **ANN index** (HNSW, IVF, and quantization such as PQ) with a storage/serving layer that provides **CRUD**, **metadata filtering**, **hybrid search**, **sharding/replication**, and consistency guarantees. Options range from **dedicated databases** (e.g. purpose-built vector stores) to **extensions** on existing databases (e.g. a Postgres extension) and **in-memory libraries** for smaller scale. Key operational concerns: **recall vs. latency** tuning, **index build time/memory**, and keeping vectors **in sync** with source data.
+
+## Common mistakes
+
+<CommonMistake>
+Confusing the vector database (the <em>system</em> that stores and serves vectors) with vector search (the
+<em>operation</em> of finding nearest neighbors). The database does search, plus storage, filtering, and scaling.
+</CommonMistake>
+
+- Reaching for a heavy vector database when a few thousand vectors fit fine in memory.
+- Forgetting to re-index when you switch embedding models (old vectors become incompatible).
+
+## When to use it
+
+- Semantic search, recommendations, deduplication, and the retrieval layer of RAG — especially at scale or with frequent updates.
+
+## When NOT to use it
+
+- Tiny datasets (a simple in-memory search suffices) or purely exact-match needs (use a regular database/index).
+
+## Alternatives
+
+- In-memory ANN libraries for small scale; classic keyword/full-text engines when you don't need semantics.
+
+<MemoryCard>
+A **vector database** stores embeddings and returns the most similar ones fast, adding **indexing,
+filtering, updates, and scaling**. It's the memory layer powering semantic search and **RAG**.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-vector-database" />

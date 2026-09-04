@@ -1,0 +1,101 @@
+---
+id: when-to-fine-tune
+slug: when-to-fine-tune
+title: When to Fine-tune vs RAG vs Prompting
+category: fine-tuning
+level: intermediate
+summary: Try prompting, then RAG for facts, then fine-tune for stubborn behavior — the 2026 default is QLoRA SFT (and DPO) plus retrieval, not weights as a wiki.
+keywords: [when to fine-tune, rag vs prompt vs finetune, decision]
+prerequisites: [what-is-fine-tuning, what-is-rag]
+next: [why-evaluation-matters]
+related: [rag-vs-fine-tuning, prompt-engineering, instruction-vs-preference, why-evaluation-matters, quality-latency-cost]
+alternatives: [rag-vs-fine-tuning]
+confusedWith: [rag-vs-fine-tuning]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-when-to-fine-tune
+estimatedMinutes: 8
+---
+
+<OneLine>The cheap order is prompt → RAG for knowledge → fine-tune for behavior that still won't stick. Fine-tune with LoRA/QLoRA; keep changing facts out of the weights.</OneLine>
+
+## Explain like I'm new to AI
+
+Teams jump to training because it feels like "real ML." In 2026 the winning order is the opposite:
+
+1. **Prompt** (and tools) until you can name the remaining failure.
+2. **RAG** (or a live API) if the failure is **missing or changing facts**.
+3. **Fine-tune** if the failure is **habit**: schema, voice, dialect, stubborn tool-call shape — after you have gold examples and an eval.
+
+<FineTuneDecision />
+
+The RAG category's **RAG vs Fine-tuning vs Long Context** lesson is the knowledge-vs-behavior lens. This lesson is the **engineering sequence** and the combined stack.
+
+## Mental model
+
+Medicine. Don't start with surgery (fine-tune). Try rest (prompt), then a prescription for the actual disease (RAG for knowledge). Operate when the anatomy (behavior) won't yield.
+
+## How it works — the default stack
+
+- **Prompt + tools** for one-shot and simple agents.
+- **RAG** for handbooks, tickets, SKUs.
+- **QLoRA SFT** on a few hundred to a few thousand clean demos if format/voice still slips.
+- **DPO** if you can label better/worse.
+- **Quantize** the served model after eval.
+- Keep **RAG in front** of the tuned model so facts stay editable.
+
+Long context: paste a short, known-relevant doc. Not a substitute for either RAG or FT at corpus scale.
+
+## Real-world example
+
+Insurance summaries: RAG the claim file + policy. SFT the four-section writeup. DPO to kill hedging. Prompting alone never locked the headings; fine-tuning the policy PDF would have been wrong.
+
+## Technical explanation
+
+Decision tests:
+
+- If an intern with a binder could answer by **looking it up**, it's RAG (or a tool).
+- If an intern would need **weeks of apprenticeship** to write like your team, it's SFT.
+- If they write the structure but **choose the worse tone**, it's DPO.
+- If few-shot already works, **stop**.
+
+Measure before/after on a frozen eval set. Fine-tuning without eval is superstition (next category).
+
+Privacy: training data is sticky. Don't FT on data you couldn't log. RAG can respect ACLs per retrieve; weights cannot forget one customer easily.
+
+## Common mistakes
+
+<CommonMistake>
+Fine-tuning first "to be safe." You now have a stale, uncited, expensive model and still need RAG.
+</CommonMistake>
+
+- Treating this lesson and **RAG vs Fine-tuning** as rival advice — they're the same split, two depths.
+- No gold set, only "vibes."
+
+## When to use it
+
+- Every time someone says "we should train a model." Run this sequence out loud.
+
+## When NOT to use it
+
+- You already know it's a lookup problem — skip to RAG. You already know few-shot works — skip training.
+
+## Alternatives
+
+- Distill to a smaller prompted model; buy a specialist API; hire workflow rules for the last 5%.
+
+<MemoryCard>
+**Prompt → RAG (facts) → SFT/LoRA (behavior) → DPO (preferences).** Combine RAG + a tuned model.
+Don't put a wiki in the weights. If few-shot works, you're done.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-when-to-fine-tune" />

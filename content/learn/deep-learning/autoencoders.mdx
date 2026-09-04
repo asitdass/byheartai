@@ -1,0 +1,134 @@
+---
+id: autoencoders
+slug: autoencoders
+title: What are Autoencoders?
+category: deep-learning
+level: intermediate
+summary: An autoencoder squeezes input through a bottleneck and reconstructs it. The code is an embedding; denoising and VAEs are the useful cousins.
+keywords: [autoencoder, bottleneck, reconstruction, denoising, vae, latent]
+prerequisites: [neurons-layers-activations]
+next: [gans]
+related: [what-are-embeddings, neurons-layers-activations]
+alternatives: [what-are-embeddings]
+confusedWith: [what-are-embeddings]
+frameworks: []
+products: []
+papers:
+  - title: "Auto-Encoding Variational Bayes (Kingma & Welling, 2014)"
+    url: "https://arxiv.org/abs/1312.6114"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-autoencoders
+estimatedMinutes: 12
+---
+
+<OneLine>An autoencoder compresses an input into a smaller code and trains a decoder to rebuild the input. The pressure of the bottleneck — or of denoising — is what makes the code useful.</OneLine>
+
+## Explain like I'm new to AI
+
+You already know **embeddings**: a vector that puts similar things nearby. That lesson is about *using* vectors. This lesson is one classic way to *learn* a compressed vector **without labels**: force a network to reconstruct its input through a skinny middle.
+
+**Encoder** `z = E(x)` maps a high-dimensional `x` (pixels, a spectrogram, 200 table columns) to a **code** `z` with far fewer dimensions. **Decoder** `x̂ = D(z)` tries to rebuild `x`. Train with a reconstruction loss (`MSE` on pixels, `BCE` on bits). If `z` is as wide as `x`, the net can learn the identity and you learned nothing. The **bottleneck** (or extra noise) is the curriculum: keep only what you need to rebuild.
+
+**Denoising autoencoders** corrupt `x` (mask pixels, add Gaussian noise) and ask `D(E(x̃))` to match the **clean** `x`. Then the code cannot be a copy; it has to capture structure. That idea is an ancestor of masked language modeling, even though BERT is not "an autoencoder" in the textbook MLP sense.
+
+Do not duplicate the embeddings lesson: a code `z` **is** an embedding. Retrieval, clustering, and RAG usually use **contrastive** or transformer embeddings now, not a pixel autoencoder. The autoencoder is the reconstruction story and the latent-compression primitive.
+
+<AutoencoderIdea />
+
+## Mental model
+
+A **postal service that only allows a tiny envelope**. To ship a poster, you must fold it into a description ("red bike, left third") and the receiver must redraw it. If the envelope is too big, you just fold the poster once and cheat. If you hand them a stained copy and they must redraw the clean poster, they have to understand the poster, not the stains.
+
+## How it works
+
+1. Choose a code size `k` ≪ input size (or a regularizer that acts like a bottleneck).
+2. Encoder: MLP, CNN, or transformer that outputs `z ∈ R^k`.
+3. Decoder: a mirror (or a fatter) net that outputs `x̂` in the input space.
+4. Loss: `‖x − x̂‖²` (or perceptual / BCE). Optionally + sparsity on `z`, or a KL term (VAE).
+5. After training, **throw away the decoder** if you only wanted embeddings, or **throw away the encoder** if you only wanted a generator (rarely — GANs/diffusion do that job better).
+
+**Tiny numeric encoder.** Six numbers → 2-d code → six numbers. Mean of the first half and second half is a cartoon encoder:
+
+```python
+import numpy as np
+
+x = np.array([0.9, 0.1, 0.8, 0.2, 0.7, 0.15])
+z = np.array([x[:3].mean(), x[3:].mean()])     # [0.60, 0.35]
+# a linear decoder that repeats each code three times
+W_dec = np.array([[1, 0.2, 0.9, 0, 0, 0],
+                  [0, 0, 0, 1, 0.3, 0.85]]).T
+x_hat = W_dec @ z
+mse = np.mean((x - x_hat) ** 2)
+```
+
+The visual uses the same squeeze-and-repeat idea. A **learned** `W` would fit residual structure the averages miss. If you widen `z` to 6, MSE can go to 0 by copying — watch the "wide code" mode.
+
+**Undercomplete vs overcomplete.** Undercomplete: `k` smaller than input — classic bottleneck. Overcomplete: `k` larger, but you add **sparsity** (most of `z` near 0) or noise so it cannot copy. Sparse coding and k-sparse autoencoders live here.
+
+## Real-world example
+
+Manufacturing: a CNN autoencoder trains on "healthy" vibration spectrograms. At test time, reconstruction error spikes → anomaly, no need for a catalog of every failure mode. Same pattern on credit-card feature vectors (with the usual caveat: rare fraud that looks like normal will reconstruct fine).
+
+Image compression research used autoencoders; **production image gen** moved to GANs then **diffusion** (next lesson + the multimodal generation lesson). Tabular "entity embeddings" at a company are more often supervised or contrastive than a vanilla AE.
+
+## Technical explanation
+
+A linear autoencoder with MSE and no tying is closely related to **PCA**: the subspace that minimizes reconstruction is the top principal components (with extra rotation freedom). Nonlinear encoders (ReLU MLPs, conv stacks) can fold manifolds PCA cannot. That is the deep-learning pitch.
+
+**Tied weights:** `W_dec = W_enc.T` cuts parameters and is a reasonable default on small data. Not required.
+
+**Variational autoencoders (VAEs), one paragraph.** Instead of a point `z`, the encoder outputs `μ(x)` and `σ(x)`; you sample `z = μ + σ ⊙ ε` with `ε ~ N(0,1)` (reparameterization). A **KL** term pushes `q(z|x)` toward `N(0,1)` so the decoder sees a smooth, sampleable latent. That lets you **generate** by drawing `z` from the prior and decoding — blurrier images than GANs historically, but a proper likelihood model. β-VAE, VQ-VAE (discrete codes; ancestor of some image tokenizers), and latent diffusion (SD-class models encode pixels with an autoencoder *then* diffuse in `z`) are the 2020s descendants. You do not need the Kingma & Welling derivations to use the idea: **code is a distribution, not a point; KL keeps it regular.**
+
+**Masked autoencoders (MAE)** in vision: hide patches, reconstruct pixels — a transformer encoder, still the reconstruction objective. Different architecture, same family of pressure.
+
+<Compare
+  a="Autoencoder code"
+  b="Contrastive embedding (what-are-embeddings)"
+  rows={[
+    { label: "Supervision", a: "Reconstruct x (or denoise)", b: "Pull pairs together, push others apart" },
+    { label: "What z is for", a: "Compress / denoise / anomaly / latent for a decoder", b: "Retrieve, cluster, RAG, similarity" },
+    { label: "2026 default for search", a: "Rare as the only encoder", b: "Transformer embedding models" },
+    { label: "Generation", a: "VAE / VQ-VAE tokenizer; not photoreal SOTA alone", b: "Not a generator" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Calling any vector an autoencoder, or assuming a bottleneck automatically yields a great embedding for search. If the decoder can ignore semantics and copy texture, z is a bad retrieval index. Contrastive training is usually the better embedding objective — see What are Embeddings?.
+</CommonMistake>
+
+- Bottleneck as wide as the input and no noise — identity function, useless code.
+- Using pixel MSE and expecting sharp faces — it averages plausible pixels (blur). Perceptual losses / adversarial decoders / VAEs+diffusion are the patches.
+- Treating a VAE as "just an autoencoder with extra loss" and then sampling `μ` at train time (you must sample `z`, or the KL is a lie).
+
+## When to use it
+
+- Unsupervised compression, denoising, anomaly via reconstruction error.
+- Learning a latent grid for a downstream generator (VQ-VAE, latent diffusion encoder).
+
+## When NOT to use it
+
+- Semantic search / RAG — train or buy a **contrastive embedding** model.
+- Photoreal image generation from scratch — **diffusion / flow** (and historically GANs), not a vanilla AE decoder.
+
+## Alternatives
+
+- **PCA / NMF** when linear is enough.
+- **Contrastive embeddings** for similarity (linked lesson).
+- **GANs and diffusion** when the job is generate-from-noise, not reconstruct-this-x.
+
+<MemoryCard>
+**Autoencoder = encoder → bottleneck z → decoder**, trained to reconstruct (or denoise).
+z is an embedding, but search usually wants contrastive vectors. VAEs: z is a distribution + KL, one paragraph, not a second paper.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-autoencoders" />

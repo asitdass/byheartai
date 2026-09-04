@@ -1,0 +1,91 @@
+---
+id: rag-poisoning
+slug: rag-poisoning
+title: RAG Poisoning
+category: security
+level: advanced
+summary: RAG poisoning plants text in the index so retrieval serves it as context. Control who can write; treat hits as untrusted even when they look grounded.
+keywords: [rag poisoning, data poisoning, llm08, embeddings]
+prerequisites: [prompt-injection, what-is-rag]
+next: [insecure-output-handling]
+related: [indirect-prompt-injection, rag-evaluation]
+alternatives: []
+confusedWith: [indirect-prompt-injection]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-rag-poisoning
+estimatedMinutes: 8
+---
+
+<OneLine>RAG poisoning is writing hostile or false text into the index (or a lookalike embedding) so retrieval serves it as context. The model then looks "grounded" — to the plant. Who can write the corpus is a security question.</OneLine>
+
+## Explain like I'm new to AI
+
+Indirect injection is "the page we fetched was hostile." Poisoning is "**we stored** the hostility," so every future query can retrieve it. Insider, open wiki, customer-upload folder, or a public page you crawled without care.
+
+<RagPoisoning />
+
+OWASP LLM04 (data poisoning) and LLM08 (vector/embedding weaknesses) overlap here: malicious chunks, embedding inversion, cross-tenant hits, and "similar" decoy docs.
+
+Faithfulness eval can **pass** (the answer matches the chunk). That's why hallucination-eval splits groundedness vs world-truth.
+
+## Mental model
+
+A library where anyone can slip a forged page into the encyclopedia. The student who "cites the book" is still wrong.
+
+## How it works
+
+- **Write control:** who can publish to the index? Review, provenance, signed sources.
+- **Tenant isolation:** separate indexes or hard metadata filters. Never "search all" for a user chat.
+- **Ingest hygiene:** don't blindly crawl the open web into a privileged assistant. Quarantine uploads.
+- **At query time:** retrieved text stays untrusted (indirect injection). Acting tools still gated.
+- **Detect:** sudden chunk edits, embedding outliers, eval slices on canary questions you own.
+
+Lookalike attacks: a doc titled like your policy with a high embedding similarity. Rerankers and metadata (source, date, publisher) help; they are not magic.
+
+## Real-world example
+
+A public "how to get refunds" page is ingested. It states a fake policy. Support bot quotes it with a citation. Marketing thinks RAG is working. Legal disagrees. That's poisoning (or reckless ingest) without a custom exploit string.
+
+## Technical explanation
+
+If attackers can **write embeddings** directly, they can place vectors near hot queries. Guard the upsert API like you guard the database.
+
+Deleting a poisoned chunk is not enough if it was **fine-tuned** into weights — that's why facts belong in RAG you can edit, not in FT (fine-tuning category). Poisoned FT is worse.
+
+## Common mistakes
+
+<CommonMistake>
+Crawling the internet into an employee assistant and calling it "knowledge."
+</CommonMistake>
+
+- One shared index for all customers.
+- Treating citations as proof of truth.
+
+## When to use it
+
+- Any RAG corpus with more than one writer, or any ingest from outside the security perimeter.
+
+## When NOT to use it
+
+- Don't skip write-controls because "we have a system prompt about only using trusted docs." Retrieval already picked the plant.
+
+## Alternatives
+
+- Closed corpus: legal-approved PDFs only. Smaller recall, much smaller poison surface.
+
+<MemoryCard>
+**Poisoning** = hostile text (or vectors) in the index. Grounded ≠ true.
+Control writes, isolate tenants, treat hits as untrusted. Don't crawl the open web into a privileged bot.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-rag-poisoning" />

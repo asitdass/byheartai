@@ -1,0 +1,92 @@
+---
+id: design-research-multi-agent
+slug: design-research-multi-agent
+title: Design a Research or Multi-Agent System
+category: ai-system-design
+level: advanced
+summary: Default to one researcher with search tools; add parallel gatherers only when sub-questions are independent — cap cost, keep citations, and don't share god tools.
+keywords: [research agent, multi-agent, orchestrator, parallel gather]
+prerequisites: [how-to-design-ai-system, multi-agent-systems]
+next: [design-ai-search]
+related: [mcp-and-agents, planning-reflection, agent-traces]
+alternatives: [design-rag-chatbot]
+confusedWith: [multi-agent-systems]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-design-research-multi-agent
+estimatedMinutes: 8
+---
+
+<OneLine>Research systems browse and synthesize with citations. Start with **one** agent and tools. Fan out extra agents only for independent, parallel reads — then cap loops, isolate tools, and trace every handoff.</OneLine>
+
+## Explain like I'm new to AI
+
+The multi-agent lesson warned: extra personalities are extra cost and extra bugs. This is when the *job* is research (many sources, a brief) and when a **team** actually pays.
+
+<ResearchTeamDesign />
+
+**Job:** a sourced brief on a question. **SLO:** citation coverage, time budget, $ cap, no silent tool storms.
+
+**Shape:** one agent + search/browse/notes is the default (2026). Multi-agent when sub-questions don't share state and can run in parallel.
+
+## Mental model
+
+A journalist with a notebook vs a newsroom: you don't hire five editors to fetch one weather page. You do send two reporters to two cities.
+
+## How it works
+
+- Tools: search, fetch, maybe a code interpreter in a jail. Fetch is **indirect injection** — no send-mail on that kit.
+- Output: claims with source urls/ids. Verify citations in code when you can.
+- Memory: a research pad (notes tool) rather than stuffing every page in the window (compress/isolate).
+- Multi-agent: orchestrator assigns disjoint queries; synthesizer only sees notes, not god refund tools.
+- Eval: rubrics on groundedness + coverage; humans on a sample. Cost per brief is a first-class metric.
+- Traces: parent run id, child spans per gatherer.
+
+## Real-world example
+
+"Competitive memo." One agent, 12 fetches, 8 minutes, $0.40, citations. The "team of 6" version spent $9, disagreed, and cited a URL it never fetched. Eval chose the single agent.
+
+## Technical explanation
+
+Fan-out helps **read-heavy, decomposable** work (Anthropic-style guidance you've seen in the agents category). Tight sequential coding/support work gets worse with more agents.
+
+MCP: each gatherer gets a **read-only** server. Orchestrator holds the write-to-doc tool.
+
+Don't confuse this with **AI search** (next): search returns a ranked list; research writes a document.
+
+## Common mistakes
+
+<CommonMistake>
+A Slack channel of agents with every MCP server installed because "collaboration."
+</CommonMistake>
+
+- No $ or step cap.
+- Synthesizer that can also hit production APIs.
+
+## When to use it
+
+- Open-ended briefs over many sources. Fan-out when eval shows wall-clock or coverage wins.
+
+## When NOT to use it
+
+- Don't multi-agent a FAQ. Don't skip citations because the prose sounds like a report.
+
+## Alternatives
+
+- RAG chatbot over a closed corpus. Human researcher + RAG. Plain search UI.
+
+<MemoryCard>
+**One researcher first.** Fan-out only for independent parallel reads. Citations + $ caps.
+Read-only tools for gatherers. Traces on handoffs. A meeting of agents is not a design.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-design-research-multi-agent" />

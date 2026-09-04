@@ -1,0 +1,99 @@
+---
+id: short-term-memory
+slug: short-term-memory
+title: Short-term Memory & Conversation History
+category: memory
+level: beginner
+summary: Short-term memory is two layers — the session log you store and the smaller working set that actually fits in the context window.
+keywords: [short-term memory, working memory, conversation history, session memory, context window]
+prerequisites: [context-window, context-state]
+next: [long-term-memory]
+related: [agent-memory, context-compression]
+alternatives: []
+confusedWith: [long-term-memory]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-short-term-memory
+estimatedMinutes: 7
+---
+
+<OneLine>Short-term memory is not "whatever the model feels like remembering" — it is the session you persist plus the much smaller working set that still fits in the context window this call.</OneLine>
+
+## Explain like I'm new to AI
+
+People say "the chatbot remembers this conversation." Two different things get mixed up:
+
+1. **Session / conversation history** — every turn saved in a database for this thread. You can reload it tomorrow *in this session*.
+2. **Working memory** — what is actually inside the **context window** for the *next* model call. That window is tiny compared with a long thread.
+
+Click through a chat. The left column keeps the whole session. The right column is all the model can see:
+
+<ConversationHistory />
+
+When the window fills, older turns are still in the **log**. They are not in the **model's head** unless you put them back (summarize, retrieve, or pin).
+
+## Mental model
+
+A meeting. The **recording** is the session log. The **notes currently on the whiteboard** are working memory. Wipe the board and the recording still exists — but the people in the room only see the board.
+
+## How it works
+
+- Append each user/assistant/tool message to a **thread-scoped store** (Postgres, SQLite, Redis).
+- On the next call, **select** a working set: last *N* turns, plus a compact summary of the rest (see **context compression**).
+- Working memory also includes the live **task state** (todos, the current file) — that is context engineering's packing job.
+
+MemGPT-style agents treat this like an OS: RAM = context window, disk = the log and long-term stores, with "paging" when RAM fills.
+
+## Real-world example
+
+You tell a support bot your order id in turn 2. In turn 40, if those tokens have fallen out of the window and nobody saved `order_id` into state, the model will ask again — even though the session log still has it. The bug is selection, not "a forgetful model."
+
+## Technical explanation
+
+The weights do not update when you chat. Continuity is 100% **what you resubmit**. Distinguish:
+
+| Layer | Lifetime | Typical store |
+| --- | --- | --- |
+| Working memory | One API call | Context window |
+| Conversation / session | One thread | DB, often with a summary column |
+| Long-term | Across threads | Vector/graph/KV (next lesson) |
+
+Hot path: keep recent turns **verbatim** (tool errors, the latest user ask). Cold path: compact. Prompt caching likes an **append-only** recent history so prefixes stay stable.
+
+## Common mistakes
+
+<CommonMistake>
+Equating "we stored the chat" with "the model remembers." Storage without packing is a log the model
+cannot see.
+</CommonMistake>
+
+- Replaying the entire thread every call (cost, dilution, cache misses when you rewrite it).
+- No thread id — messages leak across users or conversations.
+
+## When to use it
+
+- Any multi-turn product. Session logs are the default; working-set packing is mandatory once threads get long.
+
+## When NOT to use it
+
+- Single-shot APIs with no follow-up — don't invent a history store.
+
+## Alternatives
+
+- Stateless turns with all needed facts in one prompt; **long-term memory** when it must survive a *new* thread.
+
+<MemoryCard>
+**Short-term** = session **log** + **working set** in the window. The model only sees the working set.
+Old turns still exist on disk until you **select, compact, or pin** them back in.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-short-term-memory" />

@@ -1,0 +1,150 @@
+---
+id: lstms-grus
+slug: lstms-grus
+title: LSTMs and GRUs
+category: deep-learning
+level: intermediate
+summary: LSTMs and GRUs add gates so memory survives longer than a vanilla RNN. Useful in some time series; transformers took NLP.
+keywords: [lstm, gru, gates, memory cell, forget gate, recurrent]
+prerequisites: [rnns]
+next: [autoencoders]
+related: [rnns, why-transformers-replaced-rnns]
+alternatives: [what-is-transformer]
+confusedWith: [rnns]
+frameworks: []
+products: []
+papers:
+  - title: "Long Short-Term Memory (Hochreiter & Schmidhuber, 1997)"
+    url: "https://www.bioinf.jku.at/publications/older/2604.pdf"
+    kind: paper
+  - title: "Learning Phrase Representations using RNN Encoder–Decoder (Cho et al., 2014)"
+    url: "https://arxiv.org/abs/1406.1078"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-lstms-grus
+estimatedMinutes: 13
+---
+
+<OneLine>LSTMs and GRUs are RNNs with learned gates so a memory can stay put instead of being smashed by every new tanh. They fixed a lot of vanishing-gradient pain; they did not make training parallel.</OneLine>
+
+## Explain like I'm new to AI
+
+A vanilla RNN overwrites `h` every step with a fresh `tanh(...)`. Asking `h_100` to still contain `x_1` is like photocopying a photocopy. **LSTM** (Long Short-Term Memory, 1997) adds a **cell** `c` whose default job is *not* to overwrite: a **forget gate** close to 1 means "keep the old cell," an **input gate** close to 0 means "don't write this step." **GRU** (Gated Recurrent Unit, 2014) is the cheaper cousin: one state, two gates, no separate cell.
+
+These were the workhorses of NLP and speech from the mid-2010s until transformers. In 2026 you still meet them in **some time-series and on-device sequence** stacks. You do **not** start a new translation system or LLM on an LSTM. The last lesson in this category is why.
+
+<LstmGru />
+
+## Mental model
+
+LSTM: a **safe** (the cell `c`) and a **whiteboard** (the hidden `h` others see). Forget / input / output are the combination on the safe and whether you copy the contents onto the board. You can keep a number in the safe while showing zeros on the board ("hold but hide" in the visual).
+
+GRU: only the whiteboard, with a dimmer that blends old writing and new writing (**update**), and a knob for how much old writing you look at when drafting the new sentence (**reset**). Simpler. Cannot hide a full memory from the output state.
+
+## How it works
+
+All gates are **sigmoids** of an affine mix of `x_t` and `h_{t-1}` (LSTM also peeks at `c` in some variants — "peephole"). Values in (0, 1) mean interpolate, not hard switches — but you should think of them as soft keep/write/read.
+
+**LSTM (standard):**
+
+```text
+f_t = σ(W_f [h_{t-1}, x_t] + b_f)      # forget
+i_t = σ(W_i [h_{t-1}, x_t] + b_i)      # input
+o_t = σ(W_o [h_{t-1}, x_t] + b_o)      # output
+c̃_t = tanh(W_c [h_{t-1}, x_t] + b_c)   # candidate
+c_t = f_t ⊙ c_{t-1} + i_t ⊙ c̃_t
+h_t = o_t ⊙ tanh(c_t)
+```
+
+If `f = 1` and `i = 0`, then `c_t = c_{t-1}` **exactly** (up to floating point). The gradient through that path is ~1. That is the trick Hochreiter and Schmidhuber designed: a **constant error carousel**, not a product of random `W_h`.
+
+**Tiny numbers.** Suppose `c_{t-1} = 2.0`, candidate `c̃ = -1.0`:
+
+| Intent | f | i | c_t |
+| --- | --- | --- | --- |
+| Keep | 0.95 | 0.05 | 0.95×2 + 0.05×(−1) = 1.85 |
+| Overwrite | 0.10 | 0.90 | 0.1×2 + 0.9×(−1) = −0.70 |
+| Wipe | 0.05 | 0.05 | ~0.05 |
+
+Output gate 0.05 on a cell of 1.85 → `h ≈ 0.05 * tanh(1.85) ≈ 0.05`. Downstream sees near-zero; the cell still holds the fact. GRU cannot do that split.
+
+**GRU:**
+
+```text
+z_t = σ(W_z [h_{t-1}, x_t] + b_z)      # update (how much new)
+r_t = σ(W_r [h_{t-1}, x_t] + b_r)      # reset
+h̃_t = tanh(W_h [r_t ⊙ h_{t-1}, x_t] + b_h)
+h_t = (1 - z_t) ⊙ h_{t-1} + z_t ⊙ h̃_t
+```
+
+`z ≈ 0` keeps `h`. `z ≈ 1` replaces it. Reset `r ≈ 0` makes the candidate ignore the past (useful when the next token starts a new phrase). Roughly **⅔ the parameters** of an LSTM of the same width — often similar accuracy on smaller tasks, which is why GRUs were popular in 2015–2018 ablation tables.
+
+**Stacking and bidirectionality.** Two LSTM layers: the second reads `h` of the first as its `x`. Bidirectional: a forward LSTM and a backward LSTM concatenated — gold for tagging, illegal for causal language modeling.
+
+## Real-world example
+
+A factory sensor at 10 Hz: a 2-layer GRU with hidden 64 predicts "pump will stall in 30 s" from the last few minutes. Sequence is long but the pattern is local-ish, data is not web-scale text, latency budget is a microcontroller. An LSTM/GRU is still a reasonable 2026 choice.
+
+A support-ticket classifier on raw tokens: you'd be fighting 2016. Embed with a transformer (or a frozen encoder) instead.
+
+Speech: listen, attend, and spell was LSTM. Whisper and friends are transformers. On-device **wake-word** models may still be tiny conv + GRU.
+
+## Technical explanation
+
+Gates do **not** magically give infinite memory. If forget sits at 0.9 every step, `0.9^50 ≈ 0.005` — the cell still dies on long spans. LSTMs learn to pop `f` to 1 when a fact must survive, and drop it when the clause ends. That is a **data-driven** memory policy, not a tape you can address (Transformers' KV cache *is* more like an addressable tape).
+
+Training still uses BPTT. You still cannot parallelize over T. Gradient clipping is standard. Packed padded sequences in frameworks exist because batches of different lengths are otherwise a mess — another operational tax transformers pay differently (padding + attention mask).
+
+**peephole / CIFG / coupled forget-input** are LSTM variants; you do not need them unless you are reproducing a paper. **LayerNorm LSTMs** were a late attempt to stabilize deep stacks; by then attention had won language.
+
+<Compare
+  a="LSTM"
+  b="GRU"
+  rows={[
+    { label: "State", a: "Cell c + hidden h", b: "Hidden h only" },
+    { label: "Gates", a: "forget, input, output (3)", b: "update, reset (2)" },
+    { label: "Can hide memory from h", a: "Yes (output gate)", b: "No" },
+    { label: "Typical size", a: "More params, slightly more VRAM", b: "Leaner, often close accuracy" },
+    { label: "NLP in 2026", a: "Legacy / niche", b: "Same — transformers default" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Calling every gated net "an LSTM" or assuming GRUs obsolete LSTMs. They are two points on the same gated-RNN line. Neither is the default language architecture anymore.
+</CommonMistake>
+
+- Expecting an LSTM to remember a 10,000-step dependency because "it has a cell." Cells leak; attention or explicit state is for that.
+- Using a bidirectional LSTM in a decoder that must not see the future.
+- Stacking 8 LSTM layers without residuals/LayerNorm and then blaming "RNNs are bad" — they are just painful to optimize at that depth.
+
+## When to use it
+
+- Moderate-length time series, streaming features, small models where a 64-d state is the whole memory.
+- Reproducing or maintaining 2015–2018 sequence systems.
+
+## When NOT to use it
+
+- New NLP, long documents, or any workload you want to train with full sequence parallelism — **transformers**.
+- When a sliding-window 1-d CNN or a gradient-boosted model on lagged features already hits the metric.
+
+## Alternatives
+
+- **Vanilla RNN** — almost never; gates are cheap insurance.
+- **Transformers / SSMs (Mamba-class)** — parallel sequence models; SSMs target the remaining "long 1-d stream" niche.
+- **Kalman filters / classical state-space** — if the dynamics are actually linear-Gaussian.
+
+<MemoryCard>
+**LSTM:** cell + forget/input/output. Keep by f≈1, i≈0. **GRU:** one state, update + reset, fewer params.
+Gated RNNs beat tanh-RNNs; they are still serial. Transformers took NLP; some time series still use them.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-lstms-grus" />

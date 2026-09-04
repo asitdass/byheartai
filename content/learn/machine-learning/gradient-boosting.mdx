@@ -1,0 +1,123 @@
+---
+id: gradient-boosting
+slug: gradient-boosting
+title: Gradient Boosting and XGBoost
+category: machine-learning
+level: intermediate
+summary: Gradient boosting adds trees in sequence to fix leftover errors. XGBoost and LightGBM still default for tabular; use deep learning for images and language.
+keywords: [gradient boosting, xgboost, lightgbm, catboost, residuals, tabular]
+prerequisites: [decision-trees]
+next: [classification-metrics]
+related: [decision-trees, random-forests, what-is-deep-learning, overfitting-vs-underfitting]
+alternatives: [random-forests, what-is-deep-learning]
+confusedWith: [random-forests]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-gradient-boosting
+estimatedMinutes: 14
+---
+
+<OneLine>Gradient boosting builds trees in sequence: each new tree fits the leftover errors of the ensemble so far. On spreadsheets, this family is still the 2026 default — not a neural net.</OneLine>
+
+## Explain like I'm new to AI
+
+A random forest is a **parallel** crowd. **Gradient boosting** is a **relay**.
+
+Start with a naive prediction (often the mean). Look at the **residuals** — where you are still wrong. Train a **small** tree to predict those leftovers. Add it to the ensemble (times a **learning rate**, so you do not jump too far). New residuals. Another tree. Repeat.
+
+<GradientBoosting />
+
+**XGBoost**, **LightGBM**, and **CatBoost** are industrial implementations of this idea (plus regularization, missing-value handling, histogram splits, categorical tricks). Do not marry one vendor in your head: in 2026 they are a **family**. One will win a given table; the concept is residual-fitting boosted trees.
+
+They are **not** the tool for pixels or paragraphs. For images and language, **deep learning** won. For churn, credit, pricing, click-through on *columns*, boosting still eats neural nets for breakfast unless you have a representation that already did the hard work.
+
+## Mental model
+
+Office hours. The first tutor teaches the average student. The second tutor only coaches whoever still fails. The third hunts the remaining mistakes. Each tutor is a stump or a shallow tree. The course grade is the sum of their notes.
+
+Forests: many tutors independently read random chapters and vote. Boosting: tutors go in order and the syllabus is “whatever is still wrong.”
+
+## How it works
+
+1. Initialize `F₀(x)` (mean for regression; log-odds for classification).
+2. For m = 1 … M:
+   - Compute the **negative gradient** of the loss wrt current predictions (for squared error, that *is* the residual `y − F`).
+   - Fit a tree `h_m` to that gradient.
+   - `F_m = F_{m−1} + ν · h_m`, with learning rate `ν` (often 0.01–0.3).
+3. Stop at M, or **early-stop** when validation loss stops improving.
+
+**Why shallow trees?** Each tree should be a weak specialist. Depth 3–8 is a common band. A depth-20 tree in the loop memorizes residuals, including noise — classic overfit. Forests wanted deep trees; boosting wants polite ones. Do not copy hyperparameters across the two.
+
+**Regularization** in the family: `λ` on leaf weights, `γ` on making a split, column/row subsampling (yes, boosting stole bagging’s clothes), min child weight. LightGBM grows leaf-wise; XGBoost historically level-wise. CatBoost is careful with categoricals and ordered boosting to reduce target leakage.
+
+## Real-world example
+
+An insurer predicts claim cost from 80 underwriting columns. A linear model underfits interactions. A deep net on 40k rows overfits and needs a GPU story. A LightGBM / XGBoost / CatBoost bake-off with the **same** CV splits is the adult pipeline. The winner is usually in this family.
+
+A photo app that tags species does **not** start here. Pixels → a convolutional or vision transformer network (deep learning). You might *then* boost on the embedding plus metadata — still: the image understanding is not XGBoost’s job.
+
+## Technical explanation
+
+“Gradient” in the name: boosting is gradient descent **in function space**. The tree approximates the gradient of the loss. Change the loss (Huber, logistic, ranking) and the “residuals” change meaning.
+
+**2026 tabular vs nets:** when features are heterogeneous, missing, mixed scale, and n is 10⁴–10⁷ rows of columns, boosted trees remain the default on Kaggle-like and production scoring tables. Neural nets win when you must *learn the features* from raw sensors or text. Foundation-model embeddings + a linear head can close the gap; they still do not make “always use a net on CSV” true.
+
+Do not lock architecture to a single brand. Benchmark the family. Watch **train vs val** by round: boosting will drive train loss to a puddle while val rises — early stopping is the overfitting lesson with a progress bar.
+
+<Compare
+  a="Random forest"
+  b="Gradient boosting"
+  rows={[
+    { label: "Order", a: "Trees independent (parallel)", b: "Trees sequential (each fixes leftovers)" },
+    { label: "Typical tree", a: "Deep", b: "Shallow" },
+    { label: "Knob that overfits", a: "Leaks, not extra trees", b: "Too many rounds, too high ν, too deep" },
+    { label: "2026 tabular default?", a: "Strong baseline", b: "Usually the accuracy champ of the two" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Feeding JPEGs or raw token ids into XGBoost because “boosting is SOTA.” SOTA for which input? For language and vision, use deep learning. Boosting wants a table of features.
+</CommonMistake>
+
+- Learning rate 1.0 and 2000 depth-10 trees. You will nail train and miss val.
+- Tuning on the test set. Same crime as always.
+- Target encoding categoricals on the full fold (leak). CatBoost’s ordered schemes and CV-safe encoders exist because people leak.
+- Treating “XGBoost” as the concept. It is one implementation of **gradient-boosted trees**.
+
+## When to use it
+
+- Tabular supervised problems where a forest is good and you want better.
+- Ranking, probability calibration pipelines, production feature stores with columns.
+- As the model after you have a frozen split and a metric that matches the business (next lesson).
+
+## When NOT to use it
+
+- **Images, audio, video, raw language.** Use deep learning (and the later LLM/VLM stack). Boosting on pixels is a museum exhibit.
+- Tiny n where a regularized linear model is more honest.
+- When you must ship one readable tree. Boosting is an additive pile of trees.
+- Online learning with a tiny latency budget on a microcontroller — maybe a single tree or a linear model.
+
+## Alternatives
+
+- **Random forests** for less tuning and easy parallelism.
+- **Linear / logistic** plus good features.
+- **Deep learning** for perception and language; sometimes tabular nets when n is huge and features are dense.
+- Stacking: boost on embeddings from a net — still two tools, two jobs.
+
+<MemoryCard>
+**Gradient boosting** = add **shallow trees** in sequence to fit **residuals** (the loss gradient).
+**XGBoost / LightGBM / CatBoost** are the 2026 tabular family, not one vendor. Not for images or language — that is deep learning. Early-stop on val.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-gradient-boosting" />

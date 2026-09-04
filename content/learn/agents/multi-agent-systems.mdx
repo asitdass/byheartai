@@ -1,0 +1,96 @@
+---
+id: multi-agent-systems
+slug: multi-agent-systems
+title: Multi-Agent Systems
+category: agents
+level: advanced
+summary: Multi-agent systems split a big task across specialized agents coordinated by an orchestrator, trading extra complexity and cost for better focus and parallelism.
+keywords: [multi-agent, orchestration, supervisor, specialist agents, agent teams]
+prerequisites: [what-is-agent, agent-loop]
+next: [what-is-mcp]
+related: [planning-reflection, agent-loop, design-research-multi-agent]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-multi-agent-systems
+estimatedMinutes: 8
+---
+
+<OneLine>A multi-agent system uses several specialized agents — usually coordinated by an orchestrator — to tackle one big task, gaining focus and parallelism at the cost of more complexity, latency, and spend.</OneLine>
+
+## Explain like I'm new to AI
+
+Instead of one agent doing everything, a **multi-agent system** is a **team**: several agents, each good at one thing, working together. A common setup has a **supervisor** (orchestrator) that receives the goal and **delegates** sub-tasks to specialist agents, then combines their results.
+
+<MultiAgent />
+
+Each specialist has its own focused instructions and tools, so it does its part well — like a research team with a manager.
+
+## Mental model
+
+A **company org chart**: a manager (supervisor) splits a project among a researcher, an engineer, and a writer. Each expert focuses on their piece; the manager coordinates and assembles the final result. More people can mean faster work — or more coordination overhead.
+
+## How it works
+
+Common patterns:
+
+- **Supervisor / orchestrator:** one coordinator plans and routes sub-tasks to workers, then merges outputs. Most common and controllable.
+- **Pipeline:** agents hand off in sequence (agent A's output → agent B's input).
+- **Parallel:** independent sub-tasks run at once, then results are combined (fan-out/fan-in).
+- **Peer collaboration / debate:** agents critique or debate to improve quality.
+
+Each agent has its own **role, prompt, tools, and sometimes memory**, communicating via messages.
+
+## Real-world example
+
+A "deep research" system: a **supervisor** breaks a question into sub-topics, spins up several **researcher** agents to investigate each in parallel, then a **writer** agent synthesizes their findings into a report. The parallelism covers more ground quickly, and separation keeps each agent's context focused.
+
+## Technical explanation
+
+Multi-agent systems help when a task has **separable sub-problems** or benefits from **parallel exploration** and **context isolation** (each agent keeps a clean, focused context instead of one giant shared one). But they add real costs:
+
+- **Coordination overhead & failure modes:** agents miscommunicate, duplicate work, or deadlock.
+- **Higher latency and token spend:** many agents = many LLM calls.
+- **Harder debugging & evaluation:** errors compound across agents.
+
+Guidance (echoing Anthropic and others): **prefer a single agent** until you clearly need multiple; multi-agent shines for **parallelizable, read-heavy** work (like research) and is riskier for tightly-coupled tasks needing shared state. Good orchestration, clear role boundaries, and strong evaluation are essential.
+
+## Common mistakes
+
+<CommonMistake>
+Reaching for a multi-agent system by default. It multiplies cost, latency, and failure modes. Start with
+one well-designed agent; only split into multiple when sub-tasks are genuinely separable or parallel.
+</CommonMistake>
+
+- Vague role boundaries, so agents duplicate work or step on each other.
+- No shared plan/state, so specialists drift out of sync.
+
+## When to use it
+
+- Large tasks with **separable, parallelizable** sub-problems (e.g., research across many topics) or where context isolation clearly helps.
+
+## When NOT to use it
+
+- Simpler or tightly-coupled tasks where a single agent is cheaper, faster, and easier to debug.
+
+## Alternatives
+
+- A **single agent** with good tools and planning; a fixed **workflow** when the sub-task structure is known and static.
+
+<MemoryCard>
+**Multi-agent systems** = a team of specialized agents, often led by a **supervisor/orchestrator**
+(other patterns: pipeline, parallel, debate). They add cost, latency, and coordination risk — prefer a
+**single agent** until sub-tasks are clearly separable or parallelizable (e.g., research).
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-multi-agent-systems" />

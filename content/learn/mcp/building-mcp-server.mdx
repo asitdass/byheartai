@@ -1,0 +1,125 @@
+---
+id: building-mcp-server
+slug: building-mcp-server
+title: Building an MCP Server
+category: mcp
+level: advanced
+summary: An MCP server wraps one system behind clear tools, resources, and prompts, served over stdio or HTTP with an official SDK.
+keywords: [build mcp server, fastmcp, mcp sdk, tools/call, stdio, streamable http]
+prerequisites: [mcp-primitives, mcp-auth]
+next: [consuming-mcp-server]
+related: [mcp-architecture, mcp-security]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Model Context Protocol specification"
+    url: "https://modelcontextprotocol.io"
+    kind: spec
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-building-mcp-server
+estimatedMinutes: 10
+---
+
+<OneLine>Building an MCP server means wrapping one system behind clear tools (and maybe resources and prompts), serving them over stdio or HTTP, and letting official SDKs handle the protocol so you can focus on safety and a good schema.</OneLine>
+
+## Explain like I'm new to AI
+
+You are not building an agent. You are building a **device** that plugs into agents. The recipe:
+
+1. Pick **one system** (your tickets, your DB, your files) — not "the whole company."
+2. Declare a **small set of tools** with honest names, descriptions, and input schemas.
+3. Optionally add **resources** (read-only context) and **prompts** (recipes).
+4. Serve over **stdio** (local) or **Streamable HTTP** (remote, with OAuth).
+5. Use a **Tier-1 SDK** (TypeScript, Python, Go, C#) so you don't hand-roll JSON-RPC.
+
+<McpCallFlow />
+
+That's the loop hosts will run against you: discover, list, call, result (or "need input").
+
+## Mental model
+
+Write a **tiny, well-labeled API** whose only clients are AI hosts. The "docs" *are* the tool descriptions — models never read your README. If the description is vague, the model will call the wrong thing.
+
+## How it works
+
+Conceptually (SDKs differ in spelling; this is the shape):
+
+```ts
+// Illustrative — use the current official SDK, not this as copy-paste production code.
+server.tool(
+  "create_issue",
+  {
+    description: "Create a ticket in the engineering project. Never use for comments or search.",
+    inputSchema: { title: "string", body: "string" },
+  },
+  async ({ title, body }) => {
+    const issue = await tickets.create({ title, body });
+    return { content: [{ type: "text", text: JSON.stringify(issue) }] };
+  },
+);
+```
+
+Then:
+
+- **stdio:** the SDK reads stdin / writes stdout; the host launches your command.
+- **HTTP:** expose `/mcp` (or your SDK's handler). Send `Mcp-Method` / `Mcp-Name` as required. Stay **stateless** at the protocol layer. Need a multi-step upload? Return a handle (`uploadId`) as a tool result.
+- **Mid-call confirmation:** return `input_required` (MRTR) rather than holding a stream.
+- **Long work:** use the **Tasks** extension and polling, not a 10-minute HTTP request.
+
+Add `ttlMs` / `cacheScope` on list/read results. Keep list **order deterministic**.
+
+## Real-world example
+
+A "company handbook" server: resource `doc://handbook/{slug}` for reading, tool `search_handbook` for lookup, prompt `answer_from_handbook` that forces citations. No write tools. That's a complete, safe server an IDE and an HR chatbot can both use.
+
+## Technical explanation
+
+Production checklist:
+
+- **Least privilege.** Separate read and write tools. Default to read-only if you can.
+- **Validate arguments** against the schema *again* in your handler. The model is untrusted.
+- **Structured errors** the model can act on (`not_found`, `permission_denied`) — don't throw HTML.
+- **No token passthrough.** Your server is an OAuth *client* to upstream APIs.
+- **Sandbox** local servers (filesystem allow-lists, no arbitrary shell).
+- **Don't log secrets.** Do log `Mcp-Name`, user id, and outcome for audit.
+- **Extensions** go in `ServerCapabilities` — don't pretend experimental features are core.
+- Target spec **2026-07-28**: no `initialize` session, self-describing `_meta`, optional `server/discover`.
+
+## Common mistakes
+
+<CommonMistake>
+Shipping 40 overlapping tools ("get_data", "fetch_info", "query_all"). Models pick by description.
+Fewer, sharper tools beat a junk drawer — the same lesson as tool selection for agents.
+</CommonMistake>
+
+- Hiding required state in "the session" after 2026 — there isn't one.
+- Running `eval` / unconstrained SQL because "the model will be careful."
+
+## When to use it
+
+- A capability many hosts should share, or a vendor-owned integration you want to publish once.
+
+## When NOT to use it
+
+- A function used by only one internal workflow — a normal API plus function calling is enough.
+
+## Alternatives
+
+- OpenAPI the host wraps; a plugin only for one vendor's store.
+
+<MemoryCard>
+An MCP server = **one system**, a **small clear catalog**, served over **stdio or HTTP** via an official
+SDK. Stay **stateless** on the wire, **least-privilege** in tools, validate every argument, never pass
+tokens through. Descriptions *are* the docs the model reads.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-building-mcp-server" />

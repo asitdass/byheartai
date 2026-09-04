@@ -1,0 +1,98 @@
+---
+id: agent-loop
+slug: agent-loop
+title: The Agent Loop
+category: agents
+level: intermediate
+summary: The agent loop is the cycle of observe, reason, plan, and act that repeats — using tools and results — until the agent reaches its goal.
+keywords: [agent loop, observe reason plan act, control loop, iteration, tools]
+prerequisites: [what-is-agent]
+next: [react]
+related: [what-is-agent, react, tool-selection, agent-traces]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-agent-loop
+estimatedMinutes: 7
+---
+
+<OneLine>The agent loop is the repeating cycle — observe the situation, reason about it, plan the next move, act with a tool — that lets an agent make progress step by step until the goal is met.</OneLine>
+
+## Explain like I'm new to AI
+
+What actually makes an agent "go" is a **loop**. Rather than answering once, the agent repeats a short cycle:
+
+1. **Observe** — look at the goal and the latest information.
+2. **Reason** — think about what's needed next.
+3. **Plan** — decide the specific next action.
+4. **Act** — do it (usually call a tool), producing a new result to observe.
+
+Then it loops back to Observe with that new result. Step through a real example:
+
+<AgentLoop />
+
+## Mental model
+
+It's the same loop you use fixing something at home: **look** at the problem, **think** about the cause, **decide** what to try, **try it**, then **look again** at what changed — repeating until it's fixed.
+
+## How it works
+
+- Each iteration adds the latest **observation** (often a tool result) to the agent's context.
+- The model uses everything so far to choose the next action — or to decide it's **done**.
+- A **stopping condition** ends the loop: goal achieved, max steps reached, or budget exhausted.
+
+This "act → observe → decide" cycle is the engine underneath every agent framework, whether it's called a loop, a graph, or a runtime.
+
+## Real-world example
+
+A coding agent fixing a failing test: **Observe** the error → **Reason** it's a null check → **Plan** to edit the function → **Act** (edit + run tests) → **Observe** the new result. If tests still fail, it loops; if they pass, it stops. No single step solves it — the loop does.
+
+## Technical explanation
+
+The loop is a control structure around the LLM: the model emits either a **tool call** or a **final answer**; tool calls are executed and their outputs appended to the context as observations. Critical engineering concerns:
+
+- **Stopping conditions & step limits** to prevent infinite or runaway loops.
+- **Error handling** — feed failures back so the agent can recover instead of crashing.
+- **Context growth** — long loops fill the context window, so old steps may need summarizing (see memory).
+- **Cost/latency** — every iteration is an LLM call, so more steps = more money and time.
+
+Variants like **ReAct** make the reasoning explicit in the loop; planning/reflection add checkpoints for reliability.
+
+## Common mistakes
+
+<CommonMistake>
+Running the loop with no step limit or budget. An agent that never decides it's "done" can spiral into
+dozens of expensive calls — always cap iterations and define a clear stopping condition.
+</CommonMistake>
+
+- Not feeding tool errors back into the loop, so the agent can't recover.
+- Ignoring context growth, causing the agent to "forget" early steps mid-task.
+
+## When to use it
+
+- Any agent — the loop is the fundamental structure that turns an LLM into an actor.
+
+## When NOT to use it
+
+- One-shot tasks that need no iteration — a single call is simpler and cheaper.
+
+## Alternatives
+
+- A fixed **workflow** replaces the dynamic loop with predetermined steps when the sequence is known.
+
+<MemoryCard>
+The **agent loop**: observe → reason → plan → act, repeating with each new result until done. Always set
+a **stopping condition** (goal, max steps, or budget) and feed **errors** back so the agent can recover.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-agent-loop" />

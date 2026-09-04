@@ -1,0 +1,96 @@
+---
+id: tool-selection
+slug: tool-selection
+title: Tool Selection
+category: agents
+level: intermediate
+summary: Tool selection is how an agent picks the right tool for a step by matching the task to each tool's name and description — so good tool design is critical.
+keywords: [tool selection, tool use, function calling, tool design, agent tools]
+prerequisites: [react, function-calling]
+next: [agent-memory]
+related: [react, function-calling, tool-abuse]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-tool-selection
+estimatedMinutes: 7
+---
+
+<OneLine>Tool selection is the agent's decision of which tool to use for the current step — it reads each tool's name and description and matches them to the task, so clear tool design directly drives agent reliability.</OneLine>
+
+## Explain like I'm new to AI
+
+An agent usually has **several tools** available — search, calculator, calendar, code runner, database. For each step it must pick the **right one**. How? It reads each tool's **name and description** (which you write) and matches them against what the task needs.
+
+<ToolSelection />
+
+Because the model decides purely from those descriptions, **how you describe a tool is as important as the tool itself**. Vague descriptions → wrong choices.
+
+## Mental model
+
+Think of a **toolbox with labels**. If the labels are clear ("cuts wood," "tightens screws"), you grab the right tool instantly. If they're vague or overlapping ("tool A," "tool B"), you fumble. The agent only sees the labels.
+
+## How it works
+
+1. Each tool is registered with a **name**, a **description**, and a **parameter schema** (via function calling).
+2. The model compares the current need against all tool descriptions and **selects one** (or none).
+3. It fills in the **arguments** from the context.
+4. The tool runs; the result comes back as an observation.
+
+Good practice: **clear, distinct descriptions**, **few well-chosen tools** rather than dozens, and **examples** of when to use each in the description.
+
+## Real-world example
+
+Ask an agent *"What's 15% of last month's revenue?"* It shouldn't guess arithmetic — it should pick the **calculator** (and maybe a **database** tool for the revenue figure). If two tools both sound like "get data," the model may pick wrong; renaming them `get_sales_data` and `get_support_tickets` fixes it instantly.
+
+## Technical explanation
+
+Tool selection quality degrades as the number of tools grows and as descriptions overlap — the model has to disambiguate from text alone. Techniques to keep it reliable:
+
+- **Minimal, orthogonal tool set** — fewer tools with non-overlapping purposes.
+- **Descriptive names + rich descriptions**, including when *not* to use a tool.
+- **Tool retrieval / RAG over tools** when there are many (retrieve the top-k relevant tools into context rather than listing all).
+- **Strict parameter schemas** so arguments are valid, plus error messages that guide correction.
+- **Namespacing / grouping** (e.g., MCP servers) to organize large tool sets.
+
+Poor tool design is one of the most common causes of flaky agents — it shows up as wrong actions, not model "stupidity."
+
+## Common mistakes
+
+<CommonMistake>
+Blaming the model when the agent calls the wrong tool. Usually the fix is a clearer tool name and
+description — the model can only choose from what you wrote.
+</CommonMistake>
+
+- Overloading an agent with dozens of similar tools, causing confusion and wrong picks.
+- Vague or overlapping descriptions ("gets info") that don't disambiguate.
+
+## When to use it
+
+- Any agent with more than one tool — thoughtful tool design is non-optional.
+
+## When NOT to use it
+
+- Single-tool or no-tool tasks, where selection is trivial or unnecessary.
+
+## Alternatives
+
+- For very large tool sets, **retrieve** the relevant tools per query instead of exposing all at once.
+
+<MemoryCard>
+**Tool selection**: the agent picks a tool by matching the task to each tool's **name + description**.
+Keep tools **few and distinct**, write **clear descriptions** (including when not to use them), and
+retrieve tools when there are many. Wrong tool choices are usually a design problem, not a model one.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-tool-selection" />

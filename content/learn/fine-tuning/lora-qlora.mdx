@@ -1,0 +1,96 @@
+---
+id: lora-qlora
+slug: lora-qlora
+title: LoRA and QLoRA
+category: fine-tuning
+level: advanced
+summary: LoRA trains two small matrices instead of the frozen weight W; QLoRA also stores W in 4-bit so a 7B+ model fine-tunes on one GPU.
+keywords: [lora, qlora, low rank adaptation, adapters, peft]
+prerequisites: [full-vs-peft]
+next: [quantization]
+related: [quantization, full-vs-peft]
+alternatives: []
+confusedWith: [quantization]
+frameworks: []
+products: []
+papers:
+  - title: "LoRA: Low-Rank Adaptation of Large Language Models (Hu et al., 2021)"
+    url: "https://arxiv.org/abs/2106.09685"
+    kind: paper
+  - title: "QLoRA: Efficient Finetuning of Quantized LLMs (Dettmers et al., 2023)"
+    url: "https://arxiv.org/abs/2305.14314"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-lora-qlora
+estimatedMinutes: 8
+---
+
+<OneLine>LoRA freezes the big weight matrix and learns two skinny factors whose product is added back. QLoRA does the same while keeping the frozen base in 4-bit, so fine-tuning fits on a single consumer GPU.</OneLine>
+
+## Explain like I'm new to AI
+
+Each linear layer has a big table of numbers **W**. Updating W is expensive. **LoRA** says: keep W. Learn **A** and **B** so small that `ΔW ≈ A × B` with rank **r** (8, 16, 32…). Only A and B get gradients.
+
+**QLoRA** also **quantizes** frozen W to 4-bit (NF4) in memory. Adapters stay in higher precision. A 7B that wanted ~14GB in 16-bit can train in ~5–8GB class VRAM.
+
+<LoraQlora />
+
+## Mental model
+
+A huge printed map (W) you are not allowed to redraw. You overlay a **thin transparent sheet** with a few corrections (A×B). QLoRA is storing the map as a compressed poster while you doodle on the sheet in ink.
+
+## How it works
+
+Typical targets: attention `q/k/v/o` and often MLP `gate/up/down`. Rank **r** is capacity. **alpha** scales the update (common heuristic: α ≈ 2r). Dropout on adapters is optional.
+
+At serve time: load base + adapter, or **merge** A×B into W for a single checkpoint (faster, less flexible).
+
+QLoRA is **training-time** quantization of the frozen base. It is not the same as packing a GGUF for Ollama (that's **inference** quantization — next lesson). You can QLoRA-train then export a 16-bit or GPTQ model.
+
+## Real-world example
+
+Unsloth / Axolotl / Hugging Face PEFT: QLoRA SFT on 7B–32B on one 24GB GPU is a normal 2026 hobby-to-startup path. Labs still full-FT giant models; products rarely need to.
+
+## Technical explanation
+
+Low-rank updates assume the task shift lives in a low-dimensional subspace — empirically true for style/format SFT. If eval plateaus, raise r or unfreeze more modules before jumping to full FT.
+
+Double quantization and paged optimizers in the QLoRA paper are implementation tricks to squeeze VRAM; libraries hide them.
+
+**Do not** confuse "LoRA rank" with "model quality ranking." r=64 on 50 examples overfits.
+
+## Common mistakes
+
+<CommonMistake>
+Thinking QLoRA is a different algorithm from LoRA. QLoRA <em>is</em> LoRA plus a 4-bit frozen base.
+Same adapters, less RAM.
+</CommonMistake>
+
+- r way larger than your dataset can support.
+- Quantizing adapters to 4-bit during training (they should stay richer).
+
+## When to use it
+
+- Default SFT/DPO stack. QLoRA when VRAM is tight; LoRA in 16-bit if you have headroom and want max adapter fidelity.
+
+## When NOT to use it
+
+- You haven't tried prompting/RAG. Tiny models where full FT is cheaper to reason about.
+
+## Alternatives
+
+- Full FT; vendor hosted fine-tunes; DoRA / other PEFT variants (same idea, different math).
+
+<MemoryCard>
+**LoRA:** freeze W, train low-rank **A, B**. **QLoRA:** LoRA + **4-bit** frozen W. Rank r is capacity.
+Adapters are small and swappable. QLoRA is for **training memory**, not the same as GGUF serving.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-lora-qlora" />

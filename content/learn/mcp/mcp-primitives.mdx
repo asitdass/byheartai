@@ -1,0 +1,112 @@
+---
+id: mcp-primitives
+slug: mcp-primitives
+title: Tools, Resources, and Prompts
+category: mcp
+level: intermediate
+summary: MCP servers expose three primitives — tools that act, resources that are read into context, and prompts that are reusable starting recipes.
+keywords: [mcp tools, mcp resources, mcp prompts, primitives, tools/call, resources/read]
+prerequisites: [mcp-architecture, function-calling]
+next: [mcp-auth]
+related: [tool-selection, what-is-mcp]
+alternatives: []
+confusedWith: [function-calling]
+frameworks: []
+products: []
+papers:
+  - title: "Model Context Protocol specification"
+    url: "https://modelcontextprotocol.io"
+    kind: spec
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-mcp-primitives
+estimatedMinutes: 8
+---
+
+<OneLine>Every MCP server offers some mix of three primitives: tools (do something), resources (read something into context), and prompts (start from a reusable recipe).</OneLine>
+
+## Explain like I'm new to AI
+
+If MCP is USB-C, the "device features" come in three kinds. Click each:
+
+<McpPrimitives />
+
+- **Tools** — the model *does* something (create an issue, run a query). Same idea as function calling.
+- **Resources** — the host *reads* data into the prompt (a file, a ticket, a schema). No side effect.
+- **Prompts** — named templates the server authors ("review this PR", "onboard a new hire"). The user or agent picks one.
+
+Most servers start with tools. Great servers also offer resources (so you can ground without granting write) and a few prompts (so people don't reinvent the same instruction).
+
+## Mental model
+
+A restaurant:
+
+- **Tools** = placing an order (something happens in the kitchen).
+- **Resources** = reading the menu and the wine list (information, no order).
+- **Prompts** = "the tasting menu" — a pre-designed sequence you start with one choice.
+
+## How it works
+
+**Tools** have a name, description, and JSON Schema for arguments. The host puts that catalog in front of the model. A call is `tools/call` with `name` + `arguments`. Descriptions are how the model *selects* tools — write them like you would for function calling.
+
+**Resources** have a URI (`file:///…`, `ticket://142`, `db://schema/public`). `resources/read` returns content the host can attach. Resources can be templates (a pattern with parameters). Prefer resources when the user should *choose* what enters context, or when you want read-only access.
+
+**Prompts** are `prompts/get` with a name and optional arguments. They return messages ready to drop into the conversation. They're for UX and quality, not for side effects.
+
+List endpoints (`tools/list`, etc.) now include cache hints. Keep names and descriptions **stable** — churning the catalog busts prompt caches and confuses tool selection.
+
+## Real-world example
+
+A Postgres MCP server:
+
+- **Tool:** `query` (run SQL — gated, maybe read-only).
+- **Resource:** `db://schema/public` (the schema as context, no query run).
+- **Prompt:** `explain_slow_query` (a recipe that pulls a query + schema and asks the model to explain).
+
+The model isn't forced to `query` just to see the schema.
+
+## Technical explanation
+
+Tools are the dangerous primitive: they have **side effects**. Design them **small, orthogonal, and least-privilege**. Return errors as structured results so the agent can recover. For long work, use the **Tasks** extension rather than blocking a single HTTP request forever.
+
+Resources are closer to RAG than to function calling: they add **context**, they shouldn't mutate. Hosts may show a picker; agents may `resources/read` on their own depending on client policy.
+
+Prompts are **productized context engineering** shipped next to the tools they complement. A good prompt names the goal, the inputs, and the constraints ("never run DELETE").
+
+MRTR (`input_required`) can interrupt a **tool** call for confirmation — that's how "delete 1,000 rows" becomes a human-in-the-loop step without a session stream.
+
+## Common mistakes
+
+<CommonMistake>
+Exposing only tools, including for read-only data. A schema or a file should often be a <em>resource</em>.
+Tools that only "get" things train models to take actions when they only needed context.
+</CommonMistake>
+
+- Vague, overlapping tool names — the same failure mode as bad function-calling descriptions.
+- Prompts that secretly perform actions. Prompts should not mutate; tools should.
+
+## When to use it
+
+- **Tools** for actions. **Resources** for readable context. **Prompts** for repeatable, high-quality starts.
+
+## When NOT to use it
+
+- Don't invent a tool for something the host already does (plain file open in an IDE). Don't ship a prompt that is just "you are a helpful assistant."
+
+## Alternatives
+
+- Function calling with no catalog (one app only); stuffing files into the prompt by hand (no resource protocol).
+
+<MemoryCard>
+MCP's three primitives: **tools** act (side effects, schema, `tools/call`), **resources** are read into
+context (`resources/read`, URIs), **prompts** are reusable recipes (`prompts/get`). Use the least powerful
+primitive that works — don't turn a read into a tool.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-mcp-primitives" />

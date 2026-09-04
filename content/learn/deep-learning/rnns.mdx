@@ -1,0 +1,134 @@
+---
+id: rnns
+slug: rnns
+title: What are RNNs?
+category: deep-learning
+level: intermediate
+summary: An RNN folds a sequence into a hidden state, one step at a time. Sequential by design, historically crucial, limited by vanishing gradients.
+keywords: [rnn, recurrent neural network, hidden state, vanishing gradients, sequence]
+prerequisites: [neurons-layers-activations]
+next: [lstms-grus]
+related: [neurons-layers-activations, lstms-grus, why-transformers-replaced-rnns]
+alternatives: [what-is-transformer]
+confusedWith: [lstms-grus]
+frameworks: []
+products: []
+papers:
+  - title: "Learning long-term dependencies with gradient descent is difficult (Bengio et al., 1994)"
+    url: "https://www.iro.umontreal.ca/~lisa/pointeurs/ieeetrans94.pdf"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-rnns
+estimatedMinutes: 12
+---
+
+<OneLine>An RNN reads a sequence one step at a time, mixing the new input with a hidden state that is supposed to remember the past. Sequential, powerful for its era, and cursed by vanishing gradients.</OneLine>
+
+## Explain like I'm new to AI
+
+An MLP sees a **fixed-size** vector. A sentence is not that: 3 words or 300. A **recurrent neural network (RNN)** reuses the **same** neuron-layer at every timestep:
+
+```text
+h_t = tanh(W_x x_t + W_h h_{t-1} + b)
+```
+
+`h_t` is the **hidden state** — a summary of "everything so far." To classify a review, you read until the last `h`. To generate, you emit a token from `h_t` and feed it back as `x_{t+1}`.
+
+That loop is why RNNs mattered: **variable length**, **shared weights through time**, a natural model of speech and text before 2017. It is also why they hurt: timestep *t* cannot start until *t−1* finished (**no parallelism** over the sequence), and the gradient from the end of a paragraph back to the first word is a product of many `W_h` and `tanh'` factors. If those factors sit below 1, the signal **vanishes**; if they sit above 1, it **explodes**.
+
+LSTMs/GRUs (next lesson) patch the memory. Transformers (the lesson after GANs in this chain) replace the loop. You still need the RNN picture to understand *why* that replacement happened, and to read older papers and a few time-series stacks.
+
+<RnnIdea />
+
+## Mental model
+
+A person reading through a **straw**, whispering one running summary into their own ear after every word. The whisper is `h`. If the straw is long, the first chapter's whisper is a rumor of a rumor. Training asks that rumor to explain a mistake at the last word — that is vanishing gradients.
+
+## How it works
+
+1. `h_0 = 0` (or a learned start).
+2. For each `x_t` (token embedding, sensor sample, frame): update `h_t` with the formula above.
+3. Optional **output** `y_t = W_y h_t + b_y` at every step (tagging, language modeling) or only at the end (classification).
+4. **BPTT** (backprop through time): unroll the loop into a deep net *T* layers tall, then backprop. Truncated BPTT cuts the unroll to save memory.
+
+**Tiny 1-d walkthrough.** `W_x = 0.6`, `W_h = 0.5`, `tanh`, inputs `[1.0, 0.4, -0.2]`, `h_0 = 0`:
+
+```python
+import numpy as np
+
+Wx, Wh, b = 0.6, 0.5, 0.0
+h = 0.0
+for x in [1.0, 0.4, -0.2]:
+    h = np.tanh(Wx * x + Wh * h + b)
+    print(h)
+# t=1: tanh(0.60) ≈ 0.537
+# t=2: tanh(0.24 + 0.269) ≈ 0.467
+# t=3: tanh(-0.12 + 0.234) ≈ 0.113
+```
+
+The last hidden state still "knows" the first input, but **weakly**. The gradient of `h_3` w.r.t. `h_1` includes `Wh * tanh'(z_2) * Wh * tanh'(z_3)` — on the order of `0.5²` times fractions &lt; 1. Ten more steps and early tokens are numerically gone. That is the visual's shrinking bar.
+
+**Many-to-one / many-to-many / encoder-decoder.** Same recurrence, different wiring: sentiment (many-to-one), POS tagging (many-to-many), old NMT (encoder RNN + decoder RNN). Seq2seq + attention (Bahdanau 2015) was the bridge to transformers: keep the RNN, add a peek at all encoder states.
+
+## Real-world example
+
+2015: a two-layer LSTM language model was a serious paper. 2016: Google Translate's GNMT was eight LSTM layers. 2026: that product is a transformer (and then an LLM). You will still see **small RNNs** in on-device keyword spotting, some Kalman-like time series, and as a teaching model. You will almost never start a new NLP system on a vanilla RNN.
+
+## Technical explanation
+
+The hidden-to-hidden Jacobian is `diag(a'(z_t)) W_h`. The long-run behavior is a product of those Jacobians. Spectral radius of `W_h` &gt; 1 → explosion (clip gradients, or the net diverges). Radius &lt; 1 → vanishing. **Identity-initialized / orthogonal RNNs** and **LSTMs** are different attempts to keep that product near 1 along some paths.
+
+**Teacher forcing:** at train time, feed the *true* previous token, not the model's sample — otherwise early mistakes poison `h`. At decode time you have no gold, so errors compound. Transformers with teacher forcing still have this train/serve gap for generation, but they do not have to *run a serial loop to train the rest of the sequence*.
+
+Complexity: O(T) serial steps, O(T d²) compute for hidden size d. Transformers are O(T² d) attention plus cheap parallelism. For language, parallelism won.
+
+<Compare
+  a="Vanilla RNN"
+  b="MLP on a fixed window"
+  rows={[
+    { label: "Length", a: "Any T, one set of weights", b: "Must pick a window or pad/truncate" },
+    { label: "Memory of the past", a: "Compressed into h (lossy, fragile)", b: "Only what fits in the window, all positions equal" },
+    { label: "Train parallelism", a: "Serial in T", b: "Fully parallel in the window" },
+    { label: "Long-range gradient", a: "Vanishes / explodes", b: "Short by construction" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Treating "RNN" as the name for any sequence model in 2026. Sequence model ≠ recurrent. Transformers are sequence models without a hidden-state loop.
+</CommonMistake>
+
+- Unrolling 1,000 steps of a vanilla tanh RNN and expecting it to learn a dependency at step 2. It won't; use LSTM/GRU or attention.
+- Forgetting that **generation** is still sequential even for transformers (decode) — the RNN's unique pain was sequential **training** of the encoder over the whole sentence.
+- Bidirectional RNNs leaking the future into a language model (fine for tagging, cheat for next-token).
+
+## When to use it
+
+- To understand papers 1990–2016 and the LSTM lesson.
+- Tiny streaming sensors where the state is a few dozen numbers and you cannot afford attention over a long buffer.
+
+## When NOT to use it
+
+- New NLP, speech recognition at scale, or anything you'd rather train on a GPU without a time for-loop — use a transformer.
+- Problems that are actually bags of features — an MLP or a 1-d conv over a short window.
+
+## Alternatives
+
+- **LSTMs / GRUs** — gated RNNs, next lesson.
+- **Transformers** — default sequence model; why they won is the last lesson in this category.
+- **1-d CNNs / TCNs** — local temporal filters, parallel, finite memory.
+
+<MemoryCard>
+**RNN:** hₜ = a(Wₓ xₜ + Wₕ hₜ₋₁). Same weights every step; state is the memory.
+Serial in time. Gradients vanish through the loop. Historical backbone of NLP; not the 2026 default.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-rnns" />

@@ -1,0 +1,153 @@
+---
+id: classification
+slug: classification
+title: What is Classification?
+category: machine-learning
+level: beginner
+summary: Classification assigns a discrete label — spam or not, cat or dog — by learning a decision boundary from labeled examples.
+keywords: [classification, binary, multiclass, decision boundary, supervised]
+prerequisites: [supervised-unsupervised-rl]
+next: [clustering]
+related: [regression, clustering, classification-metrics, supervised-unsupervised-rl]
+alternatives: [clustering, regression]
+confusedWith: [clustering]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-classification
+estimatedMinutes: 12
+---
+
+<OneLine>Classification is supervised learning whose target is a category: the model learns a decision boundary from examples that already have names.</OneLine>
+
+## Explain like I'm new to AI
+
+Someone already stamped each training example with a **class**.
+
+- Inbox: `spam` or `ham` — **binary**.
+- Ticket: `billing`, `bug`, `feature` — **multiclass** (one label, several options).
+- Photo: `cat` and `indoor` at once — **multilabel** (several independent yes/no). Different problem; same family.
+
+The model’s job is to stamp **new** examples. Internally it often outputs scores or probabilities; you then draw a **decision boundary** — the cut in feature space where the predicted name flips.
+
+<ClassificationIdea />
+
+**Clustering** can look like the same scatter plot. The difference is the stamp. Clustering was never given names. If you color points *after* k-means, you invented labels; you did not *learn* the official ones.
+
+## Mental model
+
+A sorting hat that practiced on students whose houses were already assigned. It draws regions on the floor. A new student lands in a region and gets a house.
+
+If nobody had houses, and you asked “who stands near whom?”, that is clustering. If you predicted *how many points* they will score, that is regression.
+
+## How it works
+
+1. **Collect labeled rows.** Features `x`, class `y ∈ {1, …, K}` (or `{0, 1}`).
+2. **Choose a model** that can score classes: logistic regression, a tree, a boosted ensemble, a neural net.
+3. **Train** by penalizing wrong (or unconfident) class probabilities — typically **log-loss**, not MSE.
+4. **Decide.** For binary, pick a threshold on `p(spam)` (0.5 is a default, not a law). For multiclass, usually `argmax` of the scores.
+5. **Evaluate with the right metric.** Accuracy is fine when classes are balanced and mistakes are equal. They rarely are — that is the classification-metrics lesson (precision, recall, F1, ROC-AUC).
+
+A **decision boundary** can be a straight line (linear classifier), an axis-aligned box (shallow tree), or a wild curve (deep net). Flexibility is not free: wild curves overfit.
+
+## Code
+
+Tiny synthetic “spam-like” data — two numbers per email: `shoutiness` and `link_count`.
+
+```python title="classify_spam.py"
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+X, y = make_classification(
+    n_samples=400,
+    n_features=2,
+    n_informative=2,
+    n_redundant=0,
+    n_clusters_per_class=1,
+    class_sep=1.2,
+    random_state=0,
+)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, stratify=y, random_state=0
+)
+
+clf = LogisticRegression().fit(X_train, y_train)
+print("weights:", clf.coef_, "bias:", clf.intercept_)
+print(classification_report(y_test, clf.predict(X_test), target_names=["ham", "spam"]))
+# Probability that row 0 is class 1:
+print("p(spam) for first test row:", clf.predict_proba(X_test[:1])[0, 1])
+```
+
+`stratify=y` keeps the spam rate similar in train and test. `predict_proba` is the soft score; `predict` is the 0.5 cut.
+
+## Real-world example
+
+A mail filter. Features might be token counts, sender reputation, and whether the domain is new. Labels come from user “this is spam” clicks plus a seed set. The boundary is not a single word. “Urgent” appears in both invoices and scams.
+
+When legal wants an explanation, teams often keep a **linear** or **tree** classifier in the mix so they can say “these tokens pushed it over the line.” A giant net can be more accurate and less narratable.
+
+## Technical explanation
+
+Binary logistic regression: `p(y=1|x) = σ(w · x + b)`. The boundary `w · x + b = 0` is a hyperplane. Multiclass: one-vs-rest or **softmax** over K scores.
+
+**Class imbalance:** if 1% of rows are fraud, a model that always says “legit” is 99% accurate and useless. You will change the threshold, the loss weights, or the metric — not the definition of classification.
+
+**Multilabel** vs **multiclass:** multiclass = one exclusive bucket. Multilabel = a bit vector. Do not train a softmax when two labels can be true together.
+
+Trees and boosting (later lessons) dominate **tabular** classification in 2026. Images and raw text go to deep learning. Same task name; different model.
+
+<Compare
+  a="Classification"
+  b="Clustering"
+  rows={[
+    { label: "Labels at train time", a: "Required", b: "Absent" },
+    { label: "Output", a: "A known name (or names)", b: "A group id you interpret later" },
+    { label: "Boundary", a: "Separates official classes", b: "Separates density blobs" },
+    { label: "Spam filter", a: "Yes — ham/spam exist", b: "No — unless you are exploring topics" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Calling k-means a classifier because you colored the clusters red and blue. Without a labeled holdout, you have no precision or recall — only a picture.
+</CommonMistake>
+
+- Using accuracy alone on a 10%-spam inbox. The metrics lesson exists because this mistake ships.
+- Treating the 0.5 threshold as sacred. Cost of a missed scam ≠ cost of burying an invoice.
+- One-hot encoding a high-cardinality ID (zip, user_id) into a linear model and wondering why it memorized people.
+
+## When to use it
+
+- Historical rows already have the category you will need on live rows.
+- The action is “route / block / approve / diagnose,” not “estimate a quantity.”
+- You can define the classes so two annotators would usually agree.
+
+## When NOT to use it
+
+- You do not have labels and will not get them. That is clustering or a rule, not classification.
+- The real target is a number you then squash into “high / low.” Prefer regression, then band the prediction if a badge is required.
+- Classes leak the future (“will churn next month” labeled with information from next month). That is a split problem, not a model brand problem.
+
+## Alternatives
+
+- **Regression** for quantities; threshold later if you must.
+- **Clustering** to *discover* buckets worth labeling.
+- A deterministic rule when the policy is already written (“block attachment `.exe` from new domains”).
+
+<MemoryCard>
+**Classification** = predict a **named class** from labeled examples using a **decision boundary**.
+Binary vs multiclass is how many names. Clustering looks similar and is not the same job.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-classification" />

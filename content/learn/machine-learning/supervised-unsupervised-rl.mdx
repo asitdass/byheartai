@@ -1,0 +1,144 @@
+---
+id: supervised-unsupervised-rl
+slug: supervised-unsupervised-rl
+title: Supervised, Unsupervised, and Reinforcement Learning
+category: machine-learning
+level: beginner
+summary: Supervised learns from labeled examples, unsupervised finds structure without labels, and RL learns from trial-and-error rewards.
+keywords: [supervised learning, unsupervised learning, reinforcement learning, labels, reward]
+prerequisites: [what-is-machine-learning]
+next: [regression]
+related: [what-is-machine-learning, regression, classification, clustering, what-is-deep-learning]
+alternatives: []
+confusedWith: [what-is-deep-learning]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-supervised-unsupervised-rl
+estimatedMinutes: 12
+---
+
+<OneLine>The three families of machine learning differ by the teaching signal: a correct label, raw structure, or a reward after actions.</OneLine>
+
+## Explain like I'm new to AI
+
+**Machine learning** is “learn from data instead of writing rules.” That sentence hides a fork: *what kind of feedback does the data give?*
+
+1. **Supervised** — each example already has the answer. Email + “spam.” House + sold price. You are learning a mapping you can reuse on new inputs.
+2. **Unsupervised** — examples have no answer column. A pile of shoppers, or tickets, or pixels. You are looking for *structure*: groups, compressions, oddballs.
+3. **Reinforcement learning (RL)** — nobody labeled the right move. An agent acts in an environment and gets a **reward** (win the game, the robot didn’t drop the mug). It learns a **policy**: what to do in which situation.
+
+<SupervisedUnsupervisedRl />
+
+Deep learning is not a fourth family. It is a *style of model* (stacked neural nets) you can use inside any of the three. A neural net that predicts house prices is still supervised. A clustering method can be classical or deep. RL can use a neural net as the policy.
+
+## Mental model
+
+Three teachers:
+
+- **Supervised** is a marked exam. Every practice question has the answer key in the margin.
+- **Unsupervised** is a box of unlabeled photos. Sort them into piles that *look* related. Nobody told you the pile names.
+- **RL** is learning to ride a bike. You are not shown a labeled dataset of “correct lean angles.” You wobble, fall, get a delayed “you stayed up,” and adjust.
+
+If you remember only one distinction: **did a human (or a system of record) already write the target for each row?** Yes → supervised. No, and you want groups or compression → unsupervised. No, and the feedback is a score after a sequence of actions → RL.
+
+## How it works
+
+**Supervised**
+
+1. Collect pairs `(x, y)` — features and a target.
+2. If `y` is a number, you are heading toward **regression**. If `y` is a category, **classification**.
+3. Train: predict `ŷ`, measure error vs `y`, adjust the model.
+4. Evaluate on rows the model never trained on. That split is what later lessons on overfitting and cross-validation are for.
+
+**Unsupervised**
+
+1. Collect `x` only.
+2. Choose a notion of structure: distance (clusters), reconstruction (compression), density (anomalies).
+3. There is no `y` to score against in the supervised sense. You judge clusters by usefulness, stability, or a downstream task.
+
+**Reinforcement**
+
+1. Define states, actions, and a reward.
+2. The agent tries, observes the next state and reward, and updates a policy (or a value function that scores states).
+3. Credit assignment is hard: the winning move may have been twenty steps ago. That is why RL is powerful and sample-hungry.
+
+## Real-world example
+
+A support org has three different ML jobs on the *same* tickets:
+
+- **Supervised:** tag “billing / bug / how-to” because agents already labeled last year’s queue. Train a classifier.
+- **Unsupervised:** you have no tags yet. Cluster embeddings of tickets to discover that “SSO timeout” is a hidden theme. A human *then* names the cluster.
+- **RL (rare on this desk):** an agent that chooses which knowledge article to show, scored by “did the user stop writing?” — delayed, noisy reward. Most teams should not start here.
+
+A game studio trains an RL policy to play a title. A bank trains supervised models on historical defaults. Same word “training”; different signal.
+
+## Technical explanation
+
+Formally:
+
+- Supervised: estimate `p(y | x)` or `E[y | x]` from i.i.d. labeled samples.
+- Unsupervised: estimate structure in `p(x)` — mixture components, a low-dimensional manifold, outliers in the tails.
+- RL: maximize expected discounted reward `E[Σ γ^t r_t]` by interacting with a Markov decision process. Data is *on-policy* unless you deliberately reuse old trajectories.
+
+Cousins you will meet later, still not extra families:
+
+- **Self-supervised** (masked language modeling, contrastive vision) invents a pretext label from the data itself. It is unsupervised in spirit, supervised in the training loop. Foundation models use it, then you *fine-tune* with real labels.
+- **Semi-supervised** mixes a few labels with a lot of unlabeled `x`.
+- **Imitation / offline RL** blurs into supervised learning when you just clone expert actions.
+
+<Compare
+  a="Supervised"
+  b="Unsupervised"
+  rows={[
+    { label: "Need y?", a: "Yes — a target per row", b: "No — x only" },
+    { label: "Question", a: "What should this input map to?", b: "What structure is in this pile?" },
+    { label: "Score", a: "Error vs the label (MSE, F1…)", b: "Usefulness, silhouette, downstream task" },
+    { label: "Classic next lesson", a: "Regression, then classification", b: "Clustering" },
+  ]}
+/>
+
+RL sits beside that table, not on it: the unit of data is a **trajectory**, not a row with a static `y`.
+
+## Common mistakes
+
+<CommonMistake>
+Calling every unlabeled project “unsupervised learning” when you actually have a target you have not extracted yet. Ticket type lives in the CRM. Pull it — that is supervised data you are ignoring.
+</CommonMistake>
+
+- Treating clustering output as if it were a certified class label. Clusters are hypotheses. Classification requires names you already trust.
+- Reaching for RL because it sounds advanced. If you can write `(x, y)` pairs, use supervised learning. RL is for *sequential decisions with delayed reward*, not “we don’t feel like labeling.”
+- Confusing **deep learning** with a learning *paradigm*. Depth is the model; the paradigm is the signal.
+
+## When to use it
+
+- **Supervised** when history already recorded the thing you want to predict, and new cases will look like old ones.
+- **Unsupervised** for exploration, segmentation, anomaly hints, or compressing `x` before a later supervised step.
+- **RL** when the system must *act* over time and you can define a reward you are willing to optimize (games, robotics, some bidding and control).
+
+## When NOT to use it
+
+- Do not pick RL as a first production tool for a spreadsheet problem. Label or extract `y`.
+- Do not run unsupervised clustering and then ship the cluster id as “fraud” without a labeled holdout. That is a story, not a detector.
+- Do not force supervised learning when there is no stable target (the business has not decided what “good” means). Fix the definition first.
+
+## Alternatives
+
+- Rules and heuristics when the mapping is short and legal (“if amount &gt; 10k and country in list → review”).
+- Retrieval and tools (later AI stack) when the “answer” is a document, not a learned function of columns.
+- Human labeling so an unsupervised pile *becomes* a supervised dataset.
+
+<MemoryCard>
+**Supervised** = labeled pairs. **Unsupervised** = structure in unlabeled x. **RL** = act, get a reward, improve a policy.
+Deep learning is a model style, not a fourth family. If you have y, start supervised.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-supervised-unsupervised-rl" />

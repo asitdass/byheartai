@@ -1,0 +1,94 @@
+---
+id: design-coding-agent
+slug: design-coding-agent
+title: Design a Coding Agent
+category: ai-system-design
+level: advanced
+summary: A coding agent explores with repo tools, patches, and verifies in a sandbox — tests are the judge, the PR is HITL, and the repository is not a paste into the window.
+keywords: [coding agent, repo tools, sandbox, test verifier]
+prerequisites: [how-to-design-ai-system, what-is-agent]
+next: [design-research-multi-agent]
+related: [secrets-sandboxing, human-in-the-loop, planning-reflection]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-design-coding-agent
+estimatedMinutes: 8
+---
+
+<OneLine>A coding agent reads and patches a repo through tools, runs tests in a jail, and ships a PR for a human. Dumping the whole codebase into context is not a design; it's a bill and a leak.</OneLine>
+
+## Explain like I'm new to AI
+
+Humans don't memorize the company monorepo to fix a bug. Neither should the model. **Explore → edit → verify → review.**
+
+<CodingAgentDesign />
+
+**Job:** produce a change that passes checks for *this* task. **SLO:** tests green, limited steps, no secret exfil, p95 that a developer will wait (or overnight batch).
+
+**Shape:** agent (the path through the repo is unknown) with a **hard cap** and a verifier.
+
+## Mental model
+
+A contractor with a badge to the repo, a laptop that can't see `~/.aws`, and a rule: nothing merges without CI + a person.
+
+## How it works
+
+- Tools: `list`, `grep`/`search`, `read`, `apply_patch`, `run_tests`. Not unrestricted shell if you can avoid it.
+- Context: retrieve/grep first (code RAG). Pack only the files that matter (context engineering).
+- Verify: unit tests, typecheck, linters — **code as judge** (evaluation / GRPO-style when you train; at serve time it's just CI).
+- Sandbox: no home directory, egress allow-list, no Docker socket (secrets-sandboxing).
+- HITL: the pull request. Show the diff. The model cannot click merge.
+- Eval: held-out tasks (issue → failing test → patch). Trajectory eval, not BLEU on the chat.
+- Loop cap and $ cap (unbounded consumption).
+
+## Real-world example
+
+Agent "fixes" auth by printing a key it found in `.env` into the reply. Jail + don't index secrets + output filters. Tests wouldn't catch the leak — security eval would.
+
+## Technical explanation
+
+Long-context models still lose the middle of a 400-file dump. Tools beat paste.
+
+MCP for repo tools is fine; treat the server like installable software (MCP security).
+
+Multi-agent "writer vs reviewer" can help *if* the reviewer is tests + linter, not another ungrounded LLM arguing.
+
+## Common mistakes
+
+<CommonMistake>
+Pasting the repository into the prompt because the window is "a million tokens."
+</CommonMistake>
+
+- `exec` on the developer machine.
+- No tests, only "looks like good code."
+
+## When to use it
+
+- Well-tested repos, scoped tasks, humans who will read PRs.
+
+## When NOT to use it
+
+- Don't unleash write tools on prod. Don't skip sandbox "because it's local."
+- Greenfield "build me an app" with no tests is a generator, not this design.
+
+## Alternatives
+
+- Completions in the editor (chatbot). Workflow: generate patch from a fixed template. Human pair-programming.
+
+<MemoryCard>
+**Coding agent:** repo tools, not a paste. **Tests in a sandbox** are the judge. **PR = HITL.**
+Cap loops. Secrets never in the window. Eval on tasks, not chat fluency.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-design-coding-agent" />

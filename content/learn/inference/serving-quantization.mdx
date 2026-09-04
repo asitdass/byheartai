@@ -1,0 +1,92 @@
+---
+id: serving-quantization
+slug: serving-quantization
+title: Quantization for Serving
+category: inference
+level: intermediate
+summary: Serving quantization shrinks weights, activations, and KV so more model and more users fit — it is not QLoRA. Re-run eval after you drop bits.
+keywords: [awq, gptq, fp8, kv quant, gguf]
+prerequisites: [what-is-inference, quantization]
+next: [model-serving]
+related: [lora-qlora, kv-cache-serving]
+alternatives: []
+confusedWith: [quantization]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-serving-quantization
+estimatedMinutes: 8
+---
+
+<OneLine>The fine-tuning quantization lesson is the idea (fewer bits). Serving quantization is three knobs — **weights**, **activations**, **KV** — so the model fits and decode bandwidth drops. QLoRA is still a training recipe.</OneLine>
+
+## Explain like I'm new to AI
+
+<QuantizationBits />
+
+<ServingQuant />
+
+- **Weights:** GPTQ, AWQ, GGUF, bitsandbytes, FP8 checkpoints. Fit a 70B on fewer GPUs.
+- **Activations:** compute dtype (often FP8 on newer accelerators) — speed, not only disk size.
+- **KV:** often the real win for **concurrency** (previous lesson).
+
+Always **eval your suite** after shrinking. Structured JSON, rare names, and long-context recall are the first to wobble.
+
+## Mental model
+
+Packing for a flight: squeeze the suitcase (weights), wear lighter clothes on the plane (activations), write smaller boarding notes (KV). Different bags. QLoRA was packing while you still *alter* the outfit at home (train).
+
+## How it works
+
+Calibration (AWQ/GPTQ) uses a small dataset to set scales. Garbage calibration → garbage 4-bit.
+
+SmoothQuant-style methods protect activations. FP8 is increasingly the **native** serve dtype on datacenter GPUs in 2026 — sometimes you quant *up* from a 4-bit file into FP8 kernels. Read your engine docs; don't assume 4-bit is always fastest.
+
+LoRA at serve time: adapters stay small; the base can be quantized. Don't mix a 4-bit base with an adapter trained at a mismatched layout without checking the engine.
+
+## Real-world example
+
+INT4 weights fit. p95 quality on tool-call JSON drops 8 points. You keep 8-bit or FP8 for that route and 4-bit for summarization. Routing (later) + eval slices, not one global quant.
+
+## Technical explanation
+
+Decode is memory-bound: fewer bytes per KV token ⇒ more tokens/s until you hit compute. Prefill may still be compute-bound — weight quant helps there too.
+
+Don't confuse **training QLoRA NF4** with **inference AWQ**. Same family of ideas, different artifacts.
+
+## Common mistakes
+
+<CommonMistake>
+Shipping 4-bit because a blog said "lossless" without running *your* gold set.
+</CommonMistake>
+
+- Quantizing KV to 4-bit on a 128k support bot and wondering why citations drift.
+- Calling GGUF "the algorithm" — it's a format many local runners use.
+
+## When to use it
+
+- When weights or KV don't fit, or decode is bandwidth-starved. Start 8-bit/FP8, then 4-bit if eval holds.
+
+## When NOT to use it
+
+- Don't 4-bit a judge or a high-stakes extractor until eval says so.
+- Don't skip this recap and re-quantize a QLoRA training setup as if it were a server.
+
+## Alternatives
+
+- Smaller dense model, MoE with expert offload, more GPUs, shorter context.
+
+<MemoryCard>
+**Serve quant** = weights + activations + KV. **QLoRA** = training. Eval after every bit drop.
+KV quant buys users. 4-bit is not automatically faster than FP8 on modern GPUs.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-serving-quantization" />

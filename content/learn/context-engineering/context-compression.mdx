@@ -1,0 +1,107 @@
+---
+id: context-compression
+slug: context-compression
+title: Context Compression
+category: context-engineering
+level: advanced
+summary: When the window fills, trim bulky tool output first, then compact old turns into state — prefer deletion over rewriting, and trigger on a token or turn threshold.
+keywords: [context compression, compaction, summarization, trimming, pruning]
+prerequisites: [context-selection]
+next: [context-caching]
+related: [agent-memory, context-selection]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-context-compression
+estimatedMinutes: 8
+---
+
+<OneLine>Compression is how you keep working when history outgrows the window: delete bulky tool dumps, then compact old turns into a short state note — on a real threshold, not a vibe.</OneLine>
+
+## Explain like I'm new to AI
+
+Agents loop. Each tool result is pasted back into context. After twenty steps the window is a landfill of diffs, HTML, and repeated searches — and the actual goal is a needle.
+
+**Compression** has two honest moves:
+
+1. **Trim / prune** — throw bytes away (keep a pointer: `auth.ts:84`, not the 900-line file).
+2. **Compact / summarize** — rewrite old turns into *state*: goal, decisions, open work, recent files.
+
+Step through both:
+
+<ContextCompression />
+
+Naive "summarize the whole chat" is dangerous: models **invent** details when they rewrite. Prefer **deletion** of raw dumps; summarize only what must persist.
+
+## Mental model
+
+Cleaning a desk. First **throw out** printouts you can reprint (tool output). Then write a **sticky note** of decisions ("refund cap is $120; waiting on legal"). Don't recopy every email into a new essay — that's how errors creep in.
+
+## How it works
+
+**Triggers (pick a number):** token count (e.g. 70% of the window), turn count, or "last tool result &gt; N tokens." Don't compact "when it feels long."
+
+**What to keep literal:** the live goal, the latest user message, pinned rules, recently touched files, unresolved errors.
+
+**What to shrink first:** `tool_result` payloads, search hit lists, stack traces after you've extracted the failing line.
+
+**How to compact:** a structured note beats a prose recap:
+
+- Goal
+- Done
+- Open
+- Constraints / decisions
+- Pointers (paths, ids)
+
+Coding agents (e.g. compaction in Claude Code) keep architectural decisions and open bugs, drop redundant tool output, and restart with that summary plus recently accessed files.
+
+## Real-world example
+
+A debugging agent reads a 2,000-line log five times. After trim, context holds one error line and a file pointer. After compact, older wanderings become "tried restarting Redis; miss was a nil session in `auth.ts`." The next call is cheaper and more accurate.
+
+## Technical explanation
+
+Compression sits on the **write** path of context engineering: you persist a smaller artifact (scratchpad / state) so the next **select** has something trustworthy.
+
+Watch for **summary drift** — each rewrite can drop a constraint or add a hallucinated "fix." Mitigations: structured fields, quoting critical facts verbatim, **grounded** compaction (only from traces you still have), and periodic re-read of source files instead of trusting the note forever.
+
+Learned compressors (models trained to shrink retrieved context) exist in research; production still mostly uses **rules + an LLM summary with a schema**. Tool outputs compress more aggressively than chain-of-thought: the *decision* is usually denser than the bytes that produced it.
+
+## Common mistakes
+
+<CommonMistake>
+Asking the model to "summarize the conversation so far" with no schema and no trigger. You get a
+fuzzy story, lost numbers, and a new hallucination that all later steps treat as fact.
+</CommonMistake>
+
+- Compacting too early (you throw away a stack trace you still needed).
+- Compacting too late (you've already paid for 15 bloated calls).
+
+## When to use it
+
+- Long-horizon agents, chat threads that outlive the window, tool-heavy loops.
+
+## When NOT to use it
+
+- Short tasks that fit. Compression is overhead and risk if you don't need it.
+
+## Alternatives
+
+- **Select less** so you never fill the window; **isolate** a sub-agent so the parent never sees the dump; a bigger window as a last resort.
+
+<MemoryCard>
+**Trim** bulky tool output (delete, keep pointers). **Compact** old turns into structured state on a
+**numeric trigger**. Prefer deletion over free-form rewrite — summaries drift and hallucinate.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-context-compression" />

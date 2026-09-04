@@ -1,0 +1,99 @@
+---
+id: planning-reflection
+slug: planning-reflection
+title: Planning & Reflection
+category: agents
+level: advanced
+summary: Planning breaks a goal into sub-tasks before acting, and reflection lets the agent critique and fix its own work — together they make agents far more reliable.
+keywords: [planning, reflection, self-critique, plan and execute, agent reliability]
+prerequisites: [agent-loop]
+next: [human-in-the-loop]
+related: [react, agent-loop]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Reflexion: Language Agents with Verbal Reinforcement Learning (Shinn et al., 2023)"
+    url: "https://arxiv.org/abs/2303.11366"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-planning-reflection
+estimatedMinutes: 8
+---
+
+<OneLine>Planning has the agent break a big goal into ordered sub-tasks before diving in, and reflection has it review its own results to catch and fix mistakes — two techniques that dramatically improve agent reliability on hard tasks.</OneLine>
+
+## Explain like I'm new to AI
+
+Basic agents can wander — reacting step by step without a big-picture plan, and never checking their own work. Two upgrades fix this:
+
+- **Planning:** first **break the goal into sub-tasks** and order them, then execute. Like writing an outline before an essay.
+- **Reflection:** after acting, the agent **reviews its own output** — "is this right? did I miss anything?" — and revises if not. Like proofreading and editing.
+
+<PlanningReflection />
+
+## Mental model
+
+- **Planning** = making a to-do list before starting, so you don't forget steps or do them in the wrong order.
+- **Reflection** = re-reading your work with a critical eye and fixing errors before calling it done.
+
+Humans do both instinctively for hard tasks; agents get much better when we make them do it explicitly.
+
+## How it works
+
+**Planning approaches:**
+- **Plan-and-execute:** generate a full plan up front, then execute each step (re-planning if reality diverges).
+- **Decomposition:** split a complex goal into smaller, checkable sub-goals.
+
+**Reflection approaches:**
+- **Self-critique:** the agent evaluates its own output against the goal or criteria.
+- **Reflexion-style:** turn failures into written "lessons" fed back into the next attempt.
+- **Verification:** check with tests, a rubric, or a separate "critic" model/agent.
+
+The two combine: plan → execute a step → reflect → revise or continue.
+
+## Real-world example
+
+A research agent tasked with a report **plans**: "gather sources → extract key points → draft → check for gaps." After drafting, it **reflects**: "Section 3 lacks recent data" → re-retrieves and revises. A coding agent writes code, **reflects** by running tests, sees a failure, and fixes it — that test-and-fix loop is reflection with an objective signal.
+
+## Technical explanation
+
+Planning reduces error accumulation by committing to structure before the model drifts; **re-planning** handles the reality that early plans are often wrong. Reflection (e.g., **Reflexion**, Shinn et al., 2023) provides a feedback signal without weight updates — the agent verbalizes what went wrong and conditions future attempts on it. Reflection works best with a **grounded signal** (tests passing, tool errors, a rubric) rather than pure self-judgment, since models are unreliable critics of themselves. Costs: both add extra LLM calls (more tokens, latency), so they're worth it on **hard, high-stakes, or long-horizon** tasks, less so on simple ones.
+
+## Common mistakes
+
+<CommonMistake>
+Trusting pure self-reflection with no external check. Models often rate their own bad output as "great."
+Ground reflection in real signals — tests, tool results, a rubric, or a separate critic.
+</CommonMistake>
+
+- Making one rigid plan and never re-planning when reality diverges.
+- Adding reflection loops to simple tasks, wasting tokens for no gain.
+
+## When to use it
+
+- Hard, multi-step, or high-stakes tasks where mistakes are likely and correctness matters.
+
+## When NOT to use it
+
+- Simple tasks where a single ReAct loop already succeeds — the extra calls aren't worth it.
+
+## Alternatives
+
+- Plain **ReAct** for straightforward tasks; **human-in-the-loop** review when a person should verify.
+
+<MemoryCard>
+**Planning** = decompose the goal into ordered sub-tasks before acting (re-plan when reality differs).
+**Reflection** = critique and fix your own work, ideally against a **grounded signal** (tests, rubric,
+critic). Both add cost — use them on hard, high-stakes tasks.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-planning-reflection" />

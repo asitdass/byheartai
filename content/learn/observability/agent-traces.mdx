@@ -1,0 +1,99 @@
+---
+id: agent-traces
+slug: agent-traces
+title: Tool, Retrieval, and Agent Traces
+category: observability
+level: advanced
+summary: Nested spans for retrieve, each model call, and each tool — a waterfall that shows which stage failed, without dumping secret payloads.
+keywords: [agent tracing, tool spans, retrieval spans, waterfall, mcp traces]
+prerequisites: [what-is-observability, agent-loop]
+next: [prompt-versioning]
+related: [tracing-logging-metrics, rag-evaluation, what-is-mcp, tool-abuse]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-agent-traces
+estimatedMinutes: 8
+---
+
+<OneLine>An agent trace is a waterfall: retrieve, plan, tool, answer — each a child span with ids, timings, and status. You debug "wrong tool" or "empty retrieval" by clicking the guilty row, not by rereading the final chat.</OneLine>
+
+## Explain like I'm new to AI
+
+A wrong answer has stages. If you only store the final paragraph, you cannot tell **missed retrieval** from **ignored chunk** from **bad tool args** from **looping**. Nested spans make the stages visible.
+
+<AgentTraceWaterfall />
+
+What to record (minimum):
+
+- **Retrieve:** query (or hash), `k`, hit **ids**, optional scores. Not always the full chunk text.
+- **LLM:** model, tokens, `finish_reason`, tool names it requested.
+- **Tool / MCP:** name, **hashed** args, status, duration, result size. Raw results often hold secrets — default off.
+- **Loop:** iteration index, stop reason (done / cap / error).
+
+## Mental model
+
+A kitchen pass: ticket in, grill, sauce, plate. If the plate is wrong you look at which station timestamped last — not only the complaint at the table.
+
+## How it works
+
+Parent span = user turn (or agent run). Children = each retrieve, embed, rerank, model, tool. MCP calls are tool spans with server name as an attribute (the protocol is still "a tool ran").
+
+Empty retrieve vs wrong retrieve: `hits=0` vs `hits=8` but none of the gold ids. That's the same split as **RAG evaluation**, live.
+
+Wrong tool: the `llm.plan` span shows `tool=refund` with args hash; you compare to policy. **Excessive agency** (Security, next category) is this span with a destructive name you should have gated.
+
+Cap **max iterations** in the runtime *and* alert when traces hit the cap. Observability without a cap just documents a money fire.
+
+Multi-turn: `session_id` on the parent so you can see memory and prior tools, but each turn still has its own tree.
+
+## Real-world example
+
+User: "cancel my order." Final text is polite. Trace: `tool.delete_account` ran. The chat UI lied; the waterfall didn't. Grade **trajectories**, not only the last sentence (eval category said the same — traces are how you capture the trajectory).
+
+## Technical explanation
+
+Span events can mark "token stream started" without storing the stream. For RAG, store **chunk ids** so you can join to the index version (`retriever_version` on the span — next lesson).
+
+Don't nest 200 tiny spans per token; nest **semantic** operations. Cardinality of span *names* should be a short enum, not the user query.
+
+Tail-sample traces with `loop_count > 3` or `tool_error` always kept.
+
+## Common mistakes
+
+<CommonMistake>
+One timer around "the agent." You will know it was slow and never which child.
+</CommonMistake>
+
+- Logging full tool JSON (API keys, account dumps).
+- No retrieve ids — you cannot replay what the model saw.
+
+## When to use it
+
+- Any tool-using or RAG system in production. Multi-agent: one trace per handoff, linked by parent id.
+
+## When NOT to use it
+
+- Don't flatten to a single "LLM call" span "to keep it simple." That's how you go back to superstition.
+- Don't store every retrieved paragraph in the trace store by default.
+
+## Alternatives
+
+- Application debugger on your laptop — not the fleet. Eval sets catch average quality; they won't show this morning's `delete_account`.
+
+<MemoryCard>
+**Waterfall:** retrieve → llm → tool → llm. Record ids, tool name, status, loop index — hash payloads.
+Empty vs wrong retrieval are different spans. Cap loops; alert when traces hit the cap.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-agent-traces" />

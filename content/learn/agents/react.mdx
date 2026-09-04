@@ -1,0 +1,95 @@
+---
+id: react
+slug: react
+title: What is ReAct?
+category: agents
+level: intermediate
+summary: ReAct is an agent pattern that interleaves reasoning (Thought) with tool use (Action) and results (Observation), looping until it can answer.
+keywords: [react, reason and act, thought action observation, agent pattern, tool use]
+prerequisites: [agent-loop, function-calling]
+next: [tool-selection]
+related: [agent-loop, planning-reflection]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "ReAct: Synergizing Reasoning and Acting in Language Models (Yao et al., 2022)"
+    url: "https://arxiv.org/abs/2210.03629"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-react
+estimatedMinutes: 7
+---
+
+<OneLine>ReAct ("Reason + Act") is the classic agent pattern where the model alternates between thinking out loud and taking actions with tools, using each result to inform its next thought.</OneLine>
+
+## Explain like I'm new to AI
+
+**ReAct** stands for **Reason + Act**. It's a simple, powerful recipe for agents: instead of guessing an answer, the model repeats three moves:
+
+- **Thought** — reason about what to do next.
+- **Action** — use a tool (search, calculator, API).
+- **Observation** — read the tool's result.
+
+…then thinks again, acts again, and so on until it can give a final answer. Step through a trace:
+
+<ReactTrace />
+
+## Mental model
+
+It's "**show your work, then check it**." Rather than blurting an answer, the model writes down its reasoning, does a concrete action to get real information, looks at what came back, and adjusts — like a detective narrating each deduction and following each clue.
+
+## How it works
+
+1. The model produces a **Thought** (its reasoning).
+2. It emits an **Action** — a tool call with arguments.
+3. The system runs the tool and returns an **Observation**.
+4. The observation is added to the context; the model **thinks again**.
+5. Repeat until the model outputs a **final answer** instead of an action.
+
+Interleaving reasoning with real observations keeps the model **grounded** — it reacts to actual results instead of hallucinating a path.
+
+## Real-world example
+
+Question: *"What's the population of the capital of France?"* A pure guess might be wrong or outdated. With ReAct: **Thought** (need the capital) → **Action** search → **Observation** "Paris" → **Thought** (need its population) → **Action** search → **Observation** "~2.1M" → **Answer**. Each fact is looked up, not invented.
+
+## Technical explanation
+
+ReAct (Yao et al., 2022) showed that interleaving chain-of-thought **reasoning** with **acting** beats either alone: reasoning helps plan and handle exceptions; acting grounds the reasoning in external facts, reducing hallucination. In practice it's implemented via **function calling** (the "Action" is a structured tool call) within the **agent loop**. Trade-offs: the reasoning traces cost tokens and latency, and models can still loop unproductively — so step limits and good tool design matter. ReAct is the foundation many richer patterns (planning, reflection, agentic RAG) build on.
+
+## Common mistakes
+
+<CommonMistake>
+Letting the model "reason" its way to an answer it should have looked up. If a fact is external or
+time-sensitive, the Thought should lead to an <em>Action</em> (tool call), not a guess.
+</CommonMistake>
+
+- No loop limit, so Thought/Action cycles run on unproductively.
+- Poor tool descriptions, so the model picks the wrong Action.
+
+## When to use it
+
+- Tasks needing external information or multiple steps — the default, reliable agent pattern.
+
+## When NOT to use it
+
+- Simple questions the model can answer directly, where the extra reasoning/tool overhead isn't worth it.
+
+## Alternatives
+
+- **Plan-and-execute** (plan all steps first) and **reflection** add structure on top of ReAct's step-by-step style.
+
+<MemoryCard>
+**ReAct = Reason + Act**: loop of **Thought → Action → Observation** until a final answer. Interleaving
+reasoning with real tool results keeps the agent grounded and reduces hallucination.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-react" />

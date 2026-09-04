@@ -1,0 +1,98 @@
+---
+id: inference-caching
+slug: inference-caching
+title: Caching and Cost Optimization
+category: inference
+level: intermediate
+summary: Three inference caches — exact replay, prefix KV, semantic — plus $ per successful task. Key on prompt version; similar is not the same answer.
+keywords: [prompt cache, semantic cache, prefix cache, inference cost]
+prerequisites: [what-is-inference]
+next: [distributed-inference]
+related: [context-caching, token-latency-cost, kv-cache-serving]
+alternatives: []
+confusedWith: [context-caching]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-inference-caching
+estimatedMinutes: 8
+---
+
+<OneLine>Cost optimization at inference is cache what is safe, route what is easy, and stop paying for tokens that don't finish a task. There are three caches; only one of them means "the answer is the same."</OneLine>
+
+## Explain like I'm new to AI
+
+The context-engineering **Context Caching** lesson is prefix KV / provider prompt cache. This lesson is the **cost picture** plus the other two caches people smash into that word.
+
+<InferenceCaches />
+
+1. **Exact:** same request bytes (+ auth scope) → reuse answer or KV. Safe if the world didn't change.
+2. **Prefix KV:** skip prefill of tools/instructions. Engine pages or HTTP prompt cache. Busts if the prefix moves a comma.
+3. **Semantic:** near-duplicate questions. Great for FAQs. Dangerous for "my order 441" vs "my order 442."
+
+Cost KPI remains **$ / successful task** (eval + observability): cache hits, cheaper routes, fewer retries, shorter decode, less RAG over-retrieve.
+
+## Mental model
+
+A library: the exact book, the same introduction chapter shared by many books, and a clerk who *thinks* you asked this last week. The clerk is semantic cache. Sometimes brilliant. Sometimes a lawsuit.
+
+## How it works
+
+Keys: `prompt_version`, `model`, `tenant`, tool-catalog hash, retrieval index version. Miss those and you serve ghosts.
+
+TTLs: FAQs days; prices minutes; user-specific never semantic-cached.
+
+Don't cache errors or ungrounded answers. Don't cache across tenants.
+
+Prefill-heavy apps (huge tools lists) win most from prefix cache — keep the prefix **byte-stable** (context engineering).
+
+Batch/offline: sort requests that share a prefix so the engine's automatic prefix cache hits.
+
+## Real-world example
+
+Prompt cache hit rate 0% after a "tiny" system-prompt edit every deploy. You busted the prefix. Pin versions; put volatile user text **after** the cache breakpoint.
+
+## Technical explanation
+
+Provider cache discounts uncached input tokens; still log **cached vs uncached** (token-latency-cost). Engine prefix cache saves **compute**, which may or may not show as a line item.
+
+Semantic cache is a retriever + policy. Treat hits as **untrusted remembered answers** — still apply ACLs.
+
+Speculative decoding and quant reduce $ too; they're not caches.
+
+## Common mistakes
+
+<CommonMistake>
+Semantic-caching all support chats by embedding similarity 0.82. You mixed two customers' orders.
+</CommonMistake>
+
+- Cache key missing prompt version.
+- Celebrating hit rate while quality drops (stale docs).
+
+## When to use it
+
+- Stable prefixes: always. Exact: idempotent asks. Semantic: curated FAQ only.
+
+## When NOT to use it
+
+- Don't semantic-cache anything with IDs, money, or "as of today."
+- Don't skip RAG because "the cache had an answer last month."
+
+## Alternatives
+
+- Smaller model + routing. Shorter outputs. Don't generate when a database row would do.
+
+<MemoryCard>
+**Exact / prefix KV / semantic** — three caches. Key on **version + tenant**. Semantic ≠ same.
+Optimize **$ / successful task**, not hit-rate vanity. Prefix edits bust the expensive cache.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-inference-caching" />

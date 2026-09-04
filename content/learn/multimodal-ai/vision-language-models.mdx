@@ -1,0 +1,97 @@
+---
+id: vision-language-models
+slug: vision-language-models
+title: Vision-Language Models
+category: multimodal-ai
+level: intermediate
+summary: A vision-language model reads images as visual tokens beside your text, so one network can answer questions about what is in a picture.
+keywords: [vlm, vision language model, visual tokens, multimodal llm, gpt-4v]
+prerequisites: [what-is-llm, what-is-transformer]
+next: [image-understanding-ocr]
+related: [context-window, what-are-embeddings]
+alternatives: []
+confusedWith: [image-video-generation]
+frameworks: []
+products: []
+papers:
+  - title: "Visual Instruction Tuning (LLaVA) — Liu et al., 2023"
+    url: "https://arxiv.org/abs/2304.08485"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-vision-language-models
+estimatedMinutes: 8
+---
+
+<OneLine>A vision-language model (VLM) is a language model that can take pictures as input: the image is turned into visual tokens that sit in the same context window as your words.</OneLine>
+
+## Explain like I'm new to AI
+
+A normal LLM only reads **text tokens**. A **vision-language model** also reads **pictures**. You paste a screenshot and ask "why is this button disabled?" — the model answers from the pixels, not from a caption someone typed.
+
+It does not have eyeballs. A **vision encoder** (or native early-fusion training) turns the image into a sequence of **visual tokens**. Those tokens enter the transformer next to "what's wrong here?"
+
+<VlmArchitecture />
+
+That is why a huge screenshot can **blow the context budget** — hundreds of visual tokens before you've asked anything.
+
+## Mental model
+
+Show a friend a photo and ask a question. They look and talk. A VLM is that, implemented as: photo → numbers → same attention machinery that reads sentences.
+
+## How it works
+
+Two common designs:
+
+1. **Encoder + projector + LLM** (classic LLaVA-style): a frozen or lightly tuned vision encoder (often CLIP-like) maps the image to vectors; a small projector aligns them to the LLM's embedding space; the LLM generates text.
+2. **Native multimodal / omni models**: trained from the start on mixed text, image, audio, video so fusion happens earlier — one stack, many input types.
+
+Either way, **generation of new pixels** is a different family of models (next lessons). A VLM that *describes* a cat is not the same as a model that *paints* a cat.
+
+## Real-world example
+
+You photograph a restaurant menu in another language. The VLM can translate dishes and flag allergens. For the exact price on the last line, you still want **OCR** (next lesson) — VLMs paraphrase and sometimes invent a digit.
+
+## Technical explanation
+
+Visual tokens are usually patches (or learned queries over a feature map). Higher resolution → more tokens → more prefill cost and more **lost-in-the-middle** risk if you dump 20 photos. Production tips:
+
+- Resize / crop to the **region that matters** (the error dialog, not the whole desktop).
+- Count visual tokens in your **context budget**.
+- Don't assume the model "saw" small text — if the number must be right, extract it.
+- Images can carry **prompt injection** (text in the screenshot that says "ignore the user"). Treat pixels as untrusted, like tool output.
+
+## Common mistakes
+
+<CommonMistake>
+Sending a 4K screenshot of an entire app and expecting the model to notice a 12px error in the
+corner. Crop. Visual tokens are expensive and attention is finite.
+</CommonMistake>
+
+- Using a VLM as a calculator for numbers printed in a table.
+- Confusing "the model can see" with "the model generated this image."
+
+## When to use it
+
+- Questions about photos, UIs, charts, diagrams — where language alone is missing the scene.
+
+## When NOT to use it
+
+- Pure text tasks; or when you only need the literal characters (use OCR).
+
+## Alternatives
+
+- Caption the image with a smaller model, then a text LLM (lossy cascade); **multimodal RAG** if the picture lives in a large corpus.
+
+<MemoryCard>
+A **VLM** maps images to **visual tokens** in the same window as text. Crop, budget tokens, don't
+trust it for exact figures, and treat pixels as untrusted input. Seeing ≠ generating.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-vision-language-models" />

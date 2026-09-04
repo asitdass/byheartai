@@ -1,0 +1,98 @@
+---
+id: tracing-logging-metrics
+slug: tracing-logging-metrics
+title: Tracing, Logging, and Metrics
+category: observability
+level: intermediate
+summary: Traces are the request tree, logs are events on that tree, metrics are fleet aggregates — join them with a trace id, and sample the expensive and failing calls.
+keywords: [distributed tracing, spans, metrics, structured logs, tail sampling]
+prerequisites: [what-is-observability]
+next: [token-latency-cost]
+related: [agent-traces, quality-latency-cost]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-tracing-logging-metrics
+estimatedMinutes: 8
+---
+
+<OneLine>A trace is the tree of spans for one user turn. Logs are the events pinned to those spans. Metrics are the aggregates you alert on. The glue is a shared trace id — without it you have three piles of noise.</OneLine>
+
+## Explain like I'm new to AI
+
+Three tools, three questions:
+
+<TracingPillars />
+
+- **Trace / spans:** how this turn unfolded (retrieve then model then tool).
+- **Logs:** the one line "finish_reason=stop" on that span.
+- **Metrics:** p95, error %, tokens per minute, dollars per hour.
+
+If an alert fires ("p95 blew"), you jump **trace_id → waterfall**. If you cannot, your metrics are a weather report with no map.
+
+## Mental model
+
+A package's tracking page (the trace), the scan beeps at each warehouse (logs), and the company's "packages delayed today" graph (metrics). You need all three. The tracking number is the id.
+
+## How it works
+
+**Spans.** Name the operation (`retrieve`, `llm.chat`, `tool.get_policy`). Record start/end, status, attributes (model, token counts, k, tool name). Children nest: the agent loop is a parent of each iteration.
+
+**Logs.** Structured JSON, not a novel. Attach `trace_id` / `span_id`. Prefer events *on* the span over a second logging product that doesn't correlate.
+
+**Metrics.** RED: rate, errors, duration — plus **tokens** and **cost**. Histograms for latency (p50/p95/p99), counters for errors and cache hits. **Low cardinality:** labels like `model`, `prompt_version`, `route` — never the prompt text or user utterance as a label (you'll explode the time series).
+
+**Sampling.** Head sampling = random 5% at the start (cheap, misses rare disasters). **Tail sampling** = keep 100% of errors, slow traces, and high-cost calls after the request ends. That's the 2026 default for LLM traffic: happy-path chatter is huge; incidents are the traces you wanted.
+
+**Propagation.** The retriever, the agent runtime, and an MCP server should continue the same trace. A broken context means a waterfall with a mysterious gap.
+
+## Real-world example
+
+Metric: tool error rate 4%. Log: `status=timeout`. Trace: `tool.get_policy` is 8s because the policy API is hung — the LLM span is innocent. You page the API team, not the prompt.
+
+## Technical explanation
+
+W3C trace context in headers is how HTTP services share the id. For queues and tool workers, inject the same context into the job payload.
+
+Cardinality and PII beat teams: a metric `prompt_hash` per unique prompt is still often too hot; use `prompt_version`. Logs of completions belong behind ACL and short TTL.
+
+Don't duplicate: the span *is* the timing. A second timer in application logs that doesn't match the span will gaslight you.
+
+## Common mistakes
+
+<CommonMistake>
+A wall of stdout "debug prompts" and a separate uptime ping, with no trace id. You cannot go from red graph to guilty span.
+</CommonMistake>
+
+- High-cardinality metric labels (raw queries).
+- 100% full-payload ingest "just in case" — cost and leak risk.
+
+## When to use it
+
+- Always, as the skeleton. Agent waterfalls (next lessons) sit on this.
+
+## When NOT to use it
+
+- Don't skip traces "because we have logs." Logs without a tree don't show nested LLM/tool timing.
+- Don't skip metrics "because we have traces." You cannot alert by reading every waterfall.
+
+## Alternatives
+
+- APM that only wraps HTTP: keep it, then **add** GenAI spans as children. Replacing nothing with "we'll grep Kubernetes" is not an alternative.
+
+<MemoryCard>
+**Trace** = span tree for one turn. **Logs** = events on spans. **Metrics** = fleet + tokens + $.
+Join with `trace_id`. Tail-sample errors, slowness, and expensive loops. Low-cardinality labels.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-tracing-logging-metrics" />

@@ -1,0 +1,94 @@
+---
+id: agent-vs-chatbot-vs-workflow
+slug: agent-vs-chatbot-vs-workflow
+title: Agent vs Chatbot vs Workflow
+category: agents
+level: beginner
+summary: A chatbot replies, a workflow runs fixed steps, and an agent decides its own next step — knowing the difference tells you which to build.
+keywords: [agent, chatbot, workflow, orchestration, autonomy, when to use agents]
+prerequisites: [what-is-agent]
+next: [agent-loop]
+related: [what-is-agent, agent-loop, how-to-design-ai-system]
+alternatives: []
+confusedWith: [what-is-agent]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-agent-vs-chatbot-vs-workflow
+estimatedMinutes: 7
+---
+
+<OneLine>A chatbot answers, a workflow follows fixed steps you defined, and an agent chooses its own next step based on what it sees — each fits a different kind of problem.</OneLine>
+
+## Explain like I'm new to AI
+
+These three get mixed up constantly:
+
+- **Chatbot:** you talk, it responds. It may use RAG or tools, but it doesn't pursue a multi-step goal on its own.
+- **Workflow:** a **fixed sequence** of steps a developer wired up in advance (step 1 → 2 → 3). Predictable and reliable.
+- **Agent:** given a goal, it **decides each step itself**, looping and adapting until done.
+
+The key difference is **who decides the control flow** — you (workflow) or the model (agent).
+
+<AgentVsWorkflow />
+
+## Mental model
+
+- **Chatbot** = a helpful receptionist answering questions.
+- **Workflow** = an assembly line: same steps every time.
+- **Agent** = a capable employee: "get this done" — they figure out the steps.
+
+## How it works — the deciding question
+
+Ask: **"Do I know the exact steps in advance?"**
+
+- **Yes, always the same steps** → build a **workflow**. It's cheaper, faster, and predictable.
+- **No, steps depend on what's discovered along the way** → use an **agent**.
+- **Just answering questions/conversation** → a **chatbot** (optionally with RAG/tools).
+
+## Real-world example
+
+- **Chatbot:** a support Q&A bot grounded in your docs (RAG).
+- **Workflow:** "summarize this ticket → classify it → route it to a team." Same three steps every time.
+- **Agent:** "investigate why this customer was double-charged and draft a resolution" — the steps depend on what the investigation uncovers.
+
+## Technical explanation
+
+Modern practice (echoed by Anthropic's "Building Effective Agents") distinguishes **workflows** (LLM calls orchestrated along predefined paths) from **agents** (the LLM dynamically directs its own process and tool use). Workflows offer **predictability and lower cost**; agents offer **flexibility** at the cost of latency, spend, and debuggability. The strong recommendation: **start with the simplest thing that works** — a single prompt, then RAG, then a workflow — and only reach for an agent when the task genuinely needs dynamic decision-making. Many "agents" in production are actually mostly-workflow with one or two agentic steps.
+
+## Common mistakes
+
+<CommonMistake>
+Building an autonomous agent when a fixed workflow would do. Agents are powerful but less predictable and
+more expensive — don't add a loop the task doesn't need.
+</CommonMistake>
+
+- Calling any tool-using chatbot an "agent" — the test is whether it *decides its own steps*.
+- Using a rigid workflow for a task that truly needs adaptation, then bolting on endless special cases.
+
+## When to use it
+
+- **Chatbot:** conversational Q&A. **Workflow:** known, repeatable pipelines. **Agent:** open-ended, adaptive tasks.
+
+## When NOT to use it
+
+- Don't use an agent for predictable pipelines, and don't force a workflow onto genuinely open-ended tasks.
+
+## Alternatives
+
+- These three (plus plain prompting and RAG) are the palette — most systems mix them.
+
+<MemoryCard>
+**Chatbot** replies; **workflow** runs fixed steps you defined; **agent** decides its own steps. Ask
+"do I know the steps in advance?" — yes → workflow, no → agent. Start simple; add autonomy only when needed.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-agent-vs-chatbot-vs-workflow" />

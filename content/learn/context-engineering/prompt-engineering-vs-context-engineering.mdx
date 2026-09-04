@@ -1,0 +1,111 @@
+---
+id: prompt-engineering-vs-context-engineering
+slug: prompt-engineering-vs-context-engineering
+title: Prompt Engineering vs Context Engineering
+category: context-engineering
+level: intermediate
+summary: Prompt engineering writes the instruction; context engineering designs everything the model sees on each call — retrieval, tools, memory, history, and budget.
+keywords: [context engineering, prompt engineering, context window, agents, rag]
+prerequisites: [prompt-engineering, context-window]
+next: [context-selection]
+related: [prompt-engineering, context-window, what-is-rag]
+alternatives: []
+confusedWith: [prompt-engineering]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-prompt-vs-context
+estimatedMinutes: 8
+---
+
+<OneLine>Prompt engineering is how you phrase the ask. Context engineering is the system that decides what the model is allowed to know — and at what cost — every time it runs.</OneLine>
+
+## Explain like I'm new to AI
+
+A **prompt** is the instruction you write: *be brief, cite the policy, use this format.* That craft still matters.
+
+**Context engineering** is bigger. Before each model call, your app *assembles a payload*: instructions, tool schemas, retrieved docs, memories, conversation history, and the user's question. You decide **what goes in, in what order, with what token budget, and what gets dropped**.
+
+<PromptVsContext />
+
+If the retrieved policy is wrong, a prettier sentence will not save you. If the window is stuffed with old tool dumps, the model will miss the one line that matters. That is a context problem, not a wording problem.
+
+## Mental model
+
+- **Prompt engineering** = writing a clear exam question.
+- **Context engineering** = packing the open-book materials the student may use — the right chapters, not the whole library, with a page limit.
+
+The wording of the question still helps. The wrong book still fails the exam.
+
+## How it works
+
+A modern call looks like this (order matters for caching, later):
+
+1. **Tool definitions** the model might use.
+2. **System / developer instructions** (behavior).
+3. **Selected context** — RAG chunks, memories, files, scratchpads.
+4. **History** — recent turns, compacted older ones.
+5. **The current user message** (and any images).
+
+Prompt engineering mostly owns (2) and how you phrase (5). Context engineering owns the *pipeline* that fills (1), (3), and (4) on every step of an agent or RAG app.
+
+Four recurring moves (we unpack them in this category): **write** (store outside the window), **select** (pull the next slice in), **compress** (shrink what aged), **isolate** (give a sub-task its own window).
+
+<Compare
+  a="Prompt engineering"
+  b="Context engineering"
+  rows={[
+    { label: "Unit of work", a: "The instruction text", b: "The full payload for this call" },
+    { label: "You control", a: "Wording, role, examples, format", b: "Retrieval, tools, memory, history, budget" },
+    { label: "Typical fix", a: "Rewrite the prompt", b: "Change what is packed, ordered, or dropped" },
+    { label: "Fails as", a: "Vague or ignored instructions", b: "Wrong, missing, or bloated context" },
+    { label: "Best for", a: "One-shot tasks", b: "Agents, RAG, long-running jobs" },
+  ]}
+/>
+
+## Real-world example
+
+A support agent with a perfect system prompt still refunds the wrong amount because retrieval stuffed six outdated policy PDFs in the middle of the window. You don't "prompt harder." You **select** the current policy, **put it next to the question**, and **stop dumping** the archive.
+
+## Technical explanation
+
+Context is not a bucket you fill to the advertised maximum. Extra tokens **compete for attention** (dilution), cost money, and often *hurt* quality. Effective usable context is smaller than the brochure window — especially in the middle of long inputs.
+
+Prompt engineering remains the right first lever for **single-call** features. The moment you add retrieval, tools, or multi-step state, the dominant bugs move to **assembly**: stale RAG, overlapping tools, unbounded history, cache-busting timestamps in the prefix. Treat that assembly as **application infrastructure** — versioned, evaluated, observable — not as a string you edit in a playground.
+
+## Common mistakes
+
+<CommonMistake>
+Treating a bad agent as a prompt problem. If the model never saw the right fact, or saw it buried under
+noise, rewriting "you are an expert" will not help. Inspect the payload, not just the instruction.
+</CommonMistake>
+
+- Equating RAG with all of context engineering. RAG is one **select** tactic.
+- Using a huge window as an excuse to skip selection.
+
+## When to use it
+
+- Any system with retrieval, tools, memory, or more than one model call. That is the default for production agents.
+
+## When NOT to use it
+
+- A one-shot feature with no external data — spend your time on a clear prompt.
+
+## Alternatives
+
+- Prompt engineering alone; fine-tuning when the gap is *behavior* baked into weights, not missing tokens this call.
+
+<MemoryCard>
+**Prompt engineering** writes the instruction. **Context engineering** designs the whole window for
+each call: what to include, in what order, at what budget. For agents and RAG, packing beats phrasing.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-prompt-vs-context" />

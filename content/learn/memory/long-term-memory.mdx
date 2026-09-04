@@ -1,0 +1,98 @@
+---
+id: long-term-memory
+slug: long-term-memory
+title: Long-term Memory
+category: memory
+level: intermediate
+summary: Long-term memory stores distilled facts outside the model so a new session can retrieve them — the weights never learned the fact.
+keywords: [long-term memory, persistent memory, memgpt, cross-session, retrieval]
+prerequisites: [short-term-memory, what-are-embeddings]
+next: [memory-types]
+related: [agent-memory, what-is-rag]
+alternatives: []
+confusedWith: [short-term-memory, what-is-rag]
+frameworks: []
+products: []
+papers:
+  - title: "MemGPT: Towards LLMs as Operating Systems (Packer et al., 2023)"
+    url: "https://arxiv.org/abs/2310.08560"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-long-term-memory
+estimatedMinutes: 7
+---
+
+<OneLine>Long-term memory is a store outside the model — you write a distilled fact in one session and retrieve it in another, because the model itself forgets the moment the window is gone.</OneLine>
+
+## Explain like I'm new to AI
+
+Close the chat, open a new one. Short-term memory is gone. If the assistant still knows you're vegetarian, that fact lived in a **database**, not in the neural net.
+
+Write once, retrieve later:
+
+<LongTermRecall />
+
+That is the same *shape* as RAG (embed, store, search) but the corpus is **this user's or this agent's extracted memories**, not your public docs. RAG answers "what's in the handbook?"; long-term memory answers "what did we already decide about Ada?"
+
+## Mental model
+
+A **medical chart**. Each visit, the doctor doesn't replay every prior appointment from RAM. They pull the chart (allergies, meds) and add a new note. The brain of the doctor on Tuesday is not a copy of Monday's — the chart is.
+
+## How it works
+
+1. **Decide to write** — not every sentence. Extract durable facts ("timezone = IST") or important events.
+2. **Store** with metadata: `user_id`, `key`, `timestamp`, `source`, `trust`.
+3. **Retrieve** at the start of a turn or when a tool says `recall(query)` — typically embedding search plus filters.
+4. **Pack** a handful of hits into the working set (context engineering).
+
+MemGPT (now Letta) popularized the OS analogy: the context window is RAM; long-term stores are disk; the agent gets tools to page memory in and out.
+
+## Real-world example
+
+ChatGPT-style "memory," a CRM assistant that remembers account quirks, a coding agent that remembers "this repo uses pnpm." All of them are **writes to a store** plus **retrieval next session** — not fine-tuning.
+
+## Technical explanation
+
+Don't confuse:
+
+- **Fine-tuning** — changes weights; slow, not per-user, bad for facts that change.
+- **Session history** — dies with the thread (unless you export it).
+- **Long-term memory** — per-entity records with retrieval. Production stacks in 2026 are often **hybrid**: vectors for fuzzy recall, a graph or KV for exact keys ("diet"), timestamps for freshness.
+
+Write policy is the hard part. Save too much → retrieval noise. Save too little → the product feels amnesiac. Extract with an LLM *into a schema*, then **dedupe / conflict-check** before commit (later lesson).
+
+## Common mistakes
+
+<CommonMistake>
+Embedding raw chat logs as "memory." You built a messy RAG corpus of transcripts, not facts. Retrieve
+noise, contradict yourself, and never expire anything.
+</CommonMistake>
+
+- One global store with no `user_id` (privacy and quality both die).
+- Using long-term memory as a substitute for the current task **state** (todos don't belong in "Ada is vegetarian").
+
+## When to use it
+
+- Preferences, durable facts, and cross-session continuity for a product people return to.
+
+## When NOT to use it
+
+- Secrets that shouldn't persist; one-off tasks; facts that already live in a system of record you can query with a tool (fetch the live order instead of memorizing it).
+
+## Alternatives
+
+- **RAG** over official docs; **tools** to the source of truth; **fine-tuning** for style/skill, not for Ada's diet.
+
+<MemoryCard>
+**Long-term memory** = distilled records **outside** the model, retrieved in a **new** session. It's
+RAG over *memories*, not over your wiki. Write a schema, filter by user, don't dump raw chats.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-long-term-memory" />

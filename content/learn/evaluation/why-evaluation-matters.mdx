@@ -1,0 +1,94 @@
+---
+id: why-evaluation-matters
+slug: why-evaluation-matters
+title: Why Evaluation Matters
+category: evaluation
+level: beginner
+summary: Without a frozen eval set, every prompt, RAG, or model change is a guess — evaluation is how you know the system actually got better.
+keywords: [evaluation, eval set, llm evaluation, regression, gold set]
+prerequisites: [what-is-llm]
+next: [offline-vs-online-eval]
+related: [rag-evaluation, when-to-fine-tune, what-is-observability]
+alternatives: []
+confusedWith: [rag-evaluation, what-is-observability]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-why-evaluation-matters
+estimatedMinutes: 8
+---
+
+<OneLine>Evaluation is a frozen test of the job your AI must do — not a vibe from one lucky demo. Without it you cannot tell a real improvement from a pretty screenshot.</OneLine>
+
+## Explain like I'm new to AI
+
+Software has tests. AI systems still need them, harder: the same prompt can answer differently, providers silently update models, and "it sounded smart" is not a metric.
+
+A **demo** is one chat you liked. An **eval set** is dozens or hundreds of real tasks with a known-good answer, a rubric, or a check (valid JSON, right tool, claim supported by the doc). You run it **before** users see a change.
+
+<WhyEvalMatters />
+
+If you fine-tuned, added RAG, or rewrote the prompt and you cannot point at a number that moved the way you wanted — you did not improve the product. You performed.
+
+## Mental model
+
+A kitchen that tastes every plate vs one that only photographs the chef's special. Evaluation is tasting a **fixed menu** every time the recipe changes — not asking whether tonight's guests seemed happy (that's online eval, next lesson).
+
+## How it works
+
+1. Write down the **job**: refund policy answers, four-section summaries, tool calls that never refund without a ticket id.
+2. Collect a **gold set** that looks like production (hard cases, not only intern happy-paths).
+3. Score automatically where you can (schema, exact ids, retrieval hit) and with a **rubric** where you cannot.
+4. Freeze the set. Change the system. Run again. Ship only if the score holds or rises **and** you did not wreck a slice you care about (language, long docs, safety).
+5. Revisit the set when real traffic drifts — a stale gold set is a false sense of safety.
+
+## Real-world example
+
+A team "improves" the prompt on Friday. Monday, citations look nicer in Slack. The frozen set shows faithfulness dropped: the model now paraphrases policies that are not in the chunk. Eval would have blocked the merge. Vibes would not.
+
+## Technical explanation
+
+LLMs are **stochastic**. One sample is not a measurement. You need a set large enough that a 3-point drop is not noise — often 50–200 well-chosen items beats 10,000 scraped ones.
+
+Eval is the **product spec**. Prompt, retrieval, tools, and fine-tune all exist to move those numbers. The previous category (fine-tuning) is superstition without a holdout; RAG without split metrics is the same trap (see **How to Evaluate RAG**).
+
+Provider models move under you. A weekly eval job is how you notice the "same" API got worse at your schema.
+
+Do not train or few-shot on the eval set. That is cheating, same as training on the test fold in classical ML.
+
+## Common mistakes
+
+<CommonMistake>
+Shipping because the founder liked one transcript. That transcript is not the user population.
+</CommonMistake>
+
+- Averaging one "quality" number so a tone win hides a hallucination loss.
+- 12 cherry-picked questions that everyone on the team already knows.
+
+## When to use it
+
+- Before every prompt, model, RAG, or fine-tune change that might reach a user.
+- As the definition of "done" for an AI feature.
+
+## When NOT to use it
+
+- Throwaway prototypes where you are still discovering the job. Even then, keep the transcripts — they become the first gold set.
+
+## Alternatives
+
+- There is no substitute for measurement. The choice is **which** scores (next lessons: offline vs online, humans, judges, benches, safety, cost).
+
+<MemoryCard>
+**Eval = frozen tasks that look like the real job.** Demos lie. Score before users see a change.
+Never train on the eval set. One "quality" average hides which failure you actually have.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-why-evaluation-matters" />

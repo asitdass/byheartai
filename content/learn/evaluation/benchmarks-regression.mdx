@@ -1,0 +1,99 @@
+---
+id: benchmarks-regression
+slug: benchmarks-regression
+title: Benchmarks, Gold Sets, and Regression Tests
+category: evaluation
+level: intermediate
+summary: Public leaderboards pick models; your private gold set and CI tests pick whether your product got worse. Never train on the eval set.
+keywords: [benchmarks, gold set, regression tests, eval ci, test dataset]
+prerequisites: [why-evaluation-matters]
+next: [hallucination-safety-eval]
+related: [offline-vs-online-eval, rag-evaluation, prompt-versioning]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-benchmarks-regression
+estimatedMinutes: 8
+---
+
+<OneLine>Public benchmarks help you pick a base model. Your product needs a private gold set that looks like real work, plus CI that fails the PR when those scores drop. Leaderboards are not a QA department.</OneLine>
+
+## Explain like I'm new to AI
+
+A school-wide exam (MMLU, a coding arena, a public "vibe check") tells you something about a **general** model. Your users ask about *your* refunds, *your* schema, *your* tools.
+
+Three layers:
+
+<BenchmarksRegression />
+
+**Contamination** is real: pieces of famous tests leaked into pretraining. A rising public score can mean "it saw the quiz," not "it got smarter at your job."
+
+## Mental model
+
+F1 cars vs your commute. Winning Sunday tells you about engines. It does not tell you if the school-run minivan still has working brakes after you "improved" the stereo (your prompt).
+
+## How it works
+
+**Public benches** — model shopping, research tracking. Do not tune your product against them. They saturate, they leak, they are not your distribution.
+
+**Private gold** — 50–200 items that look like production: happy path, long-tail, adversarial, each language you ship. Include gold **answers** and, for RAG, gold **chunks**. Version the files like code. **Never train or few-shot on them.**
+
+**Unit tests** — JSON schema, enum tool names, citation ids exist, regex for "I don't know" on empty retrieval. Cheap and exact. Put them next to the golden graded set.
+
+**CI regression** — same command every PR. Fail if a tracked metric drops more than your noise budget (often ~2 points on a 100-pt scale, after you measured variance). Store traces.
+
+Grow the set with **synthetic** extras only from human seeds you already trust — then spot-check. Garbage synth poisons the spec.
+
+Slice: report not one average. A win on English short answers can hide a collapse on long PDFs.
+
+## Real-world example
+
+You switch embedding models. Public retrieval benches look fine. CI: context recall on *your* policy corpus −14. The PR dies. That is the system working. A leaderboard screenshot would have shipped it.
+
+## Technical explanation
+
+Treat eval datasets as **immutable tagged releases**. When you add items, that's a new version; don't rewrite history so last month's dashboard lies.
+
+Agent jobs: success rate on a **held-out task suite** (did the refund tool fire with the right id?) plus a cap on steps/cost. Don't only BLEU the final chat.
+
+Fine-tunes: hold out eval. If you trained on it, the number is vanity.
+
+## Common mistakes
+
+<CommonMistake>
+Chasing a public leaderboard as if it were product QA. Your users are not that quiz.
+</CommonMistake>
+
+- Training on the gold set "just to boost the dashboard."
+- One blended score, no slices, no unit tests.
+
+## When to use it
+
+- Always: private gold + CI for anything in production.
+- Public benches when choosing or upgrading a **model**, not a prompt.
+
+## When NOT to use it
+
+- Don't skip private gold because "the model is #2 on a blog chart."
+- Don't add 10,000 unlabeled synth items and call it coverage.
+
+## Alternatives
+
+- Online metrics (previous lessons) catch drift the gold set missed — then those traces become new gold.
+
+<MemoryCard>
+**Public bench** = shop for models. **Private gold** = your spec. **CI** = don't merge a drop.
+Never train on eval. Prefer 100 real tasks + unit checks over a giant noisy dump.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-benchmarks-regression" />

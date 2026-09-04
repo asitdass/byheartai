@@ -1,0 +1,105 @@
+---
+id: context-caching
+slug: context-caching
+title: Context Caching
+category: context-engineering
+level: advanced
+summary: Prompt caching reuses the KV cache of a stable prefix so you don't re-prefill tools and instructions every turn — any change in that prefix busts the cache.
+keywords: [prompt caching, context caching, kv cache, cache breakpoint, prefix match]
+prerequisites: [context-selection, kv-cache]
+next: [long-context-strategies]
+related: [kv-cache, context-compression, token-latency-cost, inference-caching, kv-cache-serving]
+alternatives: []
+confusedWith: [kv-cache, inference-caching]
+frameworks: []
+products: []
+papers:
+  - title: "Anthropic: Prompt caching"
+    url: "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+    kind: docs
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-context-caching
+estimatedMinutes: 8
+---
+
+<OneLine>Context caching (prompt caching) stores the model's KV state for a token-identical prefix so later calls skip re-reading tools, instructions, and stable docs — a one-byte change at the front wastes that work.</OneLine>
+
+## Explain like I'm new to AI
+
+Each call, the model **pre-fills**: it reads every input token and builds key/value vectors (the **KV cache**). If 8,000 of those tokens are the *same system prompt and tools* as last time, recomputing them is waste.
+
+**Prompt caching** keeps that prefix's KV state on the provider for a few minutes (sometimes longer). The next request with the **same prefix** loads it and only prefills the new suffix (the latest user message). Cached reads are much cheaper than fresh input tokens.
+
+The catch is brutal: matching is **exact prefix**. Shuffle retrieval to the front, inject a timestamp, reorder tools — the cache misses.
+
+<ContextCaching />
+
+## Mental model
+
+A **highlighter on a textbook chapter**. If the chapter is identical, you don't re-highlight. If someone inserts a sticky note on page 1, the old highlights no longer line up — you start over. The sticky note is your timestamp.
+
+## How it works
+
+Typical render order (Anthropic-style, and the right *design* even on other APIs):
+
+**tools → system → messages**
+
+You mark a **breakpoint** (`cache_control`): "cache everything from the start through here." Automatic modes slide that breakpoint forward as the conversation grows. Explicit breakpoints pin a stable block (tools + system + a handbook). Providers cap how many breakpoints you get (often four).
+
+Rules of assembly:
+
+- **Stable first, variable last.** Tools and instructions almost never change mid-session.
+- Don't put clocks, request ids, or shuffled RAG in the prefix.
+- Keep tool JSON **key order and whitespace** stable — the hash is over bytes, not "meaning."
+- Growing history can stay cacheable if you **only append** (compaction that rewrites the prefix busts it — compact carefully, then recache).
+
+This is **not** the same as the in-request KV cache used while generating tokens. That cache lives inside one generation. Prompt caching **reuses prefill across HTTP requests**.
+
+## Real-world example
+
+A coding agent sends the same 50 tool definitions and a 4,000-token `AGENTS.md` every turn, plus one new message. Without caching you pay full prefill each time. With a breakpoint after tools + system + project rules, turns 2–N mostly pay for the new tokens. Coding hosts regularly see very high cache hit rates when the prefix is disciplined.
+
+## Technical explanation
+
+Prefill cost scales with input length. Caching stores **attention K/V tensors** for prefix tokens, keyed by a hash of the exact prefix. A mismatch at position *N* invalidates every breakpoint at *N* or later.
+
+Economics: cache writes often cost a bit more than a normal input token; cache reads cost a fraction (on the order of 0.1×). Caching pays off when a prefix is **read more than it is written** — agents and RAG with a large static handbook are the sweet spot. A one-off call with a unique prompt should not bother.
+
+OpenAI, Google, AWS Bedrock, and others offer analogous prefix caching; names differ (checkpoint vs breakpoint). The engineering invariant is the same: **identical bytes from the left**.
+
+## Common mistakes
+
+<CommonMistake>
+Putting "today's date" or a random request id at the top of the system prompt. You silently disable
+caching on every call and wonder why the bill didn't drop.
+</CommonMistake>
+
+- Reordering tools each turn (even "to help the model").
+- Compacting in a way that rewrites the cached prefix every step.
+
+## When to use it
+
+- Multi-turn agents, IDEs, and RAG apps with large stable instructions or catalogs.
+
+## When NOT to use it
+
+- Single unique prompts; tiny payloads where the write surcharge isn't worth it.
+
+## Alternatives
+
+- Smaller prompts (select/compress) so prefill is cheap even without a cache; local models where you own the KV cache process.
+
+<MemoryCard>
+**Prompt caching** = reuse **KV prefill** for an **exact prefix**. Put **tools + system + stable docs
+first**, variables last. One changed byte at the front misses the whole cache. Different from
+within-request KV cache.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-context-caching" />

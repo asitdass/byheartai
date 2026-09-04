@@ -1,0 +1,197 @@
+---
+id: loss-functions
+slug: loss-functions
+title: What is a Loss Function?
+category: foundations
+level: intermediate
+summary: A loss scores how wrong a prediction is so training can shrink that number; MSE and cross-entropy are the usual workhorses.
+keywords: [loss function, mse, cross-entropy, objective, training error, log loss]
+prerequisites: [datasets-features-labels]
+next: [optimization-gradient-descent]
+related: [datasets-features-labels, optimization-gradient-descent, backpropagation, why-evaluation-matters]
+alternatives: []
+confusedWith: [optimization-gradient-descent]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-loss-functions
+estimatedMinutes: 13
+---
+
+<OneLine>A loss function turns “how wrong is this prediction?” into a single number; training is the process of making that number smaller.</OneLine>
+
+## Explain like I'm new to AI
+
+After the model outputs ŷ, something has to say whether that is close to the label y. That something is the **loss** (also called the **objective** when you add regularization).
+
+- Loss **low** → prediction matches the label (under this scoring rule).
+- Loss **high** → prediction is wrong, or confidently wrong.
+
+The loss is not a vibe. It is a formula. Different formulas care about different mistakes: squared error cares about *distance* on a number line; **cross-entropy** cares about *probability* assigned to the true class. You cannot "just train" without picking one. Gradient descent only knows how to follow ∂L/∂θ.
+
+Eval metrics (accuracy, BLEU, "looks good in the demo") are often **not** the loss. That gap is why a model can minimize L and still fail the product.
+
+<LossFunctions />
+
+## Mental model
+
+A coach's scorecard after every shot.
+
+- Basketball: distance from the hoop (regression / MSE). Missing by a mile is much worse than missing by an inch because of the **square**.
+- Multiple-choice test: how much probability you put on the **correct** letter (cross-entropy). Writing "I'm 99% sure it's B" when the answer is A is a disaster. Writing "I'm 34% on A" when A is correct is only a little bad.
+
+The coach never looks at your outfit. Only the scorecard. Training is the same: it only "sees" L.
+
+## How it works
+
+1. Model maps features → ŷ (a number, a vector of logits, a token distribution).
+2. Loss L(ŷ, y) compares ŷ to the label.
+3. Average L over a **batch** (minibatch gradient).
+4. Backprop turns that scalar into a gradient for every parameter.
+5. The optimizer steps. Repeat.
+
+You almost always minimize **average** loss, not the worst example — unless you chose a different objective (robust losses, max-margin, RL rewards).
+
+**Mean squared error (MSE)** for a number:
+
+```text
+L = (ŷ − y)²          # or ½(ŷ − y)² so the 2 cancels in the derivative
+```
+
+**Binary cross-entropy** if the model outputs p = P(class = 1) in (0, 1):
+
+```text
+L = −[ y log p  +  (1 − y) log(1 − p) ]
+```
+
+If y = 1 (true class is "yes"), this simplifies to **−log p**. Guess p = 0.8 → L ≈ 0.22. Guess p = 0.1 → L ≈ 2.3. Guess p = 0.01 → L ≈ 4.6. Confident and wrong explodes.
+
+**Multiclass / language models:** ŷ is a softmax over K classes (or the vocab). Loss is **−log p_correct**. Next-token training *is* this loss on every token.
+
+## Real-world example
+
+**House price.** y = 340, ŷ = 410. Residual = 70. MSE = 4900 (in k$²). A ŷ of 341 would be almost 0. The square makes a 200k miss *four times* as painful as a 100k miss, not twice — outliers dominate unless you clip or switch to MAE.
+
+**Spam.** True label spam, model says p = 0.30. L = −log(0.30) ≈ 1.20. If it says 0.03, L ≈ 3.5. That is why poorly calibrated "I'm sure" heads wreck log-loss even when accuracy looks fine.
+
+**LLM.** Prompt: "The capital of France is". Gold next token: `Paris`. The loss on that step is −log p(Paris). Training does this trillions of times. **RL / preference** methods (DPO, GRPO) replace or mix this with a *reward* — still a scalar the optimizer climbs; it is a different L, not "no loss."
+
+**Search ranking.** Pairwise or listwise losses (how often the relevant doc is above the junk). Accuracy on a random query is the wrong scorecard.
+
+## Technical explanation
+
+**Why MSE.** If you assume y = f(x) + Gaussian noise, maximum likelihood ≡ minimize MSE. Derivative: `∂L/∂ŷ = 2(ŷ − y)`. Nice, everywhere, sensitive to outliers.
+
+**Why cross-entropy.** If you assume a Bernoulli or categorical likelihood, maximum likelihood ≡ minimize cross-entropy. It pairs with **softmax** (or sigmoid) so that the gradient w.r.t. logits is `p − y_onehot` — numerically stable when implemented as fused `log_softmax`.
+
+**Do not mix randomly.** MSE on raw logits for classification, or accuracy as a training loss, either trains slowly or not at all (accuracy is piecewise constant: gradient ~ 0).
+
+**Regularization** is extra terms in L: `λ‖θ‖²` (weight decay). You are still minimizing a scalar.
+
+**Train loss vs test loss.** Train L going down while test L goes up is **overfitting**. Early stopping watches *validation* loss.
+
+Worked MSE step (one example):
+
+```text
+y = 4,  ŷ = 1
+L = (1 − 4)² = 9
+∂L/∂ŷ = 2(1 − 4) = −6
+```
+
+If ŷ = w (a silly one-parameter model) and η = 0.1, then w ← 1 − 0.1(−6) = 1.6. New L = (1.6 − 4)² = 5.76. Smaller. That *is* learning.
+
+Worked cross-entropy:
+
+```text
+y = 1,  p = 0.5
+L = −log(0.5) ≈ 0.693
+y = 1,  p = 0.9
+L = −log(0.9) ≈ 0.105
+```
+
+Halving the remaining error in probability (0.5 → 0.9 is not "twice as sure" in loss space) — log loss is about **bits of surprise**.
+
+```python
+import numpy as np
+
+def mse(y_hat, y):
+    y_hat, y = np.asarray(y_hat), np.asarray(y)
+    return np.mean((y_hat - y) ** 2)
+
+def binary_log_loss(p, y, eps=1e-12):
+    p = np.clip(np.asarray(p), eps, 1 - eps)
+    y = np.asarray(y)
+    return np.mean(-(y * np.log(p) + (1 - y) * np.log(1 - p)))
+
+print("MSE", mse([410, 200], [340, 185]))
+print("log loss sure-wrong", binary_log_loss([0.05], [1]))
+print("log loss sure-right", binary_log_loss([0.95], [1]))
+```
+
+sklearn: `LogisticRegression` minimizes log-loss (+ regularization). `LinearRegression` minimizes MSE (ordinary least squares). You can also use `sklearn.metrics.log_loss` / `mean_squared_error` **after** training — that is evaluation, not the optimizer's L, unless you wired it that way.
+
+```python
+from sklearn.metrics import log_loss, mean_squared_error
+
+# Eval-only: compare a model's probabilities to labels
+y_true = [1, 0, 1]
+p = [0.8, 0.3, 0.55]
+print("log_loss", log_loss(y_true, p))
+print("mse on probs (usually the wrong metric)", mean_squared_error(y_true, p))
+```
+
+## Common mistakes
+
+<CommonMistake>
+Optimizing accuracy, BLEU, or "thumbs up rate" directly inside SGD. Those are often flat or
+noisy. Train on a differentiable loss; <em>report</em> the product metric on a frozen eval set.
+</CommonMistake>
+
+- Using MSE for a 0/1 label without a reason. Log-loss matches "probability of the class."
+- Ignoring class imbalance: average CE can look fine while the rare class is never predicted. Weight classes or change the decision threshold *after* you have calibrated p.
+- Comparing losses across different formulas or different y scales ("our loss is 0.4 so we beat the team at 2.1").
+- Forgetting that LLM **reported** loss is in nats (natural log) per token; perplexity is exp(mean CE).
+
+## When to use it
+
+- Every training run: you must name L.
+- Debugging: if train L is stuck, the model is not learning (data, lr, bugs). If train L falls and product metrics do not, L is the wrong proxy.
+
+## When NOT to use it
+
+- Do not treat train loss as a ship/no-ship gate. Use held-out **task** metrics (and calibration, latency, cost).
+- Do not switch losses mid-comparison without re-tuning η — you changed the geometry of the hill.
+- Do not use unbounded MSE on raw LLM logits.
+
+## Alternatives
+
+- **MAE / Huber** when outliers should not dominate regression.
+- **Focal loss** when easy examples drown the rare class.
+- **Preference / RL losses** (DPO, GRPO, PPO-style) when the "label" is a comparison or a verifier, not a single gold token.
+- **Eval-only metrics** (exact match, pass@k, human rubric) that you never differentiate.
+
+<Compare
+  a="MSE"
+  b="Cross-entropy"
+  rows={[
+    { label: "ŷ means", a: "A number on the same scale as y", b: "A probability (or a distribution)" },
+    { label: "Punishes", a: "Distance, especially outliers (square)", b: "Low p on the true class (confident errors)" },
+    { label: "Typical use", a: "Price, temperature, some embeddings", b: "Classes, tokens, spam, intent" },
+    { label: "Gradient w.r.t. ŷ", a: "2(ŷ − y)", b: "For logits: p − one_hot(y)" },
+  ]}
+/>
+
+<MemoryCard>
+**Loss L** is the scalar training actually minimizes. **MSE** for numbers, **cross-entropy** for
+probabilities/tokens. Metrics you show the business are usually a different formula — measure both.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-loss-functions" />

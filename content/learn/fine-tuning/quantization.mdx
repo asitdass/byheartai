@@ -1,0 +1,94 @@
+---
+id: quantization
+slug: quantization
+title: What is Quantization?
+category: fine-tuning
+level: intermediate
+summary: Quantization stores weights with fewer bits so models fit in memory — 4-bit is common for serving and for QLoRA training, with a small quality trade.
+keywords: [quantization, 4-bit, gptq, awq, gguf, nf4]
+prerequisites: [what-is-fine-tuning]
+next: [instruction-vs-preference]
+related: [lora-qlora, kv-cache, serving-quantization]
+alternatives: []
+confusedWith: [lora-qlora, serving-quantization]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-quantization
+estimatedMinutes: 7
+---
+
+<OneLine>Quantization is shrinking each weight from 16-bit-ish numbers to 8- or 4-bit codes so the model uses less memory and often runs faster — with a little rounding error.</OneLine>
+
+## Explain like I'm new to AI
+
+Weights are numbers. **16-bit** (bf16/fp16) is the usual training precision. **Quantization** packs those numbers into **fewer bits**, like compressing a photo: smaller file, slightly less detail.
+
+<QuantizationBits />
+
+Two different jobs people mix up:
+
+- **Serve / inference:** GPTQ, AWQ, GGUF, bitsandbytes — run a 70B on a smaller GPU or a laptop.
+- **Train:** QLoRA keeps the *frozen base* 4-bit while adapters learn. That's quantization in the service of fine-tuning.
+
+Same idea (fewer bits), different moment in the lifecycle.
+
+## Mental model
+
+A pantry of spices in huge glass jars (16-bit) vs the same spices in small tins (4-bit). You still cook; a pinch might be a hair less precise. For most dishes you won't notice. For a soufflé (fragile eval), you might keep the jars.
+
+## How it works
+
+A scale maps a small integer back to an approximate real. **Calibration** (GPTQ/AWQ) uses a bit of data to choose scales that hurt loss less. **GGUF** is a file format popular for local runners. **KV cache** can be quantized too at generation time (separate from weight quant).
+
+Quality drop is task-dependent. Always **eval your suite** after quantizing — especially math, rare names, and structured output.
+
+## Real-world example
+
+A 8B instruct model in 4-bit GGUF on a laptop for a demo. Production might serve AWQ 4-bit on one GPU instead of two. Fine-tuning still happens with QLoRA, then you export a quantized artifact for serving.
+
+## Technical explanation
+
+Memory for weights ≈ `params × bytes_per_weight`. 4-bit is ~4× smaller than 16-bit (plus overhead). Activations and KV cache still need RAM — so "4-bit 70B" is not 4× smaller end-to-end.
+
+Don't train LoRA adapters in 4-bit. Don't assume QLoRA training artifacts are automatically the best GGUF; convert deliberately.
+
+**Activation-aware** methods (AWQ) protect outlier weights that carry more signal.
+
+## Common mistakes
+
+<CommonMistake>
+Quantizing, skipping eval, shipping. A 2% MMLU drop might be a 20% hit on <em>your</em> JSON schema
+or legal clause.
+</CommonMistake>
+
+- Mixing up QLoRA (train) with GGUF (serve).
+- 2-bit because "smaller is better" — quality falls off a cliff.
+
+## When to use it
+
+- Fit a model on available GPUs; local apps; cheaper tokens at scale after you measure quality.
+
+## When NOT to use it
+
+- You already fit in 16-bit and eval is razor-thin. Don't 4-bit a model as a substitute for a smaller architecture if quality dies.
+
+## Alternatives
+
+- Distillation to a smaller dense model; speculative decoding for speed without 4-bit; more GPUs.
+
+<MemoryCard>
+**Quantization** = fewer bits per weight. **Inference** methods (GPTQ/AWQ/GGUF) shrink serving.
+**QLoRA** uses 4-bit for the frozen base **while training**. Always re-eval. Don't 2-bit your way to
+oblivion.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-quantization" />

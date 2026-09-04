@@ -1,0 +1,106 @@
+---
+id: how-to-design-ai-system
+slug: how-to-design-ai-system
+title: How to Design an AI System
+category: ai-system-design
+level: advanced
+summary: Design an AI system in order — job and SLO, shape, knowledge and tools, eval, security, traces, then serving and cost — and do not start with a trophy model.
+keywords: [ai system design, architecture, slo, production llm]
+prerequisites: [what-is-llm, why-evaluation-matters]
+next: [design-rag-chatbot]
+related: [what-is-rag, what-is-agent, agent-vs-chatbot-vs-workflow, quality-latency-cost, prompt-injection]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-how-to-design-ai-system
+estimatedMinutes: 10
+---
+
+<OneLine>Designing an AI system is a sequence: write the job and SLOs, pick chatbot vs workflow vs agent, decide where facts and permissions live, freeze an eval, then security, traces, and serving. The model is a component, not the architecture.</OneLine>
+
+## Explain like I'm new to AI
+
+Every earlier category was a brick. This one is the house. Teams fail by starting at "which 70B" or "we need agents." 2026 practice is the opposite: **narrow the job until a simpler shape works**, and prove it with a gold set.
+
+<SystemDesignLoop />
+
+<Compare
+  a="Wrong order"
+  b="This order"
+  rows={[
+    { label: "Starts with", a: "A model name and a framework", b: "The user job + four SLOs" },
+    { label: "Agency", a: "A loop because it's fashionable", b: "Workflow until eval demands a decision" },
+    { label: "Facts", a: "Fine-tune the wiki", b: "RAG / APIs; fine-tune habits later" },
+    { label: "Safety", a: "A stern system prompt", b: "Tiny tools, ACL at retrieve, HITL" },
+    { label: "Done", a: "A demo transcript", b: "CI gold set + traces + $ / success" },
+  ]}
+/>
+
+## Mental model
+
+Building a kitchen: you don't buy a fighter-jet stove first. You write the menu (job), the service time (SLO), then the stations (retrieval, tools), the health inspection (eval/security), the ticket printer (traces), then the stove size (inference).
+
+## How it works
+
+1. **Job & SLO** — success verb ("resolve the ticket," "cite the policy"). Quality floor, p95, $, reliability (evaluation + inference).
+2. **Shape** — chatbot / workflow / agent (**Agent vs Chatbot vs Workflow**). Start left.
+3. **Knowledge & tools** — changing facts → RAG or live APIs; stubborn format → LoRA later; tools = permissions (security).
+4. **Context & memory** — pack the window on purpose; session vs long-term (context engineering, memory).
+5. **Eval** — 50–200 real tasks, never train on them, CI.
+6. **Security** — untrusted retrieve, least privilege, output encoding, secrets out of the window.
+7. **Observability** — same trace shape in eval and prod; prompt versions.
+8. **Serve** — prefill/decode, routing, cache, KV memory. Iterate. Add agency only where the gold set says the workflow failed.
+
+MCP is how tools *connect*, not a reason to grant them.
+
+## Real-world example
+
+"AI support." Bad: 70B + 40 MCP servers. Good: lookup + policy RAG + structured refund *preview* + HITL. Eval on held-out tickets. Traces on tool spans. Route FAQs to a small model.
+
+## Technical explanation
+
+Data-flow diagram before class diagram: user → auth → retrieve/tools → model → encode → UI. Every arrow is a trust boundary.
+
+Non-goals are design: if you won't call refund, don't put the tool in the catalog (injection blast radius).
+
+Provider vs self-host is an inference/cost decision *after* the job is specified.
+
+The next six lessons are **worked examples** of this loop. Use them as templates, not as vendors.
+
+## Common mistakes
+
+<CommonMistake>
+Picking the model in week one and the gold set in month four. You will fine-tune a demo.
+</CommonMistake>
+
+- Multi-agent because the slide said "team of agents."
+- Skipping tenant ACL because the prototype used one PDF.
+
+## When to use it
+
+- Any system that will see a second user. The loop is the checklist even for a spike — write the SLO on a sticky note.
+
+## When NOT to use it
+
+- Don't run the full production loop for a throwaway that never leaves your laptop. Do run it the moment someone else depends on the answers.
+
+## Alternatives
+
+- Buy a narrow product for a narrow job. You still owe eval and data handling — you just didn't build the engine.
+
+<MemoryCard>
+**Job + SLO → shape → knowledge/tools → eval → security → traces → serve.**
+Model last. Workflow before agent. RAG for facts. $ per successful task. Gold set is the spec.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-how-to-design-ai-system" />

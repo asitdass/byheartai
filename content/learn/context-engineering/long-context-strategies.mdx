@@ -1,0 +1,107 @@
+---
+id: long-context-strategies
+slug: long-context-strategies
+title: Long-Context Strategies
+category: context-engineering
+level: advanced
+summary: A long advertised window is not a long effective brain — retrieve instead of dumping, and put key facts at the edges.
+keywords: [long context, lost in the middle, needle in a haystack, context rot, attention]
+prerequisites: [context-selection, context-window]
+next: [context-state]
+related: [what-is-attention, context-caching, what-is-rag]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Lost in the Middle: How Language Models Use Long Contexts (Liu et al., 2023)"
+    url: "https://arxiv.org/abs/2307.03172"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-long-context
+estimatedMinutes: 8
+---
+
+<OneLine>Long context is useful spare capacity, not a strategy: models still skip the middle of a haystack, so you retrieve, place facts at the edges, and evaluate on your real task — not a toy needle test.</OneLine>
+
+## Explain like I'm new to AI
+
+Vendors advertise 200k, 1M, even more tokens. It is tempting to paste the whole wiki and "just ask." Two problems:
+
+1. **Cost and latency** grow with every token of prefill.
+2. **Quality does not.** Models use the **start and end** of a long input much better than the **middle**. The same fact can be obvious at the top and invisible in the middle. Researchers called this **lost in the middle**.
+
+Click where you put the refund cap:
+
+<LostInTheMiddle />
+
+So long context is a **safety margin** and a place for a well-chosen file — not a substitute for **selection**.
+
+## Mental model
+
+A huge desk. You *can* dump every binder on it. You will still lose the one sticky note in the pile. Professionals keep a small working set and a filing cabinet (RAG / files on disk). The desk size is for occasional thick documents, not for living in clutter.
+
+## How it works
+
+**Do this with a long window:**
+
+- Attach **one** large artifact you already know is relevant (a spec, a paper, a file the user opened).
+- Put **instructions and the question at the edges** (system first, question last is also cache-friendly).
+- Repeat critical constraints near the end if the input is huge.
+
+**Don't do this:**
+
+- Concatenate a corpus "because it fits."
+- Trust **needle-in-a-haystack** marketing as proof the model will reason over *your* messy logs. Finding a planted UUID is easier than reconciling conflicting policies.
+
+**Context rot:** as you add more weakly related tokens, answers get vaguer even before you hit the max. That is attention dilution in slow motion.
+
+RAG + rerank + a moderate window usually beats "paste 800k tokens" on accuracy *and* cost. Use long context when retrieval would **split a thing that must stay whole** (a legal clause, a function that doesn't chunk well).
+
+## Real-world example
+
+A team dumps 40 meeting transcripts into a 1M-context model to "summarize Q3 decisions." The model misses the one budget number spoken in meeting 17 (middle of the pile). A 30-second retrieval over transcripts surfaces that meeting; a short context nails the number.
+
+## Technical explanation
+
+Liu et al. (2023) showed U-shaped performance vs. needle position: beginning and end outperform the middle, across several models. Later long-context training and architecture tweaks (better positional encodings, filling the window during training) *reduce* but do not erase the issue — especially for **multi-hop** questions, not single needles.
+
+Prefill is still **O(sequence length)** work (plus memory for KV). Prompt caching helps when the long blob is a **stable prefix**; it does not help if you prepend a new novel each call.
+
+Product strategy: treat advertised length as **max capacity**, engineer for a **working set** of tens of thousands of *high-quality* tokens, and only burst to the max for known-relevant documents.
+
+## Common mistakes
+
+<CommonMistake>
+Buying a longer-context model to avoid building retrieval. You trade a packing problem for a silent
+accuracy problem — and a larger bill.
+</CommonMistake>
+
+- Evaluating only needle-in-haystack, never your actual multi-document questions.
+- Putting the user question at the beginning of a 200k paste (it gets separated from the evidence).
+
+## When to use it
+
+- Whole documents that retrieval would shred; user-attached files; a cached handbook sitting in a stable prefix.
+
+## When NOT to use it
+
+- "We have a million tokens, paste the company drive." Select instead.
+
+## Alternatives
+
+- **RAG / rerank**, **just-in-time file reads**, **sub-agents (isolate)** that return briefs.
+
+<MemoryCard>
+Long windows are **capacity**, not quality. Models still **lose the middle**. Retrieve, keep a small
+working set, put key facts at the **edges**, and don't trust needle-in-haystack as your only eval.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-long-context" />

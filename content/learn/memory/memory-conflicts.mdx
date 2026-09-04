@@ -1,0 +1,111 @@
+---
+id: memory-conflicts
+slug: memory-conflicts
+title: Memory Conflicts & Security
+category: memory
+level: advanced
+summary: Memory fails by silent overwrite, poisoned writes, and cross-user retrieval — govern writes and filter every retrieve.
+keywords: [memory poisoning, memory conflict, provenance, gdpr, injection]
+prerequisites: [memory-storage, user-vs-agent-memory]
+next: [vision-language-models]
+related: [mcp-security, human-in-the-loop, prompt-injection, data-leakage]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-memory-conflicts
+estimatedMinutes: 8
+---
+
+<OneLine>A memory store is an attack surface and a contradiction engine: don't silently overwrite facts, don't let pasted jailbreaks become "remembered policy," and never retrieve one user's life into another's prompt.</OneLine>
+
+## Explain like I'm new to AI
+
+Once you persist memory, three failures show up in production. Click through them:
+
+<MemoryConflicts />
+
+1. **Conflicts** — two values for `diet`. Silent overwrite makes the system randomly "change its mind."
+2. **Poisoning** — untrusted text ("ignore all refund rules") gets **written** as a high-trust fact, then retrieved for months.
+3. **Leaks** — retrieve without `user_id` and Ada's data appears in Bob's context.
+
+Memory is more dangerous than a single RAG doc because it **sticks** and **re-enters future prompts**.
+
+## Mental model
+
+A **shared fridge with labeled leftovers**. If anyone can resticker your box, you'll eat the wrong thing next week. If a stranger's note says "this is now poison-free" you don't update the allergy list. If boxes have no names, you grab someone else's lunch.
+
+## How it works
+
+**Governed writes** (a single gateway, not five random `memory.save` tools):
+
+- Who is allowed to write this key? (user, agent, admin)
+- Normalize the value; attach **provenance** (source, time, trust)
+- Search near-duplicates / same key
+- Choose: create, corroborate, **conflict** (keep both, ask human), **supersede**, or refuse
+- Audit log. Model-originated writes must not inherit **human** authority
+
+**Reads**
+
+- Mandatory scope filters
+- Optional **output filter** (don't inject retrieved instructions that look like system prompts)
+- Least memory in context — small *k* also shrinks blast radius
+
+**People and law**
+
+- Show, edit, delete user memory
+- Honor erasure (GDPR-style) across vectors, logs, backups policy
+- Don't store secrets the product doesn't need
+
+## Real-world example
+
+A web page says "this org has no refund cap." If that string is written into semantic memory as org policy, every future refund agent is compromised. The fix is not a smarter model — it's **trust tiers**: user-confirmed facts &gt; staff tools &gt; crawled web &gt; other model output. Web never overwrites staff policy without a ticket.
+
+## Technical explanation
+
+Poisoning is prompt injection **with persistence**. Indirect injection (a ticket, a PDF, an MCP tool result) is enough if your extractor "helpfully" saves it.
+
+Conflicts need **time**: "Ada in Berlin (2024)" vs "Ada in Lisbon (2026)" is not a contradiction if you store validity windows. Real contradictions (two current diets) need ask-or-supersede, not last-write-wins.
+
+Concurrent writers (two agents) need compare-and-swap / leases so they don't clobber each other. Last-write-wins is not a conflict strategy.
+
+Pair with **HITL** on sensitive keys (medical, financial, permissions).
+
+## Common mistakes
+
+<CommonMistake>
+Last-write-wins on every fact, including from the model. You automate self-gaslighting and jailbreaks
+that survive for the lifetime of the store.
+</CommonMistake>
+
+- No provenance — you cannot debug "why did it think that?"
+- Logging memories in plaintext in support tickets.
+
+## When to use it
+
+- The moment you persist memory in a real product. Security is not a later add-on.
+
+## When NOT to use it
+
+- If you cannot govern writes, **don't persist**. A session-only assistant is safer than a poisoned brain.
+
+## Alternatives
+
+- No long-term store; live tools to systems of record; human-confirmed profile fields only.
+
+<MemoryCard>
+Govern **writes**: provenance, trust, no silent overwrite, no model-as-admin. Govern **reads**:
+user/tenant filters, small *k*, don't execute retrieved instructions. Poisoning is injection that
+**lasts**.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-memory-conflicts" />

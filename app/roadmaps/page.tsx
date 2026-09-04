@@ -7,7 +7,7 @@ import { getConceptById, conceptHref } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Learning paths & roadmaps",
   description:
-    "Guided, resumable learning paths for every audience: AI Beginner, LLM Developer, AI Engineer, and AI Agent Engineer.",
+    "Guided, resumable learning paths: AI Beginner, LLM Developer, AI Engineer, AI Systems Engineer, and AI Agent Engineer.",
   alternates: { canonical: "/roadmaps" },
 };
 

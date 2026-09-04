@@ -69,9 +69,11 @@ function walk(dir: string): string[] {
 
 let _cache: Concept[] | null = null;
 
+const isDev = process.env.NODE_ENV === "development";
+
 /** Load and cache every concept from content/learn/**.mdx. */
 export function getAllConcepts(): Concept[] {
-  if (_cache) return _cache;
+  if (_cache && !isDev) return _cache;
   const files = walk(CONTENT_DIR);
   const concepts = files.map((file) => {
     const raw = fs.readFileSync(file, "utf8");
@@ -104,7 +106,7 @@ let _orderCache: Map<string, number> | null = null;
  * back to category macro-order → level → title for anything off the main chain.
  */
 export function getReadingOrder(): Map<string, number> {
-  if (_orderCache) return _orderCache;
+  if (_orderCache && !isDev) return _orderCache;
   const all = getAllConcepts();
   const byId = new Map<string, Concept>(all.map((c) => [c.id, c]));
 

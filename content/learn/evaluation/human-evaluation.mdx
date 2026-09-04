@@ -1,0 +1,93 @@
+---
+id: human-evaluation
+slug: human-evaluation
+title: Human Evaluation
+category: evaluation
+level: intermediate
+summary: Human evaluation with a written rubric is the gold standard for open-ended quality — use it to build gold sets and calibrate judges, not to grade every reply.
+keywords: [human evaluation, rubric, annotator, pairwise, inter-annotator]
+prerequisites: [why-evaluation-matters]
+next: [llm-as-a-judge]
+related: [llm-as-a-judge, hallucination-safety-eval]
+alternatives: [llm-as-a-judge]
+confusedWith: [llm-as-a-judge]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-human-evaluation
+estimatedMinutes: 8
+---
+
+<OneLine>Human evaluation is a person scoring answers against a written rubric — the gold standard for "was this actually good?" Use it to define quality and to check cheaper graders, not to label every production reply.</OneLine>
+
+## Explain like I'm new to AI
+
+A thumb up/down hides *why*. A **rubric** splits the job: grounded, helpful, safe, on-brand. Raters score each axis (or pick **A vs B**, which humans find easier than a lonely 1–5).
+
+<HumanEvalRubric />
+
+You cannot hire humans for every chat. You hire them to (1) build the gold set, (2) write the rubric, (3) **calibrate** LLM judges, (4) sample live traffic. Domain work (legal, medical, finance) needs **experts**, not random crowd workers.
+
+## Mental model
+
+Olympic judging: published criteria, more than one judge, disagreement is a signal the rule was vague — not a reason to throw out scoring.
+
+## How it works
+
+1. Write the rubric **before** labels. Define 1 vs 5 with examples (the visual above).
+2. Train raters on 20 items together until they mostly agree.
+3. Measure **agreement** (if two people constantly clash, the task is underspecified).
+4. Prefer **pairwise** for close calls ("which summary would you send?").
+5. Sample: 100 well-chosen items beat 5,000 tired clicks. Watch fatigue — quality falls after long sessions.
+6. Use those labels as the source of truth for judges and for CI.
+
+## Real-world example
+
+Two raters score "helpfulness" all over the map. You add one line: "Helpful means the user can act without another lookup." Agreement jumps. The model wasn't random; the spec was.
+
+## Technical explanation
+
+Inter-annotator agreement (Cohen's κ, Krippendorff's α) is how you know the rubric is real. Low agreement → fix instructions, don't average noise.
+
+Bias: raters punish unusual phrasing, prefer their dialect, get primed by the last bad answer. Shuffle order. Hide which model wrote it.
+
+Cost: humans are slow and expensive. That is why the next lesson exists. Humans remain the **calibration**, not the production mill.
+
+For agents: grade the **trajectory** (wrong tool, skipped confirm) not only the final sentence.
+
+## Common mistakes
+
+<CommonMistake>
+"Looks good" from the PM on five chats. That is a demo, not human eval.
+</CommonMistake>
+
+- Rubric written after you already picked a winner (you retrofitted taste).
+- Crowd labels on medical advice.
+
+## When to use it
+
+- New product, new rubric, new judge, new high-stakes slice.
+- Periodic audit of live traces (even 50/week).
+
+## When NOT to use it
+
+- Grading every token in production. That's what unit checks + judges are for — after humans set the bar.
+
+## Alternatives
+
+- LLM-as-a-judge (next) for volume. Exact match / schema tests when the job isn't open-ended. Online task-success when you can instrument the outcome.
+
+<MemoryCard>
+**Humans + a written rubric** define quality. Pairwise is easier than 1–5. Measure agreement.
+Use people to build gold and calibrate judges — not to score every live reply.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-human-evaluation" />

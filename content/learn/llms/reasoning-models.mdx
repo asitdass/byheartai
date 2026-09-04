@@ -1,0 +1,150 @@
+---
+id: reasoning-models
+slug: reasoning-models
+title: What are Reasoning Models?
+category: llms
+level: intermediate
+summary: Reasoning models spend extra decode tokens thinking before they answer; a short prompt can still cost a lot.
+keywords: [reasoning models, test-time compute, thinking tokens, chain of thought, extended thinking, GRPO]
+prerequisites: [what-is-llm, temperature-sampling]
+next: [streaming]
+related: [streaming, small-language-models, temperature-sampling, what-is-llm, quality-latency-cost]
+alternatives: [small-language-models]
+confusedWith: [temperature-sampling, prompt-engineering]
+frameworks: []
+products: []
+papers:
+  - title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via RL (DeepSeek-AI, 2025)"
+    url: "https://arxiv.org/abs/2501.12948"
+    kind: paper
+  - title: "DeepSeekMath: Pushing the Limits of Mathematical Reasoning (Shao et al., 2024)"
+    url: "https://arxiv.org/abs/2402.03300"
+    kind: paper
+  - title: "s1: Simple test-time scaling (Muennighoff et al., 2025)"
+    url: "https://arxiv.org/abs/2501.19393"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-reasoning-models
+estimatedMinutes: 14
+---
+
+<OneLine>Reasoning models spend extra tokens thinking at decode time before they answer — test-time compute, not a bigger weight file — which is why a 20-token question can still be expensive.</OneLine>
+
+## Explain like I'm new to AI
+
+A ordinary chat model samples the **answer** almost immediately. A **reasoning model** (also called **extended-thinking** or "o1-style" in the 2024–2026 product wave) is trained and served to spend a **hidden scratchpad** of tokens first: check the problem, try a plan, maybe backtrack, then emit the user-visible reply.
+
+That scratchpad is still **next-token prediction**. You are not running a separate theorem prover. You are buying **more decode**. Industry shorthand: **test-time compute** — extra FLOPs *when answering*, not extra pretraining.
+
+Three facts that surprise people in September 2026:
+
+1. **APIs often hide the chain of thought.** You see a summary or nothing. You still **pay** for thinking tokens (and they still occupy the context window).
+2. **A short prompt can cost a lot.** "Prove this" is 15 tokens in and 8,000 thinking tokens out. Billing is dominated by decode, not the question.
+3. **Thinking is a budget.** Products expose `thinking` effort / max tokens. Hit the cap and quality drops. Uncapped thinking blows latency SLOs.
+
+This is **not** "turn temperature up to think harder." Temperature reshapes the next-token distribution. Reasoning models change *how long they decode before they commit to an answer.*
+
+<ReasoningModels />
+
+## Mental model
+
+A student taking an exam.
+
+- **Standard LLM:** writes the answer in pen on the first try (fast, cheap, sometimes sloppy).
+- **Reasoning model:** uses the entire scratch paper, then copies a clean answer onto the booklet. The booklet looks short. The scratch paper was the work — and the billed tokens.
+
+A **3B SLM** classifying "is this a refund ticket?" is the student filling a bubble sheet. Do not hand them a pad of scratch paper and a 20-minute clock.
+
+## How it works
+
+1. **Train time (optional but common in 2025–2026):** after ordinary next-token / instruction training, run **RL on verifiable tasks** (math with a checker, code with unit tests, structured format validators). Algorithms in this family include **GRPO** (group relative policy optimization — see DeepSeekMath / R1-style pipelines): sample several rollouts, score them with a **reward** (correct/incorrect, plus format), update the policy. You are teaching the model that *long, checkable work* gets rewarded. That is **not** the same as spending tokens at serve time — it *prepares* the model to use those tokens well.
+2. **Serve time:** the decoder emits **thinking tokens** (hidden or partially shown) until it decides to emit the **answer** (or hits a **thinking budget**). Some stacks stream thinking to a developer trace and only the answer to the user (see **streaming**).
+3. **You set a budget.** Low / medium / high effort, or a max think-token cap. This is a product SLO: p95 latency and $ per request.
+4. **Sampling still exists.** Temperature on the *answer* may be low for math. The hidden trace can be more exploratory. Do not assume T=0 means "no thinking."
+
+**Train-time extra compute** (more RL, more distillation from a teacher reasoner) vs **serve-time extra decode** (this request thinks longer). Both exist. Mixing them up in a design review is how you buy the wrong GPUs.
+
+## Real-world example
+
+**Math.** "A rectangle has perimeter 54 and integer sides, area maximized — what is the area?" A standard model often blurts. A reasoner enumerates constraints on the scratchpad, checks, answers `180` (sides 13 and 14). You wanted that.
+
+**Coding.** "This test fails on empty input." A reasoner reads the stack, forms a hypothesis, proposes a patch. Cost: thousands of thinking tokens. Worth it if the alternative is a human.
+
+**Easy FAQ.** "Are you open on Tuesday?" Gold answer is in a 12-line policy doc. A reasoner may still "think" for a second. That second is **latency and money**. Route to a non-reasoning model, a 3B classifier, or retrieval + extractive answer.
+
+**Classification vs 3B SLM.** Label `billing | bug | other` on 50-word tickets. A distilled 3B with a softmax head (or constrained decode to three tokens) typically **wins** on accuracy *and* cost after you fine-tune. A reasoner writing a paragraph of philosophy about the ticket is the wrong tool.
+
+**Tight interactive UI.** Autocomplete in an IDE: TTFT budget ~200ms. Extended thinking is incompatible unless you run it in the background and show a cheap draft first.
+
+## Technical explanation
+
+**Test-time scaling.** Holding weights fixed, allowing more thinking tokens often raises pass@1 on contest math and hard code — up to a plateau, then you waste decode (s1 and related 2025 papers; vendor evals through 2026). It is a **curve**, not a miracle. Measure *your* slice.
+
+**Hidden CoT.** Labs hide raw traces for safety and distillation-IP reasons. Treat traces as **untrusted internal text** if you ever log them (they can contain prompt leftovers). Do not build security on "the model promised in its thoughts."
+
+**Context.** Thinking tokens count toward the window. A 128k window with 40k of hidden thoughts leaves less room for the repo you just pasted.
+
+**GRPO / verifiable rewards (train) vs extra decode (serve).**
+
+<Compare
+  a="Train-time RL (e.g. GRPO-style)"
+  b="Serve-time thinking"
+  rows={[
+    { label: "When you pay", a: "Once, on your GPU bill for training", b: "Every request" },
+    { label: "Needs", a: "A checker: unit tests, math answers, schema", b: "Decode budget, latency SLO" },
+    { label: "What changes", a: "The weights (policy)", b: "How many tokens this call emits" },
+    { label: "If you skip it", a: "Model may not *use* a long scratchpad well", b: "You get a fast, cheaper, weaker attempt" },
+  ]}
+/>
+
+You can distill a reasoner into a smaller student (SLM lesson) so *some* of the skill lives in weights and you spend fewer think tokens. Distillation is not a license to skip eval.
+
+**Prompting "think step by step" on a non-reasoner** is a cheap cousin (classic CoT). It is not the same as a model **trained** to use a long hidden trace and a **server** that bills it. In 2026, if the product has an explicit thinking budget, you are in reasoner territory.
+
+## Common mistakes
+
+<CommonMistake>
+Judging cost by prompt length. Reasoners are decode-heavy. Log <em>thinking tokens</em> and
+end-to-end latency separately from visible completion tokens, or your unit economics are fiction.
+</CommonMistake>
+
+- Defaulting the whole product to max thinking because a demo solved a riddle.
+- Using a reasoner as a **classifier** or **JSON extractor** with a three-key schema.
+- Assuming hidden thoughts are a safe place for secrets or for "the real answer."
+- Confusing **temperature** with **thinking budget**.
+- No cap: one pathological prompt thinks until timeout and starves the batcher.
+
+## When to use it
+
+- Multi-step math, proofs, hard debugging, messy policy with constraints, tasks where a **verifier** exists (tests, schema, solver) so train-time RL or serve-time retries pay off.
+- Background jobs where TTFT is not the SLO (overnight analysis).
+
+## When NOT to use it
+
+- Easy FAQ, extraction, routing, autocomplete, anything with a tight latency or cost SLO.
+- High-QPS classification — use an SLM (or a non-reasoning chat model) and **route** the tail.
+- When you cannot afford hidden tokens in the context window (already stuffing a large repo).
+- When you need **deterministic** short outputs and you have not proven the reasoner is more calibrated than a constrained decoder.
+
+## Alternatives
+
+- **Prompted CoT** on a standard model for medium difficulty.
+- **Tools** (calculator, interpreter, retrieval) instead of silent rumination — often cheaper and checkable.
+- **SLM + router** (next: streaming, then function calling; related: model routing).
+- **More train-time compute** (better base, distillation) if you want quality *without* per-request essays.
+
+<MemoryCard>
+**Reasoning / extended-thinking models** buy **test-time compute**: extra (often hidden) decode
+tokens before the answer. Short prompts can still be expensive. Cap the budget. Do not use them
+for easy FAQ. GRPO-style RL teaches the skill at **train** time; thinking tokens spend it at
+**serve** time.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-reasoning-models" />

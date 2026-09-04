@@ -1,0 +1,95 @@
+---
+id: image-video-generation
+slug: image-video-generation
+title: Image & Video Generation
+category: multimodal-ai
+level: intermediate
+summary: Generators invent pixels from a prompt — they are not cameras. Photorealism is not proof.
+keywords: [image generation, video generation, diffusion, text to image, deepfake]
+prerequisites: [vision-language-models]
+next: [multimodal-rag]
+related: [vision-language-models, audio-video-understanding]
+alternatives: []
+confusedWith: [vision-language-models]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-image-video-generation
+estimatedMinutes: 8
+---
+
+<OneLine>Image and video generators create new pixels from text or other media. They are paintbrushes, not witnesses — photorealism is not proof.</OneLine>
+
+## Explain like I'm new to AI
+
+A VLM **looks at** a photo of your kitchen. A **generator** **invents** a kitchen that never existed. Same "multimodal" headline, opposite direction.
+
+<GenerationFlow />
+
+Today's image models are mostly **diffusion** (start from noise, denoise toward your prompt) or **autoregressive** (predict the next visual token, like language). Video models add **time**: motion has to stay coherent across frames — still the hard part (hands, physics, identity).
+
+## Mental model
+
+A sketch artist who has seen millions of kitchens vs a security camera. The artist can draw a "typical kitchen" on demand. The camera only shows what was there. Mixing them up is how fake screenshots become "evidence."
+
+## How it works
+
+**Text-to-image:** prompt (+ optional style/reference image) → new picture. **Image-to-image / inpaint / edit:** change a region. **Text-to-video / image-to-video:** a clip. Control nets and references steer composition.
+
+**Understanding vs generation** often live in different weights. Some omni models do both; you still shouldn't cite a generated frame as a source.
+
+**Cost:** video is orders of magnitude more compute than a still. That's why products cap seconds.
+
+## Real-world example
+
+Marketing: generate hero images from a product brief (labeled as synthetic). Journalism: **never** generate the "photo" of an event. Product UI: generate icons; still run them through a human for trademarks and people.
+
+## Technical explanation
+
+Diffusion: a network is trained to reverse a noising process, conditioned on text embeddings. Sampling steps and guidance scale trade speed vs prompt adherence. Autoregressive visual models unify better with LLMs but have their own failure modes (global consistency).
+
+Risks that are now first-class:
+
+- **Likeness / deepfakes** — consent, watermarking, provenance (C2PA-style credentials)
+- **Copyright** — training data and lookalike styles
+- **False confidence** — users believe sharp images
+- **Safety filters** — incomplete; don't treat them as a legal shield
+
+Generation is not RAG. If you need *this* product SKU, retrieve the real asset.
+
+## Common mistakes
+
+<CommonMistake>
+Using a generated screenshot of a "dashboard" as if it were production telemetry. It is fiction with
+a UI skin.
+</CommonMistake>
+
+- Prompting for a public figure's face "as a joke."
+- Expecting perfect text spelling inside generated images (better, not solved).
+
+## When to use it
+
+- Concept art, mockups, storyboards, synthetic data that's *labeled synthetic*, entertainment.
+
+## When NOT to use it
+
+- Evidence, IDs, medical imagery as if captured, anything that must match a real SKU or person without consent.
+
+## Alternatives
+
+- Stock / real photography; a VLM + existing assets; 3D render from a real model.
+
+<MemoryCard>
+**Generation** invents pixels (diffusion or visual tokens). **Understanding** reads pixels. Photoreal
+≠ true. Label synthetic media, respect likeness, don't cite generated images as facts.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-image-video-generation" />

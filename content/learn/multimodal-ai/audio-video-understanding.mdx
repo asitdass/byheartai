@@ -1,0 +1,101 @@
+---
+id: audio-video-understanding
+slug: audio-video-understanding
+title: Audio & Video Understanding
+category: multimodal-ai
+level: advanced
+summary: Video is a timeline — sample frames, index audio and on-screen text, retrieve the seconds that matter; don't pour the whole file into the context window.
+keywords: [video understanding, audio events, frame sampling, keyframes, omni]
+prerequisites: [vision-language-models, speech-stt-tts]
+next: [image-video-generation]
+related: [long-context-strategies, multimodal-rag]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-audio-video-understanding
+estimatedMinutes: 8
+---
+
+<OneLine>Understanding video means treating it as a timeline of sampled frames, sounds, and on-screen text — then retrieving the relevant seconds — not stuffing an entire MP4 into a long context window.</OneLine>
+
+## Explain like I'm new to AI
+
+A movie is ~24 pictures a second plus a soundtrack. A 10-minute clip is not something you "just paste" into a model. Even million-token windows choke on dense video, miss a one-second beep, and cost a fortune.
+
+What works: **index the timeline**, then ask.
+
+<VideoTimeline />
+
+Click around. The useful evidence might be a **frame**, an **audio event**, or **OCR** on a slide — different indexes.
+
+Omni models can watch short clips more natively. Long video is still a **retrieval** problem (see multimodal RAG).
+
+## Mental model
+
+A video editor's **timeline**, not a photo album. You don't print every frame. You cut to the moment that answers the question.
+
+## How it works
+
+**Ingest**
+
+- Sample keyframes (scene changes, every N seconds) → vision embeddings / VLM captions
+- Audio → STT segments **and** non-speech events (beeps, music, silence)
+- OCR on frames that look like slides/UI
+- Store **timestamps** so you can jump back to the source
+
+**Ask**
+
+- Decompose: "what exploded?" → look at frames *and* audio
+- Retrieve top snippets, not the whole film
+- For short user-uploaded clips (a few seconds to a couple of minutes), a native omni model may take the clip directly — still downsample
+
+## Real-world example
+
+Safety review of a warehouse camera: a text query "forklift near pedestrian" hits frame embeddings; "backup beeper" hits audio events. A caption-only pipeline would miss both if nobody transcribed a beep.
+
+## Technical explanation
+
+Dense frame encoding is the budget killer. Keyframe + retrieval is how production systems scale. OmniLLMs help **reasoning** over the snippets you fetched; they do not magically make 4 hours of 4K cheap.
+
+Audio-visual alignment (what's on screen when the word is said) needs clocks that match. Drift between tracks is a real bug.
+
+Long-context "needle in a video" demos are closer to needle-in-haystack marketing than to messy CCTV. Evaluate on your actual query types.
+
+## Common mistakes
+
+<CommonMistake>
+Sending 30 minutes of video as "the context." You pay, you wait, and you still miss the alarm.
+Index, then retrieve.
+</CommonMistake>
+
+- Captions only — no audio events, no OCR.
+- No timestamps, so you cannot cite "at 1:04."
+
+## When to use it
+
+- Meetings, lectures, CCTV, product recordings, sports — anything with time.
+
+## When NOT to use it
+
+- A single still image (use a VLM); a podcast you only need as text (STT + RAG).
+
+## Alternatives
+
+- Human logging; sensors (not cameras) for the actual event.
+
+<MemoryCard>
+Video = **timeline**. Sample frames, index **speech + sounds + OCR**, retrieve seconds, cite
+timestamps. Omni models help on short clips; long video is RAG, not a bigger window.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-audio-video-understanding" />

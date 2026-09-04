@@ -1,0 +1,113 @@
+---
+id: memory-types
+slug: memory-types
+title: Semantic, Episodic & Procedural Memory
+category: memory
+level: intermediate
+summary: Long-term memory splits into facts (semantic), events (episodic), and skills (procedural) — each needs a different store and a different forgetting rule.
+keywords: [semantic memory, episodic memory, procedural memory, tulving, coala]
+prerequisites: [long-term-memory]
+next: [user-vs-agent-memory]
+related: [long-term-memory, agent-memory]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Cognitive Architectures for Language Agents (Sumers et al., 2023) — CoALA"
+    url: "https://arxiv.org/abs/2309.02427"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-memory-types
+estimatedMinutes: 8
+---
+
+<OneLine>Long-term memory is not one bucket: semantic memory holds facts, episodic memory holds what happened, and procedural memory holds how to do the job — mixing them is how stores turn into junk.</OneLine>
+
+## Explain like I'm new to AI
+
+Cognitive science (and now agent frameworks like CoALA / LangGraph / Mem0) splits durable memory three ways. Click each:
+
+<MemoryTypes />
+
+- **Semantic** — "Ada is vegetarian." True until updated. Not "that time on Thursday."
+- **Episodic** — "Thursday 14:02 Ada asked for lunch." A dated event. Useful for "what did we do?" Terrible as the only copy of a fact (you'll retrieve a random Thursday forever).
+- **Procedural** — "When booking lunch, check diet, then confirm time." A skill or playbook. Version it like code.
+
+Working memory (the window) is none of these — it's the scratchpad for *right now*.
+
+## Mental model
+
+- Semantic = **Wikipedia card**
+- Episodic = **calendar + diary**
+- Procedural = **recipe card / SOP**
+
+A chef who files recipes in the diary and diary pages in Wikipedia will never find dinner.
+
+## How it works
+
+| Type | Write | Read | Forget |
+| --- | --- | --- | --- |
+| Semantic | Extract (key, value, confidence) | By key or embedding | Supersede / conflict-resolve |
+| Episodic | Append event + time | Time range + semantic search | TTL, archive |
+| Procedural | Commit a skill/prompt/checklist | By name / task | Version, deprecate |
+
+The common bug: treating the **transcript** (episodic) as **knowledge** (semantic). Then every retrieve pulls contradictory, redundant chat. Extract facts *out* of episodes.
+
+## Real-world example
+
+After a call, write:
+
+- Semantic: `account.plan = enterprise` (if confirmed)
+- Episodic: `2026-09-04 support call, discussed SSO`
+- Procedural: no change — unless you learned a new troubleshooting step worth saving as a skill
+
+A week later, "what's their plan?" should hit **semantic**, not a search over all call recordings.
+
+## Technical explanation
+
+This mapping is a **design lens**, not a vendor checkbox. Some products only say "short-term / long-term." You still implement the three *behaviors*.
+
+Storage follows type:
+
+- Semantic → KV, graph (entities/relations), sometimes vectors for fuzzy facts
+- Episodic → append-only log + embeddings (and timestamps — graphs like Graphiti add **bi-temporal** edges)
+- Procedural → git-versioned markdown, `AGENTS.md` / skills, or a playbook table
+
+Evaluation should score types separately: fact accuracy, event recall, skill success — not one "memory@k."
+
+## Common mistakes
+
+<CommonMistake>
+One vector index named "memory" that holds chat chunks, preferences, and tool recipes together.
+Retrieval quality collapses and you cannot expire the right things.
+</CommonMistake>
+
+- Never extracting semantic facts from episodes.
+- Deleting procedural memory the way you TTL a log line.
+
+## When to use it
+
+- Any long-term store that will hold more than one kind of thing — start with this split even if the first version is three tables.
+
+## When NOT to use it
+
+- A toy demo with three facts total — one KV is enough until types collide.
+
+## Alternatives
+
+- Only RAG over docs (no personal semantic layer); only a session log (no long-term).
+
+<MemoryCard>
+**Semantic** = facts, **episodic** = dated events, **procedural** = skills. Extract facts *out of*
+transcripts. Forget with **supersede / TTL / version** — not one blunt delete for everything.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-memory-types" />

@@ -1,0 +1,103 @@
+---
+id: what-is-observability
+slug: what-is-observability
+title: What is AI Observability?
+category: observability
+level: intermediate
+summary: AI observability reconstructs one request — model, tokens, retrieve, tools — not a green dashboard. Eval scores the product; traces explain a failure.
+keywords: [ai observability, tracing, llm monitoring, genai telemetry]
+prerequisites: [what-is-llm, why-evaluation-matters]
+next: [tracing-logging-metrics]
+related: [quality-latency-cost, offline-vs-online-eval, data-leakage]
+alternatives: []
+confusedWith: [why-evaluation-matters]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-what-is-observability
+estimatedMinutes: 8
+---
+
+<OneLine>AI observability is the ability to reconstruct what a model, retriever, and tools did on a given request — not a green dashboard, and not a gold-set score. You instrument the insides of the call, then you can debug it.</OneLine>
+
+## Explain like I'm new to AI
+
+A website can be "up" (HTTP 200) and still lie. An assistant can return 200 and invent a policy. **Monitoring** asks "is the fleet healthy?" **Evaluation** (last category) asks "did quality go up?" **Observability** asks "**what exactly happened on request 7f3a?**"
+
+<ObservabilityIdea />
+
+For AI that means first-class telemetry on: which **model** and **prompt version**, **input / cached / reasoning / output tokens**, **TTFT**, retrieved **chunk ids**, **tool names and errors**, agent **loop count**. A vendor's pretty UI is not the concept. The concept is: you can replay the tree.
+
+## Mental model
+
+A black-box flight recorder vs a pass/fail exam vs a "systems nominal" light. After a crash you need the recorder (observability). Before you change the plane you need the exam (eval). During the flight you need the light (monitoring). Three jobs.
+
+## How it works
+
+1. Treat each user **turn** as a **trace**: a tree of spans (HTTP → retrieve → embed → llm → tool → llm).
+2. Put stable **attributes** on spans (model id, token counts, chunk ids, tool name) — not a paste of the raw prompt by default.
+3. Carry a **trace id** through services (API, retriever, agent host, MCP client).
+4. **Redact**: prompts often contain PII. Log hashes, ids, and sampled payloads behind access control. Retention shorter than your app logs if needed.
+5. Sample: keep errors, slow calls, expensive loops; don't store 100% of happy-path token streams unless you must.
+
+Portable naming (so you are not stuck in one product): OpenTelemetry-style GenAI fields — operation, model, token usage — are the lingua franca in 2026. Buy a backend; don't invent a private dialect if you can avoid it.
+
+## Real-world example
+
+Support swears the bot "hallucinated refunds." The trace shows retrieve returned the right chunk and the **answer span** never cited it. You fix grounding, not the index. Without the tree you would have re-embedded the corpus for a week.
+
+## Technical explanation
+
+Classic APM (latency, errors) is necessary and **insufficient**. LLM calls are nested, stochastic, and economically bursty (reasoning tokens, tool loops). Observability is how you connect **quality-latency-cost** SLOs to a *reason*.
+
+Eval vs obs: eval is a **scheduled or CI score** on a frozen or sampled set. Obs is **every (or sampled) live request**. Online eval *uses* traces; it is not the same as having traces.
+
+Session vs turn vs span: a chat session is many turns; each turn is one trace (or a parent with children). Don't flatten an eight-loop agent into one timer.
+
+## Common mistakes
+
+<CommonMistake>
+Logging full prompts to a shared debug channel. That is a data leak with extra steps, not observability.
+</CommonMistake>
+
+- Equating "we bought an LLM dashboard" with being able to answer why *this* tool fired.
+- No model / prompt version on the span — you cannot roll back what you cannot name.
+
+## When to use it
+
+- Any production LLM, RAG, or agent. Before the first real user, if you can.
+
+## When NOT to use it
+
+- Don't skip eval because "we have traces." Traces explain incidents; they don't tell you the fleet got better.
+- Local toys can start with stderr. The moment someone else depends on it, instrument.
+
+## Alternatives
+
+- There is no alternative to seeing inside the call. The choice is **how much** you store (sampling, redaction) and **which backend**.
+
+<Compare
+  a="Evaluation"
+  b="Observability"
+  rows={[
+    { label: "Question", a: "Is the product good?", b: "What happened on this request?" },
+    { label: "When", a: "CI, gold set, sampled online scores", b: "Live (and replayed) traces" },
+    { label: "Unit", a: "A set + a metric", b: "A trace / span tree" },
+    { label: "Privacy", a: "Gold items are curated", b: "Prod payloads are often PII — redact" },
+  ]}
+/>
+
+<MemoryCard>
+**Observability** = reconstruct one request (model, tokens, retrieve, tools). **Monitoring** = is it up?
+**Eval** = did quality move? Instrument spans, not just HTTP. Redact prompts. Tag versions.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-observability" />

@@ -1,0 +1,100 @@
+---
+id: quality-latency-cost
+slug: quality-latency-cost
+title: Quality, Latency, Cost, and Reliability
+category: evaluation
+level: intermediate
+summary: Production AI is a tradeoff of quality, latency, cost, and reliability. Optimize dollars per successful task under an SLO — not always the smartest model.
+keywords: [latency slo, cost per task, reliability, quality tradeoff, model routing]
+prerequisites: [why-evaluation-matters]
+next: [what-is-observability]
+related: [offline-vs-online-eval, when-to-fine-tune, what-is-observability, token-latency-cost, latency-vs-throughput, model-routing, what-is-inference, how-to-design-ai-system]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-quality-latency-cost
+estimatedMinutes: 8
+---
+
+<OneLine>A production AI system is not "max quality." It is quality, latency, cost, and reliability on a frontier: pick the point that hits the job's SLO, then spend dollars per *successful* task — not per token of a trophy model.</OneLine>
+
+## Explain like I'm new to AI
+
+The smartest model is often the wrong one: too slow, too expensive, flaky at 2 a.m. Evaluation's last job is to make that tradeoff **visible**.
+
+<QualityLatencyCost />
+
+Four knobs:
+
+- **Quality** — your gold-set / task-success score (everything earlier in this category).
+- **Latency** — time to first token and time to a finished answer (p50 / p95, not just the mean).
+- **Cost** — dollars per **successful** task, including retries, tools, RAG, and the judge you run in CI.
+- **Reliability** — timeouts, empty retrieval, provider 500s, fallback actually firing.
+
+You cannot max all four. Chat wants speed. Overnight research wants quality. Support wants a **floor** on faithfulness then cheap volume.
+
+## Mental model
+
+A delivery promise: next-day vs same-hour courier. You pick a service level, then optimize cost **inside** that promise — you don't buy a fighter jet for pizza.
+
+## How it works
+
+1. Write SLOs: e.g. p95 under 2s, faithfulness ≥ 0.88 on gold, error rate under 1%, budget $X / resolved ticket.
+2. Put **quality and latency and cost** on the same dashboard (online eval). A quality win that blows p95 is a product fail.
+3. Easy asks → small/fast model or cache. Hard asks → stronger model or tools (**routing**). Eval both slices.
+4. Count **retries and agent loops** in cost. A cheap model that loops eight times is not cheap.
+5. Reliability: timeouts, fallbacks, "degraded but honest" answers. Eval the fallback path, not only the happy path.
+
+Next category — **observability** — is how you watch these knobs live. This lesson is why they belong in the same sentence as quality.
+
+## Real-world example
+
+Switching to a larger model lifts gold-set correctness +2 and p95 from 1.4s to 7s. Bounce rate eats the gain. A router: small model on FAQ, large on policy conflicts, keeps the SLO and most of the quality. Eval both routes or you'll only measure the easy slice.
+
+## Technical explanation
+
+Optimize **$ / successful task**, not $ / 1k tokens. Tokens hide tool calls, RAG hits, and judge spend.
+
+TTFT vs total time: chat UX cares about first token; a JSON API cares about complete valid payload.
+
+Reliability is an eval target: inject faults in staging (provider down, empty index) and check the system still refuses safely instead of inventing.
+
+Fine-tune + RAG (previous category) often **lowers** token cost of a giant system prompt — but only if eval quality holds.
+
+## Common mistakes
+
+<CommonMistake>
+"We use the best model" as architecture. That is a default, not a design. It fails SLOs and invoices.
+</CommonMistake>
+
+- Mean latency (hides the p95 horror).
+- Quality-only CI: you shipped a correct 12-second answer into a 2-second UI.
+
+## When to use it
+
+- Any production assistant or agent. Write the four knobs before you pick a model.
+
+## When NOT to use it
+
+- Don't "optimize cost" by dropping the faithfulness gate. Cheap wrong answers are expensive.
+
+## Alternatives
+
+- Batch/offline jobs can ignore TTFT. Interactive chat cannot. The tradeoff is the product, not a universal ranking.
+
+<MemoryCard>
+**Quality + latency + cost + reliability.** SLOs first, then $ per successful task.
+Route easy vs hard. Count loops and retries. Don't max a trophy model and miss p95.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-quality-latency-cost" />

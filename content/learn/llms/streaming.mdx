@@ -1,0 +1,182 @@
+---
+id: streaming
+slug: streaming
+title: What is Streaming?
+category: llms
+level: intermediate
+summary: Streaming sends tokens as they are generated so users see the first word fast; TTFT is wait-to-first-token, TPOT is later gaps.
+keywords: [streaming, sse, ttft, tpot, time to first token, cancellation, chunks]
+prerequisites: [what-is-llm, what-is-token]
+next: [function-calling]
+related: [what-is-token, reasoning-models, latency-vs-throughput, structured-output, temperature-sampling]
+alternatives: []
+confusedWith: [latency-vs-throughput]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-streaming
+estimatedMinutes: 13
+---
+
+<OneLine>Streaming is token-by-token delivery: the server sends each decoded token as soon as it exists, so the user sees the first word without waiting for the full reply.</OneLine>
+
+## Explain like I'm new to AI
+
+LLMs generate **one token after another**. A **non-streaming** API waits until the model hits a stop condition, then returns one JSON blob. The human stares at a spinner for the *entire* generation.
+
+**Streaming** sends **chunks** as tokens are produced — typically over **SSE** (Server-Sent Events: lines like `data: {...}`) or a similar chunked HTTP body. The UI types. Perceived wait is **time to first token (TTFT)**, not time to last token.
+
+Two clocks:
+
+- **TTFT** — queue + **prefill** (reading the prompt) + first decode. This is what "the app feels dead" measures.
+- **TPOT** (time per output token), also called **ITL** (inter-token latency) — the gap between later tokens. This is whether typing feels smooth or stuttery.
+
+**Cancellation** matters: if the user hits Stop, the client must abort the HTTP stream so the server **stops decoding**. Otherwise you pay for tokens nobody will see.
+
+<StreamingTokens />
+
+## Mental model
+
+A restaurant.
+
+- **Non-stream:** kitchen plates the entire tasting menu, then walks out. You wait 40 minutes hungry.
+- **Stream:** first bite in 40 seconds, then a bite every second. You can still leave (cancel) after the soup.
+
+Prefill is cooking from the recipe you handed them (the prompt). Decode is each bite.
+
+## How it works
+
+1. Client POST `/v1/chat/completions` with `"stream": true` (OpenAI-compatible servers).
+2. Server **prefills** the prompt (compute-heavy; dominates TTFT on long context).
+3. Server **decodes** token 1, flushes a chunk; token 2, flushes; …
+4. Client appends `delta.content` (and, for reasoners, sometimes a separate thinking delta) to the UI.
+5. A final chunk or `data: [DONE]` ends the stream. Or the client **cancels**.
+
+Chunks are **not** guaranteed to be exactly one token. A chunk might be a few tokens or a split piece. Your parser should concatenate.
+
+**Reasoning models:** many APIs stream **hidden thinking** first (or on a side channel), then visible tokens. TTFT for the *user* might be "time to first **visible** token," which can be seconds after the first *internal* token. Log both or you will fight product and infra teams using different definitions.
+
+**Structured output + streaming:** the JSON is invalid until enough brackets close. UX can show a typing pane; **code must not `json.loads` until the stream completes** (or use an incremental parser that only consumes complete values). Constrained decoding still emits token-by-token; "valid JSON" is a property of the *prefix language*, not of chunk 3.
+
+## Real-world example
+
+**Chat UI.** Stream. Always, unless the output is a 20-token classification you would rather return in one shot.
+
+**Backend pipeline** that needs a full `Report` object before the next hop: non-stream (or stream but buffer). Streaming does not help a batch job that cannot start until `finish_reason`.
+
+**Mobile with flaky network.** SSE over HTTP/2 is still one request. Handle disconnects: you may miss the tail; do not assume you can "resume token 412" unless the vendor supports it.
+
+**Agent loop.** Stream tokens to the user for commentary; **buffer** tool-call JSON until a complete `function` / `tool_calls` object exists — partial tool names are not executable. (Function calling is next.)
+
+## Technical explanation
+
+Decode is typically **memory-bandwidth bound** (KV cache). TPOT ≈ time for one decode step at that batch size. Prefill is **compute bound** in the prompt length. That is why a 2-token question with a 100k pasted PDF still has a long TTFT.
+
+**Backpressure.** If the client is slow, buffers fill. Decide whether to drop, coalesce chunks, or slow the GPU batch (usually you do not stall the whole batcher for one mobile client — you buffer in the app).
+
+**Cancellation.** `AbortController` in the browser; closing the HTTP body. On the server, check a cancel flag **between** tokens. Reasoners: cancel should stop **thinking** too, or you still burn the budget.
+
+Copy-paste an OpenAI-compatible stream. No real key. Point `BASE_URL` at any compatible server (local runner, gateway, vendor).
+
+```python
+import json
+import os
+import httpx
+
+BASE_URL = os.environ.get("BASE_URL", "https://api.example.com/v1")
+API_KEY = os.environ.get("API_KEY", "sk-placeholder")
+
+payload = {
+    "model": "your-model-id",
+    "stream": True,
+    "messages": [
+        {"role": "user", "content": "Explain streaming in one short sentence."}
+    ],
+}
+
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json",
+}
+
+def iter_text_deltas(resp):
+    for line in resp.iter_lines():
+        if not line.startswith("data: "):
+            continue
+        data = line[6:].strip()
+        if data == "[DONE]":
+            return
+        delta = json.loads(data)["choices"][0].get("delta") or {}
+        # Visible text. Some reasoners also send delta["reasoning"] / thinking.
+        text = delta.get("content") or ""
+        if text:
+            yield text
+
+with httpx.Client(timeout=60.0) as client:
+    with client.stream("POST", f"{BASE_URL}/chat/completions", headers=headers, json=payload) as resp:
+        resp.raise_for_status()
+        try:
+            for piece in iter_text_deltas(resp):
+                print(piece, end="", flush=True)
+        except KeyboardInterrupt:
+            # Closing the context manager drops the connection — ask your server to stop decode.
+            print("\n[cancelled]")
+```
+
+If you already use an official SDK, the loop is `for chunk in client.chat.completions.create(..., stream=True)` — same deltas, still set `base_url`.
+
+## Common mistakes
+
+<CommonMistake>
+Parsing streaming JSON on every chunk and crashing on incomplete objects. Buffer, or use a
+parser that understands prefixes. Never execute a half-built tool call.
+</CommonMistake>
+
+- Measuring "latency" as E2E while the user only feels TTFT (or vice versa for reasoners).
+- Not cancelling: tab closed, tokens still billed.
+- Logging every chunk at info level — high QPS will melt your observability bill.
+- Assuming chunk boundaries are stable across providers.
+
+## When to use it
+
+- Interactive chat, copilot typing, long answers, anything a human watches.
+- When you want **cancel** and **partial display**.
+
+## When NOT to use it
+
+- Tiny classification / extraction where a single JSON object is simpler and TTFT ≈ E2E anyway.
+- Consumers that **must** have a schema-valid document before acting (unless you buffer).
+- Ultra-lossy links where you cannot usefully show partial text and retries would duplicate work.
+
+## Alternatives
+
+- **Non-streaming** completions for jobs and function arguments you will not show.
+- **WebSockets** — used by some stacks; the product idea is the same (token deltas).
+- **Async jobs** + polling for multi-minute reasoners if you refuse to hold an HTTP stream that long.
+
+<Compare
+  a="Non-streaming"
+  b="Streaming"
+  rows={[
+    { label: "User sees", a: "Spinner, then everything", b: "First token, then typing" },
+    { label: "Primary clock", a: "End-to-end", b: "TTFT + TPOT" },
+    { label: "Cancel", a: "Often too late", b: "Abort between tokens" },
+    { label: "JSON", a: "Parse once", b: "Wait for complete object" },
+  ]}
+/>
+
+<MemoryCard>
+**Streaming** = send tokens as they decode (SSE chunks). **TTFT** is time to first token;
+**TPOT** is the later gap. Cancel the HTTP request to stop billing. Do not parse partial JSON
+or partial tool calls. Reasoners may stream hidden thinking before visible text.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-streaming" />

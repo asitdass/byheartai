@@ -1,0 +1,136 @@
+---
+id: classification-metrics
+slug: classification-metrics
+title: Precision, Recall, F1, and ROC-AUC
+category: machine-learning
+level: intermediate
+summary: Accuracy lies under imbalance. Precision, recall, F1, and ROC-AUC measure different mistakes — pick the one that matches the cost.
+keywords: [precision, recall, f1, roc-auc, confusion matrix, class imbalance]
+prerequisites: [classification]
+next: [cross-validation]
+related: [classification, why-evaluation-matters, overfitting-vs-underfitting, cross-validation]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-classification-metrics
+estimatedMinutes: 14
+---
+
+<OneLine>Accuracy can look brilliant while you miss the rare class. Precision, recall, F1, and ROC-AUC name different errors — choose the one whose failure you cannot afford.</OneLine>
+
+## Explain like I'm new to AI
+
+You built a spam classifier. Out of **100 emails, 10 are spam**. A model that never flags spam is **90% accurate**. Leadership applauds. Users eat phishing.
+
+Counts, not vibes:
+
+<ClassificationMetrics />
+
+Worked matrix for a **balanced** threshold (one of the buttons above):
+
+|  | Pred ham | Pred spam |
+| --- | --- | --- |
+| **Actual ham** | TN = 86 | FP = 4 |
+| **Actual spam** | FN = 2 | TP = 8 |
+
+- **Accuracy** = (TP + TN) / 100 = **94%**. Looks fine. Missed 2/10 spam.
+- **Precision** = TP / (TP + FP) = 8/12 ≈ **67%**. Of the flags, two-thirds were really spam.
+- **Recall** (sensitivity, TPR) = TP / (TP + FN) = 8/10 = **80%**. Of the actual spam, you caught 80%.
+- **F1** = harmonic mean of precision and recall ≈ **0.73**. One number when you care about both and classes are not 50/50.
+- **Specificity** = TN / (TN + FP) = 86/90 ≈ 96% — how well you leave ham alone.
+
+There is no universal winner. **Precision** when a false flag is costly (blocked vendor invoice). **Recall** when a miss is costly (cancer screen, fraud, safety). **F1** when you need a single score that punishes ignoring either side. **ROC-AUC** when you want threshold-free ranking quality — with a caveat on heavy imbalance (then also look at **PR-AUC**).
+
+This is the same discipline as **Why Evaluation Matters** in the LLM track: a demo accuracy is a vibe. A confusion matrix is a spec.
+
+## Mental model
+
+A smoke alarm.
+
+- False positive (FP): alarm, no fire. Precision suffers. You unscrew the battery.
+- False negative (FN): fire, no alarm. Recall suffers. You die.
+
+Accuracy counts the quiet nights. Quiet nights are mostly “no fire.” That is class **imbalance**.
+
+ROC-AUC asks: if you pick a random spam and a random ham, how often does the model score the spam higher? It is about **ranking**, not one threshold.
+
+## How it works
+
+1. Pick the **positive** class (the rare or costly one — spam, default, disease).
+2. Fill the 2×2. Everything else is arithmetic.
+3. Sweep the threshold on `p(positive)`: strict → fewer flags, higher precision, lower recall; loose → the reverse. That curve is the **precision–recall** tradeoff.
+4. **ROC** plots TPR vs FPR across thresholds. AUC = 0.5 is a coin; 1.0 is a perfect ranker.
+5. On 1%-positive problems, ROC can look heroic while the precision at a usable FPR is junk. Plot the **precision–recall curve** too.
+
+**Macro vs micro F1** (multiclass): micro is dominated by common classes; macro averages per-class F1 and makes rare classes visible. Say which one you report.
+
+## Real-world example
+
+100 emails, 10 spam, always-ham model: accuracy 90%, recall 0, F1 0. The confusion matrix would have shown TP = 0 in one glance.
+
+A hospital screen: miss = FN. They set a high-recall threshold and accept a pile of FPs for humans to review. A marketplace takedown: FP bans a legitimate seller — they set high precision and accept some missed junk. Same ROC curve, different operating point.
+
+## Technical explanation
+
+All of these assume a **fixed labeled set** and a definition of positive. Change the prevalence (spam becomes 40%) and precision moves even if the model’s scores do not — precision is prevalence-dependent; ROC-AUC is less so. That is why you cannot copy a precision from a paper into your inbox without matching the base rate.
+
+Do not optimize F1 in training by leaking the test fold. Metrics are for **held-out** data (overfitting lesson) and preferably **cross-validated** estimates (next lesson).
+
+LLM gold sets: “accuracy of JSON valid” is a classification metric on a schema check. “Faithfulness” is closer to precision of claims against context. The *names* differ; the insistence on a frozen labeled set does not.
+
+<Compare
+  a="Precision"
+  b="Recall"
+  rows={[
+    { label: "Question", a: "Of the flags, how many were real?", b: "Of the real positives, how many did we catch?" },
+    { label: "Hurt by", a: "False positives", b: "False negatives" },
+    { label: "When to optimize", a: "A flag triggers an expensive / harmful action", b: "A miss is the disaster" },
+    { label: "Imbalance", a: "Falls when you flag too freely", b: "Can look fine while precision collapses" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Shipping on accuracy because the slide is a single big number. On 10% spam, 90% is the dummy. Always print the 2×2.
+</CommonMistake>
+
+- Averaging F1 across classes without saying macro/micro.
+- Reporting AUC and picking 0.5 anyway when the costs are asymmetric — AUC does not choose your threshold.
+- Computing metrics on train. You will “beat” the paper and fail production.
+- Treating F1 as always better than AUC. Ranking vs a specific operating point are different jobs.
+
+## When to use it
+
+- Every binary (and per-class multiclass) classifier that will cause an action.
+- Imbalanced problems, safety, fraud, moderation, medical screen, retrieval “is this the right chunk.”
+- As the numeric half of an eval spec — classical ML or LLM.
+
+## When NOT to use it
+
+- Do not use accuracy as the only KPI when positives are rare or errors are unequal.
+- Do not use F1 when you have already decided “never miss” — report recall at a precision floor instead.
+- Regression tasks: use MAE/RMSE, not F1 on an arbitrary cutoff, unless the product really is a class.
+
+## Alternatives
+
+- **Cost-sensitive** metrics (expected dollars).
+- **Calibration** (do 0.8 scores happen 80% of the time?) — separate from discrimination (AUC).
+- Human review of the FP/FN piles. The numbers tell you *which* pile to read.
+
+<MemoryCard>
+**Accuracy** ignores which mistake. **Precision** = flags that were real. **Recall** = reals you caught.
+**F1** balances them. **ROC-AUC** ranks without a threshold. Print the confusion matrix. Match the metric to the cost.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-classification-metrics" />

@@ -1,0 +1,102 @@
+---
+id: context-state
+slug: context-state
+title: State Management
+category: context-engineering
+level: intermediate
+summary: State is the structured progress you persist outside the raw transcript — using write, select, compress, and isolate so the next call gets a clean working set.
+keywords: [context state, scratchpad, write select compress isolate, agent state]
+prerequisites: [context-selection, context-compression]
+next: [short-term-memory]
+related: [agent-memory, agent-loop, planning-reflection]
+alternatives: []
+confusedWith: [agent-memory]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-context-state
+estimatedMinutes: 8
+---
+
+<OneLine>State management is keeping a structured working set — goals, decisions, open tasks, handles — outside the raw chat log, then assembling the next window with write, select, compress, and isolate.</OneLine>
+
+## Explain like I'm new to AI
+
+The transcript is a messy diary. **State** is the sticky-note version: what we're doing, what's decided, what's left, which file or ticket ids to reuse.
+
+If you only replay the diary, the window fills and facts drift. If you maintain state, each model call gets a **clean working set**: instructions + state + the next slice of evidence + the latest user line.
+
+The four moves of context engineering are how you maintain that working set:
+
+<ContextStrategies />
+
+This is the same idea as **agent memory & state**, viewed from the *payload*: memory is storage; context engineering is **what you load this turn**.
+
+## Mental model
+
+A chef's **mise en place**. The pantry (disk, vector DB, ticket system) holds everything. The cutting board holds only what this dish needs. You write recipes down (state), pick ingredients (select), toss scraps (compress), and let a sous-chef chop in another room (isolate).
+
+## How it works
+
+**Write** — after important turns, persist: plan/todos, user preferences, artifact ids, "refund cap = $120". MCP-style **handles** (an `uploadId`) are state too — pass them as tool args instead of hoping the transcript still has the file.
+
+**Select** — on the next call, load *relevant* state + retrieved evidence, not the whole store.
+
+**Compress** — when the board is full, fold old diary pages into the sticky note.
+
+**Isolate** — spawn a sub-agent or workflow step with its own window; it returns a brief, not its entire browsing history.
+
+Checkpoint state so a paused human-in-the-loop or a crashed worker can resume. Schema it (JSON), don't rely on prose.
+
+## Real-world example
+
+A research agent writes `sources.md` and `outline.md` to disk (write). Each section step selects one outline heading + two sources (select). After five searches it compacts "dead ends" (compress). A sub-agent reads a 40-page PDF and returns a half-page note (isolate). The parent never eats the PDF.
+
+## Technical explanation
+
+State should be **explicit and inspectable**. Hidden "session memory" in the transport (old MCP sessions, sticky chats) is how bugs become unreproduceable. Prefer:
+
+- A document or record the host controls (todo list, scratchpad file, DB row).
+- **Ids over blobs** in the window.
+- Versioned instructions (the system prompt) separate from run state.
+
+Evaluate the **assembled prompt** (log redacted payloads, token shares per layer). If quality drops after compaction, your state schema is losing fields — fix the schema, don't add "remember everything" to the prompt.
+
+Don't duplicate the entire **memory** category here: long-term semantic memory is the store. This lesson is the **load/save policy** for the window.
+
+## Common mistakes
+
+<CommonMistake>
+Treating the chat log as the only source of truth. Logs rot, get compacted, and contradict themselves.
+Promote decisions into state as soon as they matter.
+</CommonMistake>
+
+- Isolating into a swarm of agents when a checklist in one window would do.
+- Writing everything to memory, then selecting nothing (the store becomes another haystack).
+
+## When to use it
+
+- Any multi-step agent, HITL pause/resume, or job that must survive more than one window.
+
+## When NOT to use it
+
+- One-shot Q&A with no continuation — no state machinery required.
+
+## Alternatives
+
+- Stateless RAG (select only, no write); a **fixed workflow** with typed step outputs instead of a free-form agent diary.
+
+<MemoryCard>
+**State** = structured progress outside the transcript. Maintain it with **write / select / compress /
+isolate**. Load a small working set each call; pass **ids and decisions**, not the whole diary.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-context-state" />

@@ -1,0 +1,149 @@
+---
+id: cnns
+slug: cnns
+title: What are CNNs?
+category: deep-learning
+level: intermediate
+summary: CNNs slide shared filters over images so the same detector works everywhere. Pooling downsamples. Still used in 2026 vision — not SOTA for language.
+keywords: [cnn, convolution, filter, kernel, pooling, convnet, translation equivariance]
+prerequisites: [neurons-layers-activations]
+next: [rnns]
+related: [neurons-layers-activations, vision-language-models]
+alternatives: [what-is-transformer]
+confusedWith: [vision-language-models]
+frameworks: []
+products: []
+papers:
+  - title: "Gradient-based learning applied to document recognition (LeCun et al., 1998)"
+    url: "http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf"
+    kind: paper
+  - title: "An Image is Worth 16x16 Words (ViT, Dosovitskiy et al., 2021)"
+    url: "https://arxiv.org/abs/2010.11929"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-cnns
+estimatedMinutes: 13
+---
+
+<OneLine>A CNN slides the same small filter across an image so "edge on the left" and "edge on the right" share weights, then pools to shrink the map. Built for vision, not language.</OneLine>
+
+## Explain like I'm new to AI
+
+A fully connected layer on a 224×224 RGB photo would attach a unique weight to every pixel. Move the cat one pixel left and the network sees a brand-new problem. That is a terrible inductive bias for vision.
+
+A **convolutional neural network (CNN / ConvNet)** uses a small **filter** (kernel) — say 3×3 — and **slides** it over the image. At each location it does the same affine thing you just learned (`sum of filter × patch + bias`), then an activation. The filter is a reusable detector: "this 3×3 looks like a vertical edge." Early layers learn edges; deeper layers compose them into textures, parts, objects.
+
+**Pooling** (max or average over a window) downsamples the feature map: keep the strongest "edge-ish" response in a neighborhood, throw away exact pixel position. That buys a bit of **translation tolerance** and cuts compute.
+
+2026 honesty: ConvNets are **not dead**. They are still the backbone of a huge amount of production vision (detectors, segmentation, mobile classifiers, the vision tower in many hybrids). **Vision Transformers (ViT)** exist and win a lot of large-data benchmarks. **Do not** pretend CNNs are state-of-the-art for language — they never were the default there; n-gram CNNs were a side path. Language is transformers.
+
+<CnnIdea />
+
+## Mental model
+
+A flashlight with a **stencil**. You don't reprint the stencil for every square of the wall. You slide one stencil. The bright spots on the wall are the **feature map**. Then you stand further back (pooling) so small jitters in the cat's position don't rewrite the whole story.
+
+## How it works
+
+1. **Input** — H×W×C tensor (height, width, channels). A gray digit is 28×28×1; a photo 224×224×3.
+2. **Convolution** — for each output channel, a filter of size k×k×C_in. Output spatial size depends on padding and stride. **Stride** 2 = skip locations = downsample without a pool. **Padding** keeps H and W from shrinking.
+3. **Activation** — ReLU historically; modern stems often GELU or just residual-friendly activations.
+4. **Stack** — conv → conv → pool (VGG-ish) or residual blocks (ResNet): `x + Conv(x)`.
+5. **Head** — global pool + MLP, or a 1×1 conv for dense prediction (segmentation).
+
+**Tiny numeric conv** (valid, stride 1). Image 4×4, kernel 2×2:
+
+```python
+import numpy as np
+
+image = np.array([[1, 0, 1, 0],
+                  [0, 1, 0, 1],
+                  [1, 0, 1, 0],
+                  [0, 1, 0, 1]], dtype=float)
+k = np.array([[1., 0.],
+              [0., -1.]])
+
+out = np.zeros((3, 3))
+for i in range(3):
+    for j in range(3):
+        out[i, j] = np.sum(image[i:i+2, j:j+2] * k)
+# out[0,0] = 1*1 + 0*0 + 0*0 + 1*(-1) = 0
+```
+
+Libraries do this as `im2col` + one matrix multiply, or with Winograd/FFT — same math, fused kernels.
+
+**Weight sharing:** that 2×2 kernel has **4** weights (plus bias), reused 9 times on a 3×3 map. A dense layer from 16 pixels to 9 outputs would have 16×9 weights and would break if you shifted the checkerboard.
+
+**Translation equivariance:** shift the input, the feature map shifts (approximately, until pooling and borders). That is the bias. It is *not* full invariance — a cat detector can still care about scale and pose; you add more layers, pyramids, or augmentations for that.
+
+## Real-world example
+
+Phone photo app: a **MobileNet / ConvNeXt-tiny** classifies "receipt vs not" on-device. A two-stage detector (FPN + conv heads) draws boxes around SKUs on a shelf. Medical imaging still ships U-Nets (conv encoder-decoder) because local structure and limited data love weight sharing.
+
+A **CLIP-style** tower in 2026 might be a ViT **or** a conv stem + transformer. Hybrids (convolutional stem, then attention) are common. The lesson is the primitive, not a religion.
+
+## Technical explanation
+
+Discrete convolution for one output channel:
+
+```text
+y[i, j] = b + Σ_u Σ_v Σ_c  K[u, v, c] · x[i·s + u, j·s + v, c]
+```
+
+A **1×1 conv** is a per-pixel MLP across channels — no spatial mix, cheap bottleneck (ResNet, Squeeze-and-Excitation). **Dilated / atrous** convs skip holes to grow receptive field without pooling away resolution (segmentation). **Depthwise separable** convs (MobileNet) factor spatial mix per channel then 1×1 mix across channels.
+
+**Receptive field:** after enough 3×3 layers, a unit "sees" a large crop of the input. That is how a deep CNN knows an object, not just an edge — composition, same story as MLP depth, but spatially organized.
+
+**ViT vs CNN, one paragraph.** ViT chops the image into patches, linearly embeds them, and runs a transformer. It needs more data (or distillation) to learn the locality a CNN bakes in. CNNs remain strong when data is limited, latency is tight, or you want dense prediction with an elegant fully-convolutional decoder. Neither is the SOTA story for **text**.
+
+<Compare
+  a="Fully connected on pixels"
+  b="CNN"
+  rows={[
+    { label: "Weights", a: "One weight per pixel-to-neuron", b: "Tiny kernel, reused everywhere" },
+    { label: "Shift the cat 1px", a: "Looks like a new input", b: "Feature map shifts; detectors still fire" },
+    { label: "Language in 2026", a: "Not how LLMs work", b: "Also not how LLMs work — use transformers" },
+    { label: "Vision in 2026", a: "Too many params, no locality", b: "Still standard backbones and hybrids; ViT is the other default" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Writing CNNs off because "ViT exists," or claiming CNNs are what GPT uses. ConvNets still ship in vision. Language models are transformers. Hybrids are normal.
+</CommonMistake>
+
+- Forgetting **channels**: a 3×3 conv on RGB is 3×3×3 weights per output filter, not 9.
+- Pooling away resolution then wondering why segmentation boundaries are mush — use skip connections (U-Net) or lighter downsampling.
+- Giant kernels "to see more" when a stack of 3×3 (or dilated) is cheaper and composes better.
+
+## When to use it
+
+- Images, video frames, spectrograms, any **grid** where local patterns repeat.
+- Tight on-device vision, dense prediction, small/medium datasets.
+
+## When NOT to use it
+
+- Token sequences for NLP — the default is **self-attention**, not a 1-d conv over words (character-CNNs were a 2015-era trick).
+- Set-like inputs with no locality (bags of embeddings) — use attention or an MLP on pooled features.
+- When a linear probe on frozen embeddings already solves the task.
+
+## Alternatives
+
+- **Vision Transformers** and conv-transformer hybrids.
+- **MLPs** on hand-crafted or pooled features for tiny problems.
+- **Vision-language models** wrap a vision encoder (CNN *or* ViT) plus a language model — different job (see that lesson).
+
+<MemoryCard>
+**CNN = shared sliding filters + (usually) pooling.** Local, translation-equivariant, cheap on grids.
+2026: still a vision workhorse and hybrid stem. Not the language SOTA. ViT is the other vision default.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-cnns" />

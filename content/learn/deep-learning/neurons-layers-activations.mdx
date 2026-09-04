@@ -1,0 +1,168 @@
+---
+id: neurons-layers-activations
+slug: neurons-layers-activations
+title: Neurons, Layers, and Activations
+category: deep-learning
+level: beginner
+summary: A neuron is affine (Wx+b) then a nonlinearity. Stack layers; without ReLU/GELU the whole net is still one linear map.
+keywords: [neuron, layer, activation, relu, gelu, sigmoid, tanh, mlp, affine]
+prerequisites: [what-is-neural-network]
+next: [cnns]
+related: [what-is-neural-network, what-is-deep-learning, backpropagation]
+alternatives: []
+confusedWith: [what-is-neural-network]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-neurons-layers-activations
+estimatedMinutes: 14
+---
+
+<OneLine>A neuron is a weighted sum plus bias (affine) followed by a nonlinearity. Layers stack those units; activations are why depth can represent more than one linear map.</OneLine>
+
+## Explain like I'm new to AI
+
+The foundations lesson **What is a Neural Network?** is the picture: valves, layers, "it learns by changing weights." This lesson is the arithmetic you will see in every modern stack — MLPs inside transformers, CNN heads, ranking models.
+
+A **neuron** does two things, always in this order:
+
+1. **Affine:** `z = w · x + b` — mix the incoming numbers with a weight vector, add a bias.
+2. **Activation:** `h = a(z)` — squash, clip, or gently gate that mix.
+
+A **layer** is many neurons looking at the same `x`, each with its own `w` and `b`. An **MLP** (multi-layer perceptron) is layers stacked: the `h` of one layer is the `x` of the next.
+
+Without step 2, stacking is a scam. Two linear maps in a row are still one linear map: `W₂(W₁x + b₁) + b₂ = (W₂W₁)x + (W₂b₁ + b₂)`. Depth would not buy you XOR, circles, or language. Nonlinearities are the whole point of "deep."
+
+Weights do not magically know the right values. **Backpropagation** (lesson id `backpropagation`, paired with this category) is how the error at the output becomes a gradient for every `w` and `b`. This lesson is the **forward pass** — what the network *computes*. Backprop is the reverse.
+
+<NeuronsLayersActivations />
+
+## Mental model
+
+A neuron is a **dimmer switch with a personality**. The affine part is "how much of each input do I let through." The activation is the personality: ReLU is a rectifier (negative current is just off), sigmoid is a soft yes/no, tanh is a signed soft yes/no, GELU is a smooth ReLU used in transformers.
+
+A layer is a **panel of those switches** sharing the same incoming wires. An MLP is several panels in series: each panel hears a more abstract mix than the last.
+
+## How it works
+
+**One neuron, numbers you can do in your head.**
+
+```text
+x = [2.0, 1.0]
+w = [0.5, -0.3]
+b = 0.1
+
+z = 2.0*0.5 + 1.0*(-0.3) + 0.1 = 1.0 - 0.3 + 0.1 = 0.8
+```
+
+| Activation | Formula (sketch) | a(0.8) ≈ |
+| --- | --- | --- |
+| ReLU | max(0, z) | 0.80 |
+| sigmoid | 1 / (1 + e⁻ᶻ) | 0.69 |
+| tanh | tanh(z) | 0.66 |
+| GELU | z · Φ(z) | ~0.63 |
+| identity | z | 0.80 |
+
+If `z` had been **-0.8**, ReLU would output **0** (the neuron is silent), sigmoid ~0.31 (still a leak), tanh **-0.66** (signed). That difference is why people switched default hidden activations from sigmoid/tanh to ReLU (2010s) and then to GELU/SiLU in transformers.
+
+**A two-layer MLP, numpy-shaped.** Hidden width 2, output 1. Same `x` as the visual: `[1.0, 0.5]`.
+
+```python
+import numpy as np
+
+x = np.array([1.0, 0.5])
+W1 = np.array([[0.8, -0.5],
+               [0.3,  0.6]])
+b1 = np.array([0.1, -0.2])
+W2 = np.array([0.4, 0.9])
+b2 = 0.0
+
+z1 = W1 @ x + b1          # [0.650, 0.400]
+h  = np.maximum(z1, 0)    # ReLU: same, both positive
+y  = W2 @ h + b2          # 0.4*0.650 + 0.9*0.400 = 0.620
+```
+
+If you **delete ReLU**, `y` is still some number — but any extra hidden layer you add can be folded into a single matrix. Click **none (linear)** in the visual: the network has "two layers" and the capacity of one.
+
+**Why these four activations show up**
+
+- **ReLU:** cheap, sparse (many zeros), default CNN / MLP hidden unit for a decade. Dying ReLU: if a unit is always negative, its gradient is 0 and it never recovers — Leaky ReLU / GELU are the patch.
+- **sigmoid:** maps to (0, 1). Still used as a **gate** (LSTM/GRU next lessons) and as a **binary output**. As a *hidden* activation it saturates: gradient `σ(1-σ)` is tiny when `|z|` is large.
+- **tanh:** sigmoid's signed cousin, range (-1, 1), zero-centered. Same saturation problem. Vanilla RNNs used it; that is part of vanishing gradients.
+- **GELU:** smooth, stochastic-ReLU intuition ("keep z with probability Φ(z)"). BERT / GPT-family MLPs. SiLU/swish is the close cousin in many 2024–2026 open models.
+
+Output activations are a **separate choice**: softmax for mutually exclusive classes, sigmoid for independent labels, identity for regression. Do not ReLU your logits.
+
+## Real-world example
+
+Every transformer block ends in a **feed-forward network**: two (or three, in SwiGLU) linear maps with a GELU/SiLU in the middle, applied **per token**. That is this lesson, copied millions of times. When a 7B model "thinks," most of the FLOPs are these MLPs, not the attention you hear about.
+
+A fraud model on 40 tabular features is also this: `Linear → ReLU → Linear → sigmoid`. Same neuron, boring features. Depth 2–4, not 96.
+
+## Technical explanation
+
+A fully connected layer with input dim `d_in` and `d_out` neurons is:
+
+```text
+h = a(x W + b)     # x is (batch, d_in), W is (d_in, d_out)
+```
+
+Parameter count is `d_in * d_out + d_out`. Two hidden layers 512-wide on 768-d input: already ~1.3M weights before you stack 32 of them. That is why people invented **convolutions** (share W across space — next lesson) and **attention** (mix tokens without a giant full sequence MLP).
+
+**Universal approximation:** a single hidden layer with a nonlinear activation can approximate a huge class of functions, given enough width. Practice prefers **depth**: composition of simple nonlinearities builds hierarchical features (edges → parts → objects, or morphemes → phrases → discourse). That is the "deep" in deep learning, not a marketing word.
+
+**Initialization and scale.** If you start with wide Gaussians, tanh/sigmoid saturate immediately and gradients die. He/Kaiming init (ReLU) and residual connections + LayerNorm (transformers) are engineering so the forward numbers in this lesson stay in a range where `a'(z)` is not ~0.
+
+Training is gradient descent on a **loss** of `y` vs target. The chain rule through `a(z)` is why a saturated sigmoid layer learns nothing. Forward pass here; the backward pass is **backpropagation**.
+
+<Compare
+  a="Stacked linear layers"
+  b="MLP with ReLU / GELU"
+  rows={[
+    { label: "What it can represent", a: "One affine map, however deep you stack", b: "Nonlinear decision surfaces; XOR, curves, language" },
+    { label: "Gradient through depth", a: "Well-defined but pointless extra matrices", b: "Depends on a'(z); ReLU is 0 or 1, GELU is smooth" },
+    { label: "Where you meet it in 2026", a: "A bug (forgot the activation)", b: "FFN inside every transformer block; small tabular nets" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Thinking "more layers" automatically means a more powerful model. Without nonlinearities, extra layers are one matrix with extra names. With them, extra layers still need data, residual paths, and a learning rate that does not explode.
+</CommonMistake>
+
+- Using sigmoid/tanh as hidden activations in a deep MLP "because that's the biology story." Use ReLU or GELU; keep sigmoid for gates and binary outputs.
+- ReLU on the **output** of a regression or on logits before softmax — you just clipped the prediction.
+- Confusing **activation** (elementwise nonlinearity) with **softmax** (a normalization across classes) or with **LayerNorm** (re-centering a vector).
+
+## When to use it
+
+- As the default building block: if you do not have a spatial or sequential inductive bias, start with an MLP.
+- Inside other architectures: the FFN after attention, the classification head on a CNN, the scorer on embeddings.
+
+## When NOT to use it
+
+- Raw pixels with a giant fully connected first layer (too many parameters, no translation bias) — use a **CNN** or a vision transformer, next and later lessons.
+- Long sequences where you need to mix distant tokens — a per-position MLP does not mix time; that is RNNs or attention.
+- Tiny linearly separable tables — logistic regression is the one-layer special case and will train faster.
+
+## Alternatives
+
+- **Convolutional layers** share weights across space (CNNs).
+- **Recurrent layers** share weights across time (RNNs / LSTMs).
+- **Self-attention + FFN** is still this neuron, plus a mixing step (transformers category).
+
+<MemoryCard>
+**Neuron = affine then activation.** Layers stack neurons. Without ReLU/GELU/etc., depth collapses to one linear map.
+Forward pass computes y; **backpropagation** updates W. GELU/SiLU in transformer FFNs; sigmoid is for gates and binary outputs.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-neurons-layers-activations" />

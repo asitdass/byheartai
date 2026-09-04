@@ -1,0 +1,101 @@
+---
+id: instruction-vs-preference
+slug: instruction-vs-preference
+title: Instruction Tuning vs Preference Tuning
+category: fine-tuning
+level: advanced
+summary: Instruction tuning (SFT) shows a gold reply; preference tuning (usually DPO) shows a winner and a loser — SFT first, then DPO is the 2026 default, not PPO.
+keywords: [sft, dpo, rlhf, instruction tuning, preference tuning, grpo]
+prerequisites: [what-is-fine-tuning]
+next: [when-to-fine-tune]
+related: [lora-qlora, rag-vs-fine-tuning]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Direct Preference Optimization (Rafailov et al., 2023)"
+    url: "https://arxiv.org/abs/2305.18290"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-instruction-vs-preference
+estimatedMinutes: 8
+---
+
+<OneLine>Instruction tuning teaches "this is the answer." Preference tuning teaches "this answer is better than that one." Do SFT first; in 2026 most teams then run DPO, not a full RLHF/PPO stack.</OneLine>
+
+## Explain like I'm new to AI
+
+Two data shapes:
+
+- **SFT / instruction tuning:** one prompt, one gold completion. The model imitates. Great for JSON shape, tone, "always cite."
+- **Preference tuning:** one prompt, two completions, a label which is better. The model shifts **toward chosen, away from rejected**. Great for "less smarmy," "refuse this class of request," "shorter."
+
+<SftVsDpo />
+
+**RLHF** (reward model + PPO) is how frontier labs historically aligned chat models. It works. It is also a lot of machinery. **DPO** fits a similar goal with one offline training run and no separate reward model — that's why product teams standardized on **SFT → DPO**.
+
+**GRPO** and verifier-based RL show up when you have a **checkable** reward (unit tests, math). Different tool, same idea: optimize preferences or scores after imitation.
+
+## Mental model
+
+SFT is a **worked example** in a textbook. DPO is a **teacher circling the better essay** and crossing out the worse one. You still need the worked examples first or the model doesn't know the assignment.
+
+## How it works
+
+**SFT:** minimize next-token loss on gold tokens. Data = demonstrations.
+
+**DPO:** for each triple `(x, y_w, y_l)`, increase likelihood of winner relative to loser vs a frozen **reference** model (usually the SFT checkpoint). No PPO loop.
+
+**RLHF:** train reward model on preferences, then PPO to maximize reward with a KL penalty to stay near SFT. Labs still use variants at scale.
+
+Watch **verbosity**: DPO can learn "longer = better" if winners were wordy. Length-control in eval.
+
+## Real-world example
+
+SFT: 500 gold "claim summary" records with four headings. DPO: 300 pairs where the winner is terse and the loser dumps liability. After DPO, refusals and tone tighten without rewriting every gold label.
+
+## Technical explanation
+
+Preference data is expensive. Synthetic pairs (LLM-as-judge) work if you audit them — judges have biases. Never DPO on raw "the model liked itself."
+
+SFT on preference-style chat without a rejected side is still SFT. Mixing both losses in one run exists; conceptually keep the stages clear.
+
+If you only have demonstrations, stop at SFT. Don't invent fake losers.
+
+## Common mistakes
+
+<CommonMistake>
+Running DPO on a base model that never saw SFT for your task. Preferences without a stable imitation
+baseline wander.
+</CommonMistake>
+
+- Reward-hacking with a sloppy judge.
+- Skipping eval for sycophancy and length.
+
+## When to use it
+
+- **SFT** whenever you fine-tune. **DPO** when you can label pairwise quality or refusals. **GRPO/RL** when a program can score the answer.
+
+## When NOT to use it
+
+- No preference labels and SFT already hits the spec. Don't PPO for a JSON formatter.
+
+## Alternatives
+
+- Prompting and constitutions; RAG for facts; human HITL instead of baking refusals (sometimes safer to keep policy out of weights).
+
+<MemoryCard>
+**SFT** = imitate gold replies (instruction tuning). **DPO** = chosen vs rejected, no reward model.
+Pipeline: **SFT then DPO**. PPO/RLHF is lab-scale. GRPO when a verifier exists. Start with
+demonstrations.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-instruction-vs-preference" />

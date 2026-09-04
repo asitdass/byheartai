@@ -1,0 +1,94 @@
+---
+id: token-latency-cost
+slug: token-latency-cost
+title: Token Usage, Latency, and Cost Tracking
+category: observability
+level: intermediate
+summary: Track input, cached, reasoning, and output tokens plus TTFT and total time — then dollars per successful task, with alerts on loops and cache busts.
+keywords: [token usage, ttft, reasoning tokens, prompt cache, llm cost]
+prerequisites: [what-is-observability]
+next: [agent-traces]
+related: [quality-latency-cost, context-caching, secrets-sandboxing, inference-caching, latency-vs-throughput]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-token-latency-cost
+estimatedMinutes: 8
+---
+
+<OneLine>On every model span log input, cached, reasoning, and output tokens, plus TTFT and total latency. Cost is dollars per successful task — including retries and loops — not the sticker price per thousand tokens.</OneLine>
+
+## Explain like I'm new to AI
+
+Tokens are the fuel gauge. Latency is the stopwatch. Dollars are what finance sees. If you only log "the call took 2s," you cannot tell a cache miss from a reasoning-model think from an agent that looped four times.
+
+<TokenCostWaterfall />
+
+**Input** tokens: what you sent. **Cached** input: prefix that hit a prompt cache (you still record the full input size; the bill is the uncached remainder). **Reasoning / hidden** tokens: 2026 thinking models spend tokens you never show; they dominate the invoice if you don't log them. **Output** tokens: the visible (and tool-call) text.
+
+**TTFT** (time to first token) is chat UX. **Total time** is when the JSON is valid or the tool loop finished. Alert on **p95**, not the mean.
+
+## Mental model
+
+A taxi meter that charges waiting, highway, and tolls separately. If the receipt only says "trip," you cannot tell why Tuesday was 10× Monday.
+
+## How it works
+
+1. Attributes on the LLM span: `input_tokens`, `output_tokens`, `cached_input_tokens`, `reasoning_tokens`, `model`, `ttft_ms`, `duration_ms`.
+2. Cost = provider formula(model, those counts) + tools + retrieval + your own **eval judges** if you score online. Roll up to **$ / successful task** (the previous category's knob).
+3. Dimensions: `prompt_version`, `route` (easy vs hard), `tenant`. Budgets and alerts per dimension.
+4. Alerts that matter: agent **loop count** spike, cache **hit rate** collapse (someone edited the prefix), reasoning tokens per request exploding, output length runaway.
+5. Streaming: TTFT at first byte; don't mark success until the stream completed or JSON parsed.
+
+## Real-world example
+
+Invoice +40% week over week. Metrics show input tokens flat. New field: `reasoning_tokens` after a model swap. You route FAQs off the thinking model. Eval quality on FAQs holds. The waterfall in the last visual's "reasoning" preset is that incident.
+
+## Technical explanation
+
+Provider usage objects differ; normalize into those four token fields so dashboards survive a vendor change. Cached tokens require you to know whether the prefix actually matched (see **Context Caching**).
+
+Retries and fallbacks: a failed expensive call still costs. Count it on the parent span.
+
+Reliability vs cost: timeouts you retry are a cost feature. Track `retry_count` on the trace.
+
+Don't use $ / 1k as the product KPI. A cheap model that loops is expensive (quality–latency–cost lesson). Observability is how you *see* the loops.
+
+## Common mistakes
+
+<CommonMistake>
+Tracking only output tokens. Reasoning and uncached input are where 2026 bills hide.
+</CommonMistake>
+
+- Mean latency as the SLO (hides p95).
+- No cache-hit metric — prefix edits silently 5× prefills.
+
+## When to use it
+
+- Every production model call, from day one. Especially agents and reasoning models.
+
+## When NOT to use it
+
+- Don't "save money" by dropping token fields from traces. You'll fly blind into the invoice.
+- Don't optimize cache hit rate if it means stuffing unused tools and busting quality (eval still gates).
+
+## Alternatives
+
+- Provider invoices are a lagging monthly lump. They are not request-level tracking.
+
+<MemoryCard>
+Log **input, cached, reasoning, output** + **TTFT** and total. Cost = **$ / successful task**, loops included.
+Alert on loop spikes and cache-busts. p95, not the mean.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-token-latency-cost" />

@@ -1,0 +1,100 @@
+---
+id: latency-vs-throughput
+slug: latency-vs-throughput
+title: Latency vs Throughput
+category: inference
+level: intermediate
+summary: Latency is one user's wait (TTFT, ITL, queue); throughput is tokens per second per GPU. Bigger batches raise throughput and hurt latency — pick the SLO first.
+keywords: [ttft, tpot, itl, tokens per second, batch size]
+prerequisites: [what-is-inference]
+next: [model-routing]
+related: [quality-latency-cost, token-latency-cost, batching-continuous-batching]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-latency-vs-throughput
+estimatedMinutes: 8
+---
+
+<OneLine>Latency is how long *this* request waited. Throughput is how much work the fleet finished. You cannot max both with the same batch size — chat and overnight jobs want different points.</OneLine>
+
+## Explain like I'm new to AI
+
+The evaluation lesson **Quality, Latency, Cost** asked *which* knob the product needs. This lesson is the **GPU arithmetic**.
+
+<LatencyThroughput />
+
+Measure separately:
+
+- **Queue** — time before prefill starts.
+- **TTFT** — first token (queue + prefill).
+- **ITL / TPOT** — time between later tokens (decode).
+- **E2E** — until stop or valid JSON.
+- **Tokens/s/GPU** — fleet efficiency.
+- **Goodput** — successful tasks/s, not raw tokens (retries, empty, filters).
+
+p95 beats the mean. Averages hide the lunch rush.
+
+## Mental model
+
+A highway: more cars per hour (throughput) vs your commute time (latency). Adding a lane of packed trucks raises throughput and your wait.
+
+## How it works
+
+Decode is memory-bound: larger batch ⇒ better bandwidth use ⇒ more tokens/s ⇒ each user waits for a fatter step.
+
+Prefill is compute-bound: long prompts steal TTFT from everyone unless you chunk (batching lesson).
+
+SLOs: interactive chat might be TTFT under 800ms and ITL under 40ms. Batch summarization might be tokens/s/GPU max, E2E minutes OK.
+
+Hedged retries improve *perceived* latency and **destroy** throughput/cost. Use as fallback, not default.
+
+## Real-world example
+
+Leadership wants "faster." You raise batch, tokens/s looks great, p95 TTFT doubles. You optimized the wrong graph. Split interactive and batch pools.
+
+## Technical explanation
+
+Little's law still applies: concurrency ≈ arrival rate × latency. KV memory caps concurrency (kv-cache-serving). That's why you can't "just batch 128" on long context.
+
+Streaming JSON: UX cares about TTFT; the API consumer cares about time-to-valid-object.
+
+Reasoning models: ITL might look fine while E2E explodes because hidden decode is long. Report both.
+
+## Common mistakes
+
+<CommonMistake>
+One dashboard number named "latency" that mixes queue, prefill, and decode.
+</CommonMistake>
+
+- Mean tokens/s as a chat SLO.
+- Comparing models without matching batch and context.
+
+## When to use it
+
+- Always, before buying GPUs or swapping models. Write the SLO in TTFT/ITL/E2E + goodput.
+
+## When NOT to use it
+
+- Don't max throughput on a human chat path. Don't max TTFT on a 3 a.m. batch job.
+
+## Alternatives
+
+- Two clusters. Routing (next) to a faster small model. Caches (following).
+
+<MemoryCard>
+**Latency** = this user (queue, TTFT, ITL, E2E). **Throughput** = fleet tokens/s.
+Batch trades them. p95. Goodput, not raw tokens. Split interactive vs batch pools.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-latency-vs-throughput" />

@@ -1,0 +1,92 @@
+---
+id: image-understanding-ocr
+slug: image-understanding-ocr
+title: Image Understanding & OCR
+category: multimodal-ai
+level: intermediate
+summary: OCR copies the letters off a page; a VLM can explain the page — for invoices and IDs you extract structure, then let the model reason.
+keywords: [ocr, optical character recognition, document ai, layout, screenshots]
+prerequisites: [vision-language-models]
+next: [speech-stt-tts]
+related: [vision-language-models, structured-output]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-image-understanding-ocr
+estimatedMinutes: 7
+---
+
+<OneLine>OCR is a specialist that reads characters and layout off an image. A VLM can talk about the whole scene. For anything that must be an exact string, OCR (or a document model) comes first.</OneLine>
+
+## Explain like I'm new to AI
+
+Two jobs get mixed up:
+
+- **What's in this picture?** (a dog, a broken UI, a chart going down) → **vision-language model**
+- **What letters are printed here?** (invoice total, passport number, code) → **OCR** (optical character recognition), often with **layout** (tables, columns, reading order)
+
+<OcrVsVlm />
+
+Modern "document AI" combines both: layout + OCR + a language model that fills a JSON schema (see **structured output**).
+
+## Mental model
+
+A human accountant **reads the digits off the paper** (OCR), then **thinks** about whether the expense is allowed (LLM). Skipping the first step and "vibing" the total is how $1,800 becomes $18,000.
+
+## How it works
+
+**OCR pipeline:** detect text regions → recognize characters → order them (left-to-right, tables) → optional language model cleanup. Classic engines (Tesseract) and cloud document APIs still win on dense forms.
+
+**VLM path:** feed the page image; ask questions. Strong on messy photos, whiteboards, memes, UIs. Weak as a ledger.
+
+**Best production pattern:** extract (OCR/layout) → **validate** (schema, checksums, human confirm on money) → reason with the VLM on the *image plus the extracted fields*.
+
+## Real-world example
+
+Expense app: OCR pulls `total = 48.20` and `merchant = …`. The VLM checks the receipt photo looks like a real meal, not a screenshot of a meme. Neither step alone is enough.
+
+## Technical explanation
+
+Layout matters as much as characters: a 3-column table dumped as a single string is garbage. Keep bounding boxes. For PDFs, **native text** (if the file has it) beats raster OCR.
+
+Resolution and contrast dominate OCR errors. A VLM may "read" a blurry sign with a plausible guess — that's **hallucinated literacy**.
+
+Screenshots of apps are a hybrid: OCR for copy-paste strings, VLM for "which tab is selected."
+
+## Common mistakes
+
+<CommonMistake>
+Asking a VLM "what's the IBAN?" and wiring the answer to a payment. Extract, checksum, confirm.
+</CommonMistake>
+
+- OCR without layout on tables.
+- Skipping native PDF text and photographing a digital file.
+
+## When to use it
+
+- Forms, IDs, receipts, slides with numbers, any string that must round-trip exactly.
+
+## When NOT to use it
+
+- "Describe this landscape" — no letters to copy; use a VLM.
+
+## Alternatives
+
+- Human keying for high-stakes docs; barcode/QR instead of reading printed numbers.
+
+<MemoryCard>
+**OCR** copies characters + layout. **VLMs** explain scenes. For money, IDs, and tables: extract →
+validate → then reason. Never pay from a model's "I think it says."
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-image-understanding-ocr" />

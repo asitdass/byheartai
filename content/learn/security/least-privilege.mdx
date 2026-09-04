@@ -1,0 +1,95 @@
+---
+id: least-privilege
+slug: least-privilege
+title: Agent Permission Boundaries
+category: security
+level: advanced
+summary: Least privilege for agents is a stack — caller identity, tiny tool kits, schema-checked args, human approval, sandbox — so a swayed model cannot exceed the job.
+keywords: [least privilege, permission boundaries, agent auth, hitl]
+prerequisites: [tool-abuse, human-in-the-loop]
+next: [secrets-sandboxing]
+related: [mcp-auth, mcp-security]
+alternatives: []
+confusedWith: [tool-abuse]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-least-privilege
+estimatedMinutes: 8
+---
+
+<OneLine>Least privilege means the agent can only do what this user, this route, and this turn require — identity, allow-listed tools, validated args, human gates, sandbox. The model never is "admin."</OneLine>
+
+## Explain like I'm new to AI
+
+Tool abuse was *why* a fat kit is dangerous. This lesson is the **stack** you actually ship.
+
+<LeastPrivilegeLayers />
+
+Each layer fails closed: missing user → no call; unknown tool → reject; extra fields → reject; money move → human; code → jail.
+
+MCP auth (OAuth audience, no passthrough) is the identity layer for remote tools. HITL is the human layer. Sandbox is the last box.
+
+## Mental model
+
+Airport: passport (who), boarding pass (which flight), no weapons (schema), extra screening for the cockpit (HITL), plane can't fly to a random country (network allow-list).
+
+## How it works
+
+1. **Identity:** act *as the user*. Tokens minted for *your* APIs. Model never holds a shared god key.
+2. **Route-scoped tools:** search bot ≠ finance bot. Don't load the union of all MCP servers.
+3. **Schema:** types, enums, max length. `user_id` from session.
+4. **Policy in code:** "refunds only on own orders" is SQL/API, not a sentence.
+5. **HITL:** irreversible and high-impact. Show args. The approve button is not an LLM.
+6. **Sandbox / egress:** next lesson, but it's part of the same stack.
+7. **Observe:** deny reasons on traces. A spike in denied tools is a signal.
+
+Two agents in a multi-agent system: don't let the "researcher" inherit the "payer" tools.
+
+## Real-world example
+
+Support route: `search_tickets`, `draft_reply`. Finance route: `preview_refund` + manager approve + `refund` API with the manager's session. Injection in a ticket can trash a draft, not the ledger.
+
+## Technical explanation
+
+Capability-based design: each tool is a tiny capability. Retrieval of tool descriptors (context engineering) should fetch **only this route's** kit so poisoned extra tools never appear.
+
+Time-box tokens. Per-tool rate limits. Break-glass documented.
+
+This is the positive version of LLM06. Excessive agency is what you have when you skip these layers.
+
+## Common mistakes
+
+<CommonMistake>
+One service account "for the bot" that can everything, because OAuth for users felt hard.
+</CommonMistake>
+
+- HITL that only asks "looks good?" without args.
+- Multi-agent handoff that forwards the full toolbox.
+
+## When to use it
+
+- Always, as soon as a model can call anything besides "return text."
+
+## When NOT to use it
+
+- Don't skip layers on internal agents. Internal is production data with worse audit.
+
+## Alternatives
+
+- No tools: the model drafts, a human copies into the real system. Slow, clear privilege.
+
+<MemoryCard>
+**Least privilege stack:** identity → tiny kit → schema → code policy → HITL → sandbox.
+The model is never admin. Session ids, not model-supplied ids. Denies belong on traces.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-least-privilege" />

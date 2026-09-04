@@ -1,0 +1,110 @@
+---
+id: memory-storage
+slug: memory-storage
+title: Storage, Retrieval & Forgetting
+category: memory
+level: advanced
+summary: Memory is a pipeline — extract structured writes, store each type in the right engine, retrieve a small filtered set, and forget on purpose with TTLs and supersedes.
+keywords: [memory retrieval, memory compression, ttl, vector graph kv, forgetting]
+prerequisites: [memory-types, vector-search]
+next: [memory-conflicts]
+related: [context-compression, hybrid-search]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-memory-storage
+estimatedMinutes: 8
+---
+
+<OneLine>A memory system is a pipeline: extract a structured write, put it in the right store, retrieve a few filtered items, and forget on purpose — not a folder where every chat is dumped forever.</OneLine>
+
+## Explain like I'm new to AI
+
+"We added memory" often means "we embedded the logs." That's a swamp. The pipeline that actually works:
+
+<MemoryLifecycle />
+
+1. **Write** — distill. `{key: "diet", value: "vegetarian", user, time, source}`
+2. **Store** — facts in KV/graph, events in a log+index, skills in versioned files
+3. **Retrieve** — filter (user, time, type) then semantic search, then rerank, then **few** items into context
+4. **Forget** — episodes expire; facts get superseded; skills get versions
+
+Compression here is cousin to **context compression**: you shrink what you *persist*, not only what you *pack this call*.
+
+## Mental model
+
+A library. You don't dump every conversation onto the floor. You **catalog** (extract), **shelve by type**, **search the catalog**, and **weed** the collection. Weeding (forgetting) keeps search from rotting.
+
+## How it works
+
+**Stores (2026 default is hybrid)**
+
+- **Key-value / SQL** — exact facts (`diet`, `timezone`)
+- **Vectors** — fuzzy "what do we know about lunch?"
+- **Graphs** — entities and relations, including *valid_from / valid_to* so "Ada was in Berlin" doesn't clobber "Ada is in Lisbon now"
+- **Files / git** — procedural memory
+
+**Retrieval**
+
+- Always **scope** (user, agent, tenant)
+- Prefer **key lookup** when you know the key
+- Else embed the query, maybe hybrid with keywords, **rerank**, cap *k* (3–10, not 50)
+- Recency and trust as ranking features, not afterthoughts
+
+**Forgetting**
+
+- Episodic: TTL (90 days) or "keep last 20 events per type"
+- Semantic: never silent-delete a live fact without a successor; mark `superseded_by`
+- Procedural: deprecate versions
+- User erasure: delete or anonymize **all types** for that `user_id`
+
+## Real-world example
+
+Mem0-style pipelines extract entities/relations with an LLM, upsert into a graph linked to embeddings, and **compare new facts to old** before insert. That's storage + conflict-aware write, not "push another chunk."
+
+## Technical explanation
+
+Write amplification: every extra memory is a future retrieve candidate (attention dilution, cost, poisoning surface). Measure **write rate**, **retrieve hit usefulness**, and **stale-fact rate**.
+
+Don't use the context window as the only store (that's working memory). Don't use fine-tuning as memory.
+
+Compaction of **episodes** can produce candidate **semantic** writes — then you still run the write gateway (next lesson). Summaries without keys are how "Ada maybe doesn't like mornings?" becomes sludge.
+
+## Common mistakes
+
+<CommonMistake>
+Never forgetting. A year of episodes makes every retrieve a needle-in-haystack problem you already
+know long context loses.
+</CommonMistake>
+
+- Embedding PII without encryption/access control.
+- Retrieving without metadata filters "to improve recall."
+
+## When to use it
+
+- Production memory: this pipeline is the job, not an optional cleanup.
+
+## When NOT to use it
+
+- Prototypes with five facts in a JSON file — still extract keys, so you can graduate to real stores.
+
+## Alternatives
+
+- Query the system of record live (orders DB) instead of memorizing; RAG over docs for non-personal knowledge.
+
+<MemoryCard>
+Memory pipeline: **extract** structured writes → **store** by type (KV/graph/vectors/files) →
+**retrieve** filtered + reranked + small *k* → **forget** (TTL, supersede, version, user erasure).
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-memory-storage" />

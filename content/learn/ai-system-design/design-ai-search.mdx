@@ -1,0 +1,93 @@
+---
+id: design-ai-search
+slug: design-ai-search
+title: Design an AI Search Engine
+category: ai-system-design
+level: advanced
+summary: AI search is query, hybrid retrieve, rerank, then grounded snippets — a chatty generator without ranking metrics is not search.
+keywords: [ai search, hybrid search, rerank, ndcg, grounded snippets]
+prerequisites: [how-to-design-ai-system, what-is-rag]
+next: []
+related: [hybrid-search, reranking, design-rag-chatbot]
+alternatives: [design-rag-chatbot]
+confusedWith: [design-rag-chatbot]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-design-ai-search
+estimatedMinutes: 8
+---
+
+<OneLine>An AI search engine ranks sources for a query — hybrid retrieve, rerank, then optional grounded snippets. If you skip retrieval eval and only generate paragraphs, you built a chatbot, not search.</OneLine>
+
+## Explain like I'm new to AI
+
+Search success is **the right documents at the top**. A generated blurb is optional sugar. Teams collapse the two and ship fluent wrong links.
+
+<AiSearchDesign />
+
+**Job:** for this query, show the best allowed hits (and maybe a short grounded answer). **SLO:** nDCG / recall@k, then snippet faithfulness, then latency.
+
+**Shape:** workflow. Query rewrite can be an LLM step; the control flow is still fixed.
+
+## Mental model
+
+A library catalog (ranking) that may also print a two-sentence card. The card is not allowed to invent a book.
+
+## How it works
+
+- Query: spell, expand, maybe split. Keep **lexical** (BM25) for SKUs and names (dense vs sparse, hybrid).
+- Retrieve: hybrid over your index. ACL if needed (enterprise lesson).
+- Rerank: cross-encoder on top N — usually the biggest quality lever.
+- Present: ranked list always. Generated snippet only from top hits; still cite.
+- Eval: labeled qrels for ranking; RAG-style faithfulness if you generate. Don't average them away.
+- Serve: cache popular queries (exact), not semantic-cache of "close" SKUs.
+
+Public web search adds crawling, spam, freshness — same pipeline, harder ingest. Don't pretend a single chat model replaced information retrieval.
+
+## Real-world example
+
+"Search" that only embeds the query and asks a 70B to write an answer with fake links. nDCG was never measured. They added hybrid+rerank, generated less, and users found files again.
+
+## Technical explanation
+
+This is the RAG architecture with the generator **optional and small**. Many products should stop at reranked hits.
+
+Multimodal search (CLIP, frames) is the multimodal RAG lesson — same design loop, extra embedding space.
+
+## Common mistakes
+
+<CommonMistake>
+Replacing the ranking stack with a chatbot because demos look smarter.
+</CommonMistake>
+
+- Pure vectors on catalog IDs.
+- No ACL on an internal search box.
+
+## When to use it
+
+- Users need to *find* things (files, SKUs, docs, web). Generation is a helper, not the product.
+
+## When NOT to use it
+
+- Don't use this when the user wants a ticket resolved (support) or a patch (coding).
+- Don't skip ranking metrics because the snippet "reads well."
+
+## Alternatives
+
+- Classic search without an LLM. RAG chatbot when the primary job is an answer, not a list. Research agent when they want a memo.
+
+<MemoryCard>
+**AI search** = query → hybrid → rerank → hits, then maybe a grounded snippet.
+Eval ranking and faithfulness separately. A generator without retrieve metrics is a chatbot.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-design-ai-search" />

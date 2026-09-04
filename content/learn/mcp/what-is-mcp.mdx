@@ -1,0 +1,106 @@
+---
+id: what-is-mcp
+slug: what-is-mcp
+title: What is MCP?
+category: mcp
+level: intermediate
+summary: MCP is an open protocol that lets any AI app discover and use tools, files, and prompts from external systems through a shared client-server language.
+keywords: [mcp, model context protocol, tools, resources, prompts, agent protocol]
+prerequisites: [function-calling, what-is-agent]
+next: [why-mcp-exists]
+related: [mcp-architecture, mcp-primitives, function-calling]
+alternatives: []
+confusedWith: [function-calling]
+frameworks: []
+products: []
+papers:
+  - title: "Model Context Protocol specification (2026-07-28)"
+    url: "https://modelcontextprotocol.io"
+    kind: spec
+  - title: "The 2026-07-28 Specification"
+    url: "https://blog.modelcontextprotocol.io/posts/2026-07-28/"
+    kind: article
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-what-is-mcp
+estimatedMinutes: 8
+---
+
+<OneLine>MCP (Model Context Protocol) is a shared USB-like standard: AI apps plug into servers that expose tools, files, and prompts, so every host doesn't invent its own GitHub, Slack, or database connector.</OneLine>
+
+## Explain like I'm new to AI
+
+An LLM can *ask* to use a tool (that's **function calling**). Someone still has to *expose* those tools to the app. Before MCP, every AI product built its own one-off connectors: Cursor talked to GitHub one way, Claude another, your agent a third.
+
+**MCP** is the open agreement those products now share. A **server** wraps one system (GitHub, Postgres, your files). A **host** (Cursor, Claude, ChatGPT, your agent) contains an **MCP client** that speaks the protocol. Plug the server in once — any MCP-speaking host can use it.
+
+<McpWhatIs />
+
+MCP is not a smarter model and not an agent loop. It's the **plug**. The host still decides *when* to call; the server just offers *what* can be called.
+
+## Mental model
+
+Think of **USB-C**. Before USB, every gadget had a unique cable. USB-C meant: one port, many devices. MCP is USB-C for AI apps and the systems they need to touch.
+
+- **Host** = the laptop (Cursor, Claude, your agent).
+- **Client** = the USB port/controller inside it (one per plugged-in device).
+- **Server** = the device (GitHub, Slack, a database).
+
+## How it works
+
+1. A server advertises **capabilities**: tools (actions), resources (readable data), prompts (reusable recipes).
+2. The host's client talks to that server over a **transport** — local **stdio**, or remote **Streamable HTTP**.
+3. Messages are **JSON-RPC**. The model never talks MCP directly; the host translates the model's tool call into `tools/call`.
+4. Since the **2026-07-28** spec, remote MCP is **stateless**: each request is self-describing. No session handshake. Any replica behind a load balancer can serve it.
+
+## Real-world example
+
+You connect a GitHub MCP server to Cursor. The model can now list PRs, read a file, and open an issue — not because Cursor hard-coded GitHub, but because the server exposed those tools in a standard shape. The same server can later be attached to Claude or an in-house agent with no rewrite.
+
+## Technical explanation
+
+MCP standardizes three things function calling left as "your app's problem":
+
+- **Discovery** — `server/discover`, `tools/list`, `resources/list`, `prompts/list` (lists are cacheable via `ttlMs` / `cacheScope`).
+- **Invocation** — `tools/call`, `resources/read`, `prompts/get`. On HTTP, `Mcp-Method` and `Mcp-Name` headers let gateways route and authorize without parsing bodies.
+- **Identity** — remote servers are OAuth 2.1 resource servers; tokens are **audience-bound** to that server's URI.
+
+The protocol is **not** the agent. Agents use MCP the way they use any tool catalog. Extensions (Tasks, MCP Apps, Enterprise Managed Authorization) sit on top of a small, stable core.
+
+## Common mistakes
+
+<CommonMistake>
+Calling MCP "the agent." MCP does not plan, loop, or decide. It is a <em>protocol</em> for exposing
+capabilities. The host's agent loop (or a human clicking a slash-command) is what uses them.
+</CommonMistake>
+
+- Treating MCP as a replacement for function calling — function calling is how the *model* requests a tool; MCP is how the *app* finds and runs tools from many vendors.
+- Assuming every MCP server is safe to install. Servers run code and see data — see **MCP security**.
+
+## When to use it
+
+- You want one integration to work across IDEs, chat apps, and custom agents.
+- You're publishing tools/data that many AI products should consume.
+
+## When NOT to use it
+
+- A single internal function the model calls directly — plain function calling is simpler.
+- A one-off script with no host to plug into.
+
+## Alternatives
+
+- **Custom function calling** inside one app; **OpenAPI / HTTP APIs** the host wraps itself; vendor-specific plugin stores (ChatGPT plugins, older IDE extensions).
+
+<MemoryCard>
+**MCP** = an open client-server protocol so any AI **host** can use **tools, resources, and prompts**
+from external systems. It is the USB-C plug, not the agent. Function calling is how the model asks;
+MCP is how the app finds and runs what it asked for.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-mcp" />

@@ -1,0 +1,155 @@
+---
+id: small-language-models
+slug: small-language-models
+title: What are Small Language Models (SLMs)?
+category: llms
+level: intermediate
+summary: Small language models (about 1–8B parameters) win on device, privacy, cost, and easy tasks; route hard turns to a larger model.
+keywords: [slm, small language model, on-device, edge, npu, distillation, 7b]
+prerequisites: [what-is-llm]
+next: [model-routing]
+related: [quantization, model-routing, reasoning-models, what-is-llm, serving-quantization]
+alternatives: [reasoning-models]
+confusedWith: [quantization, reasoning-models]
+frameworks: []
+products: []
+papers:
+  - title: "DistilBERT, a distilled version of BERT (Sanh et al., 2019)"
+    url: "https://arxiv.org/abs/1910.01108"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-small-language-models
+estimatedMinutes: 13
+---
+
+<OneLine>An SLM is a language model small enough to run cheaply or on-device — roughly 1–8B parameters in 2026 — used for easy turns, privacy, and routing, not as a trophy substitute for a frontier reasoner.</OneLine>
+
+## Explain like I'm new to AI
+
+"LLM" in the press often means a **frontier** model: huge, expensive, general. A **small language model (SLM)** is the same *kind* of thing (transformer, tokens in, tokens out) with **far fewer parameters** — in 2026 product talk, typically **about 1B to 8B**, sometimes up to ~15B if it still fits on one consumer GPU or a phone NPU after **quantization**.
+
+Small is not a synonym for "dumb." On **narrow, well-specified jobs** — classify this ticket, extract this field, rewrite this sentence in house style, decide whether to escalate — a tuned SLM often **beats** a giant general model on cost, latency, privacy, *and* accuracy. The giant model wastes capacity on a three-way softmax.
+
+The 2026 production pattern is not "pick one model." It is an **SLM swarm + a large model for hard turns**: many cheap specialists (or one general 8B) handle the bulk of traffic; a frontier or **reasoning** model gets the tail. That is **model routing**.
+
+<SlmVsLlm />
+
+## Mental model
+
+A hospital.
+
+- **SLMs** = triage nurses and specialist clinics. Fast, local, good at a defined job.
+- **Frontier / reasoner** = the attending on a confusing case.
+- **Router** = the protocol that decides who sees the patient.
+
+You do not send a sprained wrist to a 14-hour consult. You also do not let the triage nurse perform surgery because they are cheaper.
+
+## How it works
+
+1. **Choose size for the hardware.** Phone NPU / laptop GPU / single datacenter GPU. Parameter count × bytes per weight (see **quantization**) ≈ weight memory. Activations and KV cache are extra.
+2. **Specialize.** Instruction-tune or LoRA on *your* labels. Distill from a teacher: train the SLM to match the large model's answers on a dataset of prompts (classic idea: DistilBERT; still used for chat students in 2026).
+3. **Quantize for edge.** 4-bit GGUF / vendor NPU runtimes. Always re-eval — the quantization lesson is the mechanics.
+4. **Route.** Heuristics (length, intent classifier — often another SLM), confidence, or schema failure → escalate.
+5. **Eval slices.** Easy vs hard. An SLM that wins the average and fails the legal-exception slice is a liability.
+
+On-device: weights stay on the phone; prompts never leave. That is the privacy pitch, not a vibe. Still ship a **secure enclave / OS policy**; "small" is not "unteachable malware."
+
+## Real-world example
+
+**Classification.** 3B model, three labels, 80-token tickets, in-VPC. After 4k gold rows, it matches a frontier model and returns in 40ms. The frontier model was a $ rounding error per call that added up to a team.
+
+**Extraction.** JSON `{ "order_id", "reason" }` with constrained decoding. An 8B instructed model + schema is enough. A reasoner writing a hidden essay is slower and not more valid JSON.
+
+**Routing.** A 1B classifier: `faq | code | policy | other`. `faq` stays on the 8B. `policy` goes to a reasoner with a thinking cap. This is the swarm.
+
+**Privacy / air-gap.** Hospital network with no egress. A quantized 7B on-prem beats "we will anonymize and send to a US API" in the review meeting.
+
+**When the SLM loses.** Ambiguous contract clause, multi-file refactor, novel math. Distillation helps until it does not. Measure; escalate.
+
+## Technical explanation
+
+**Capacity.** Fewer parameters → less world knowledge, weaker long multi-hop reasoning, smaller effective context skill. You compensate with **RAG**, **tools**, and **routing**, not with wishful prompting alone.
+
+**Distillation.** Teacher generates answers (or logits) on a prompt set; student trains with CE / KL to match. You are transferring *behavior*, not copying 70B weights. Garbage teacher traces → garbage student.
+
+**Quantization pointer.** Serving 4-bit is how 8B fits in ~5–6 GB-class memory for weights. Quality is task-dependent. Read the **quantization** lesson before you ship a 2-bit demo.
+
+**KV cache** still grows with batch × context. An 8B with a 128k window is not "tiny" at concurrency 32. Edge apps keep context short.
+
+**Naming.** Vendors will invent new size adjectives. Treat **SLM** as "fits our cheap/on-device envelope and our easy-task eval," not as a frozen parameter cutoff. 1–8B is the 2026 working band for "small" in this curriculum.
+
+```python
+# Sketch: SLM for easy turns, escalate on low confidence.
+# Plug in your HTTP client; no vendor-specific SDK required.
+
+EASY = {"billing", "bug", "other"}
+
+def classify_ticket(text: str) -> tuple[str, float]:
+    """Returns (label, confidence). Replace with your 1–8B call."""
+    # Dummy: production = softmax over three tokens / a small classifier head.
+    label, conf = "billing", 0.91
+    return label, conf
+
+def handle_ticket(text: str) -> str:
+    label, conf = classify_ticket(text)
+    if label in EASY and conf >= 0.85:
+        return f"slm:{label}"
+    return "escalate:large-or-reasoner"
+```
+
+Wire `classify_ticket` to a local OpenAI-compatible server (`BASE_URL=http://127.0.0.1:8080/v1`) the same way as the streaming lesson.
+
+## Common mistakes
+
+<CommonMistake>
+Replacing the whole product with an 8B because a blog said SLMs are the future. They are the
+future of the <em>easy majority</em>. The tail still needs a strong model or a human.
+</CommonMistake>
+
+- Skipping eval after quantization or distillation.
+- On-device 8B with a 32k chat history — you will swap and the "fast NPU" story dies.
+- Using an SLM as a silent **reasoner** without a verifier. Small models hallucinate too; they are just cheaper at it.
+- Fine-tuning on 40 rows and calling it specialization.
+
+## When to use it
+
+- Classification, extraction, rewrite, routing, autocomplete, offline / NPU / VPC-only deployments.
+- High QPS where a frontier decode is economically absurd.
+
+## When NOT to use it
+
+- Open-ended expert work you have not distilled and cannot verify (novel legal strategy, hard code across a monorepo, contest math).
+- When you have **no** eval slice and are guessing from five chats.
+- When the only requirement is "one API, maximum general intelligence" and volume is low — a single large model can be simpler ops (until the bill arrives).
+
+## Alternatives
+
+- **Frontier chat** for low-volume, high-diversity tasks.
+- **Reasoning models** for the hard tail (test-time compute) — not for the swarm.
+- **Classic ML** (logistic regression, GBT) when features are tabular and you do not need language.
+
+<Compare
+  a="SLM (~1–8B)"
+  b="Frontier / reasoner"
+  rows={[
+    { label: "Fits", a: "Phone NPU, one GPU, cheap batch", b: "Multi-GPU or metered API" },
+    { label: "Wins at", a: "Labels, extract, route, privacy", b: "Hard, novel, long reasoning" },
+    { label: "2026 pattern", a: "Default for most turns", b: "Escalation path" },
+    { label: "Main risk", a: "Using it on the tail anyway", b: "Using it on FAQs" },
+  ]}
+/>
+
+<MemoryCard>
+**SLMs** are small LMs (about **1–8B** in 2026 talk) for cheap, private, easy turns. **Distill**
+and **quantize** (see quantization). **Route** hard turns to a large or reasoning model. Eval
+easy and hard slices separately.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-small-language-models" />

@@ -1,0 +1,210 @@
+---
+id: datasets-features-labels
+slug: datasets-features-labels
+title: Datasets, Features, and Labels
+category: foundations
+level: beginner
+summary: "A dataset is a table of examples: features are the input columns, labels are the answers the model should predict."
+keywords: [dataset, features, labels, supervised learning, train test split, leakage]
+prerequisites: [what-is-machine-learning]
+next: [loss-functions]
+related: [what-is-machine-learning, parameters-vs-hyperparameters, loss-functions, rag-evaluation]
+alternatives: []
+confusedWith: [parameters-vs-hyperparameters]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-datasets-features-labels
+estimatedMinutes: 12
+---
+
+<OneLine>A dataset is examples in a table: each row is one case, features are the inputs you will have later, and the label is the answer you want predicted.</OneLine>
+
+## Explain like I'm new to AI
+
+Machine learning does not "read the universe." It reads a **dataset**: a finite pile of examples you collected.
+
+For **supervised** learning (the default for classifiers, rankers, extractors, and most eval sets):
+
+- Each **row** is one **example** (one house, one email, one support ticket, one image).
+- **Features** (often called **X**) are the columns the model is allowed to see when it predicts. You must be able to compute the same columns for a *new* example in production.
+- The **label** (often called **y**, or the **target**) is the correct answer for that row. Training sees y. Production usually does not — that is the point of predicting.
+
+Unsupervised data has rows and features but **no** label. Reinforcement learning has **rewards** instead of a single y. This lesson is the supervised table, because that is how you should still think about **eval sets** even when the product is an LLM.
+
+<DatasetsFeaturesLabels />
+
+## Mental model
+
+A worksheet in school.
+
+- The **questions** printed on the page = features.
+- The **answer key** = labels.
+- Studying the worksheet = training.
+- A **new** worksheet with no answer key = inference.
+
+If the answer key accidentally includes "the score this student got last year" and last year's score *is* the thing you are predicting, you cheated. That is **leakage**. The model looks brilliant on the worksheet and fails in the real exam.
+
+## How it works
+
+1. **Define the prediction task** in one sentence: "Given these inputs, output that." If you cannot name y, you do not have a dataset yet.
+2. **Collect rows** that look like production. Chat logs from power users only will not represent first-week customers.
+3. **Split** *by example* into train / validation / test (or time-based split if the world drifts). Typical first cut: 70 / 15 / 15, but **time** and **groups** (all messages from one user) matter more than the ratio.
+4. **Fit** only on train. Use validation to pick hyperparameters. Touch test **once** for a honest number.
+5. At **inference**, you still compute features. You do not get y until later (or ever).
+
+Shapes, in numpy-speak:
+
+```text
+X  shape (n_examples, n_features)
+y  shape (n_examples,)            # or (n_examples, n_outputs)
+```
+
+One image can be a feature tensor (height × width × channels) flattened or passed as a grid. The idea is the same: inputs vs the thing you score against.
+
+## Real-world example
+
+**House prices.** Features: square feet, bedrooms, age. Label: sale price in thousands. A new listing has sqft/beds/age; the model outputs a number; the true sale happens later.
+
+**Spam.** Features: token counts or an embedding of the email body (and maybe `hour_sent`). Label: `spam` / `ham`. Do **not** include `was_in_spam_folder` if that folder *is* the label — leakage.
+
+**LLM product eval.** Each row is a user prompt (feature) plus a gold answer or a rubric score (label). Retrieval-augmented systems add retrieved chunks as extra features at inference; the eval still needs a held-out set of prompts and expected behaviors.
+
+**Medical imaging.** The pixels are features. The radiologist's diagnosis is the label. If you also feed the free-text report that *contains* the diagnosis, you built a report-reader, not an image model.
+
+## Technical explanation
+
+**Feature types.** Numeric (sqft), categorical (city — encode as one-hot or embedding), text (tokens), images, audio. Models only see numbers. The **feature pipeline** (tokenization, normalization, missing-value policy) must be **fit on train only** and applied identically in production. Scaling with the test set's mean is a silent leak.
+
+**Label types.**
+
+- **Regression:** y is a real number (price, latency).
+- **Classification:** y is a class id (spam, intent).
+- **Structured:** y is JSON, a span, a ranking. Same idea: a checkable target.
+
+**Imbalance.** 99% "not fraud" means accuracy is a trap. You need the right **loss** and metrics (precision/recall, calibration), which the next lessons cover.
+
+**IID vs reality.** Textbooks assume independent rows. Production has duplicates, bots, one customer with 400 tickets, and a policy change last Tuesday. **Group** splits (by user, by document) and **time** splits beat a random shuffle when those structures exist.
+
+**Leakage checklist (do this before celebrating a 99% score):**
+
+- Did a feature only exist *because* y was already known?
+- Did train and test share the same user / document / hash?
+- Did you tune on test by accident (ten "final" evals)?
+- Are missing values coded as `-1` in a way that *encodes* the label?
+
+Worked mini-table (four houses). Features = `(sqft, beds)`. Label = `price`.
+
+```text
+sqft  beds  price
+ 820     2    210
+1400     3    340
+2100     4    510
+ 980     2    185
+```
+
+A brain-dead baseline: predict the **mean train price**. If we train on the first three rows, mean y = (210+340+510)/3 = 353.3. The held-out house (980, 2) has y=185. The baseline is already 168 off. A model has to beat *that*, not beat chance in the abstract.
+
+```python
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+# Columns: sqft, beds, age. Last column is the label (price k$).
+raw = np.array([
+    [820,  2, 12, 210],
+    [1400, 3,  6, 340],
+    [2100, 4,  2, 510],
+    [980,  2, 31, 185],
+    [1600, 3,  8, 390],
+    [1200, 3, 18, 260],
+], dtype=float)
+
+X, y = raw[:, :3], raw[:, 3]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.33, random_state=0
+)
+
+model = LinearRegression().fit(X_train, y_train)
+print("train R^2", model.score(X_train, y_train))
+print("test  R^2", model.score(X_test, y_test))
+print("coef (sqft, beds, age)", model.coef_)
+```
+
+Run it. If train score >> test score, you overfit — memorizing rows, not learning a rule that generalizes.
+
+For text classification, the "features" are often a vectorizer:
+
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LogisticRegression
+
+texts = [
+    "your invoice is attached",
+    "win a free cruise now",
+    "meeting moved to 3pm",
+    "claim your prize click here",
+]
+labels = [0, 1, 0, 1]  # 1 = spam
+
+clf = make_pipeline(TfidfVectorizer(), LogisticRegression(max_iter=200))
+clf.fit(texts, labels)
+print(clf.predict(["lunch is at noon", "you won the lottery"]))
+```
+
+The vectorizer is part of the feature pipeline. Save it with the model or production will tokenize differently and silently rot.
+
+## Common mistakes
+
+<CommonMistake>
+Training and testing on the same rows, or shuffling a time series so "tomorrow" leaks into train.
+The number you get is not a measure of the product. It is a measure of your leak.
+</CommonMistake>
+
+- Using a feature you will not have at prediction time (future payment status, human review notes).
+- Treating the **prompt** as unlabeled when you actually need gold answers for eval.
+- One row per *token* when the unit of interest is a *document* — metrics lie.
+- Huge n, garbage labels. Annotator guidelines beat scraping 10× more junk.
+
+## When to use it
+
+- Every supervised model, every fine-tune, every LLM eval set: write down X, y, the split rule, and the production constraint "we will have these features."
+
+## When NOT to use it
+
+- Do not force a label onto a problem that is actually clustering or retrieval (you may still need an eval set later).
+- Do not collect labels you cannot define. "Quality" with no rubric is not a column; it is an argument.
+- Do not use random splits when the same entity appears in train and test.
+
+## Alternatives
+
+- **Unsupervised** structure (clustering, language-model pretraining) when labels are scarce — still eval with *some* labeled slice.
+- **Weak labels** (heuristics, other models) as a start, then clean a gold set.
+- **Human eval / LLM-as-judge** when y is a rubric, not a single class — see the evaluation category.
+
+<Compare
+  a="Feature (X)"
+  b="Label (y)"
+  rows={[
+    { label: "When you have it", a: "Train and production", b: "Train (and eval); usually not at serve time" },
+    { label: "House example", a: "sqft, beds, age", b: "sale price" },
+    { label: "Spam example", a: "email text, sender domain", b: "spam / ham" },
+    { label: "Failure mode", a: "Missing in prod, or leaked from y", b: "Noisy, undefined, or imbalanced" },
+  ]}
+/>
+
+<MemoryCard>
+A **dataset** is rows of examples. **Features (X)** are inputs you can compute in production.
+**Labels (y)** are the answers for training and eval. Split so test rows (and groups) stay unseen.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-datasets-features-labels" />

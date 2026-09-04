@@ -1,0 +1,120 @@
+---
+id: consuming-mcp-server
+slug: consuming-mcp-server
+title: Consuming an MCP Server
+category: mcp
+level: intermediate
+summary: A host consumes MCP by connecting a client per server, mapping the catalog into function calling, and enforcing allow-lists and approvals.
+keywords: [mcp client, consume mcp, host, tool catalog, allow list]
+prerequisites: [mcp-architecture, mcp-primitives]
+next: [mcp-and-agents]
+related: [building-mcp-server, tool-selection]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Model Context Protocol specification"
+    url: "https://modelcontextprotocol.io"
+    kind: spec
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-consuming-mcp-server
+estimatedMinutes: 7
+---
+
+<OneLine>Consuming MCP means your app is the host: you connect clients to servers, turn their catalogs into the model's tools, run the calls yourself, and decide which servers and actions are allowed.</OneLine>
+
+## Explain like I'm new to AI
+
+If building a server is making a USB device, **consuming** is being the laptop. Cursor, Claude, ChatGPT, and your own agent are consumers. They:
+
+1. Connect to a server (launch stdio, or HTTP + OAuth).
+2. **List** tools / resources / prompts (optionally `server/discover` first).
+3. Show them to the user and/or the model.
+4. When the model requests a tool, **the host runs** `tools/call` — the model never speaks JSON-RPC.
+5. Put the result back in context, or pause if the server asks for input (MRTR) or your policy requires approval.
+
+You already saw this loop from the server's side:
+
+<McpCallFlow />
+
+## Mental model
+
+You're a **switchboard operator**. The model says "create an issue." You check the allow-list, call the right server, and read the answer back. You are responsible for *which* servers are plugged in and *which* calls go through.
+
+## How it works
+
+**Connect**
+
+- Local: spawn the command, attach stdio, pass env secrets. Sandbox the process.
+- Remote: OAuth 2.1, store tokens per server, send `_meta` and routing headers on every request.
+
+**Catalog**
+
+- Cache `tools/list` using `ttlMs` / `cacheScope`. Deterministic order keeps prompt caches warm.
+- Map each MCP tool to a function-calling definition (name, description, parameters).
+- If many servers, **retrieve** relevant tools rather than dumping 200 into context (same idea as tool selection).
+
+**Call**
+
+- Validate arguments, enforce permissions, then `tools/call`.
+- On `input_required`, collect answers (often from a human) and retry.
+- On errors, return them to the model — don't crash the loop.
+
+**Policy**
+
+- Allow-list servers. Review schemas before enable (tool poisoning).
+- Human-in-the-loop on write/delete/pay. Isolation between sensitive and general servers.
+
+## Real-world example
+
+An internal "support agent" host connects to three servers: **tickets** (HTTP + OAuth), **handbook** (HTTP, read-only), **code search** (stdio on a locked-down box). The model sees ~12 tools. Refunds require a human click. A random community MCP is not on the list.
+
+## Technical explanation
+
+The client SDK handles JSON-RPC, headers, and retries. Your job is **host policy**:
+
+- Identity: who is the user, which token, which tenant.
+- Mapping: MCP names can collide across servers — namespace them (`linear.create_issue` vs `jira.create_issue`).
+- Timeouts and cancellation; poll **Tasks** for long jobs.
+- Observability: log server, `Mcp-Name`, latency, success/fail — without logging raw secrets or PII if you can avoid it.
+- Spec version in `_meta` / `Mcp-Protocol-Version` so mixed 2025/2026 servers can coexist during upgrades.
+
+Consuming is where **security actually happens**. A perfect server still shouldn't be installed blindly.
+
+## Common mistakes
+
+<CommonMistake>
+Dumping every connected server's tools into the model. Selection quality collapses, cost jumps, and a
+poisoned description in one server can steer calls toward another. Allow-list and retrieve.
+</CommonMistake>
+
+- Trusting a friendly UI summary of a tool call instead of showing the raw name and arguments.
+- One shared token for all users on a remote server (breaks audit and authorization).
+
+## When to use it
+
+- Any product that should use ecosystem MCP servers, or your own servers from more than one surface.
+
+## When NOT to use it
+
+- A single hard-coded function in one app — skip MCP and call it directly.
+
+## Alternatives
+
+- Vendor plugin APIs; wrapping REST yourself in that one host.
+
+<MemoryCard>
+A **host** consumes MCP: one **client per server**, catalog → model tools, host executes `tools/call`.
+Allow-list servers, namespace tool names, cache lists, retrieve when catalogs get large, and approve
+dangerous calls. The model never speaks MCP itself.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-consuming-mcp-server" />

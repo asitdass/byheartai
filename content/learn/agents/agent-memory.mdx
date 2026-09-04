@@ -1,0 +1,94 @@
+---
+id: agent-memory
+slug: agent-memory
+title: Agent Memory & State
+category: agents
+level: intermediate
+summary: Agents use short-term memory (the context window), long-term memory (facts stored outside and retrieved), and state (task progress) to stay coherent over many steps.
+keywords: [agent memory, short-term memory, long-term memory, state, context window, vector store]
+prerequisites: [what-is-agent, context-window]
+next: [planning-reflection]
+related: [agent-loop, what-are-embeddings, context-state, short-term-memory, long-term-memory]
+alternatives: []
+confusedWith: [context-state, user-vs-agent-memory]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-agent-memory
+estimatedMinutes: 7
+---
+
+<OneLine>Agents combine short-term memory (what's in the context window right now), long-term memory (facts stored outside the model and retrieved when relevant), and state (the task's plan and progress) to act coherently across many steps.</OneLine>
+
+## Explain like I'm new to AI
+
+An agent loops for many steps — but the model itself **has no memory** between calls. Everything it "remembers" has to be **put back into the context** each time. Agents manage three kinds of memory:
+
+<AgentMemory />
+
+- **Short-term** = what's in the context window now (limited, temporary).
+- **Long-term** = facts saved outside the model and fetched when needed (survives sessions).
+- **State** = the structured plan and progress that keeps a long task on track.
+
+## Mental model
+
+Like a worker with a **notepad** (short-term: today's scratch notes), a **filing cabinet** (long-term: retrieve old records when relevant), and a **checklist** (state: what's done, what's next). The notepad clears often; the cabinet persists; the checklist tracks progress.
+
+## How it works
+
+- **Short-term:** recent steps and tool outputs live in the context window. It's fast but **finite**, so long loops must **summarize or drop** old content.
+- **Long-term:** important facts are written to a store — often a **vector database** — and **retrieved** (RAG-style) when relevant to the current step.
+- **State:** an explicit structure (plan, to-do list, variables) the agent reads and updates, so a 30-step task doesn't lose the thread.
+
+## Real-world example
+
+A personal assistant agent remembers your **preferences** ("I'm vegetarian") across weeks — that's **long-term memory** in a store, retrieved when booking dinner. Within one booking task, the **current conversation** is short-term, and the **checklist** ("find restaurant → check hours → reserve") is state.
+
+## Technical explanation
+
+Because context is limited and expensive, memory is an engineering problem:
+
+- **Context management:** summarize old turns, keep only relevant snippets, and use the context window deliberately (this is a big part of *context engineering*).
+- **Long-term stores:** embeddings + vector search for semantic recall; sometimes structured databases or knowledge graphs for facts.
+- **Memory writing policy:** deciding *what* to persist (not everything) and *when* to retrieve it.
+- **State persistence:** frameworks checkpoint state so an agent can pause, resume, or recover after failure.
+
+Getting memory right is often what separates a demo from a reliable agent — poor memory shows up as forgetting instructions, repeating work, or contradicting earlier steps.
+
+## Common mistakes
+
+<CommonMistake>
+Assuming the model "remembers" across steps. It doesn't — anything not placed back into the context is
+gone. Long-running agents must actively manage what to keep, summarize, or retrieve.
+</CommonMistake>
+
+- Dumping everything into context until it overflows (costly and degrades quality).
+- Persisting too much noise to long-term memory, then retrieving irrelevant junk.
+
+## When to use it
+
+- Any multi-step or multi-session agent — memory and state are what make continuity possible.
+
+## When NOT to use it
+
+- Single-shot tasks that fit in one context need no long-term store or state machinery.
+
+## Alternatives
+
+- For pure fact recall, plain **RAG** may be enough without full agent state management.
+
+<MemoryCard>
+Agents use **short-term** (context window now), **long-term** (external store, retrieved when relevant),
+and **state** (plan + progress). The model forgets between calls, so you must actively **summarize,
+store, and retrieve** to stay coherent over many steps.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-agent-memory" />

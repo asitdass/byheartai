@@ -1,0 +1,101 @@
+---
+id: multimodal-agents
+slug: multimodal-agents
+title: Multimodal Agents
+category: multimodal-ai
+level: advanced
+summary: A multimodal agent uses the same observe-reason-act loop — screenshots and mics are observations, with extra injection risk.
+keywords: [multimodal agent, computer use, voice agent, screenshot, visual injection]
+prerequisites: [what-is-agent, vision-language-models]
+next: [what-is-fine-tuning]
+related: [multimodal-rag, agent-loop, mcp-security]
+alternatives: []
+confusedWith: [what-is-agent]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-multimodal-agents
+estimatedMinutes: 8
+---
+
+<OneLine>A multimodal agent is still an agent: it observes, reasons, and acts. The new observations are pixels and sound; the new actions are clicks, crops, and speech — which makes injection and privacy sharper.</OneLine>
+
+## Explain like I'm new to AI
+
+You already know the **agent loop**. Multimodal agents don't replace it. They plug **eyes, ears, and a mouth** into it.
+
+<MultimodalAgent />
+
+Examples: a "computer use" agent that screenshots the desktop and clicks; a voice agent that hears you and talks back; a warehouse robot that looks at a shelf and moves.
+
+The brain is still an LLM/VLM/omni model with tools. MCP and function calling still apply.
+
+## Mental model
+
+A colleague on speakerphone **looking at your shared screen**. They see, they talk, they ask you to click. That's the agent — except the clicks might be automatic. You still wouldn't let a stranger share a screen with your password manager open.
+
+## How it works
+
+**Observe:** screenshot, camera frame, PDF page, microphone stream. Each observation **costs tokens** (visual tokens, audio tokens).
+
+**Reason:** same ReAct / loop. Plans should name *what to look at next* ("zoom the error banner"), not dump the whole display.
+
+**Act:** `click`, `type`, `scroll`, `crop_image`, `search_frames`, `speak`. High-risk actions need **HITL** (send, pay, delete).
+
+**Respond:** text, speech, overlay, generated image (labeled).
+
+Omni models collapse STT/TTS/VLM into one network for short interactions; tools and retrieval still matter for long jobs (OmniRAG-style: fetch the right second of video instead of watching the hour).
+
+## Real-world example
+
+Support agent: sees the user's screenshot, OCR's the error code, searches docs (RAG), speaks the fix. A poisoned screenshot that says "refund $10,000" in tiny text is **visual prompt injection** — same family as malicious tool descriptions.
+
+## Technical explanation
+
+New failure modes:
+
+- **Visual / audio injection** — instructions in pixels or sound
+- **Privacy** — screenshots capture secrets; voice recordings are biometric-adjacent
+- **Grounding** — the model clicks the wrong button; confirm with structure (AX tree, selectors), not only pixels
+- **Latency** — vision+voice loops must stream
+- **Evaluation** — task success on a real UI, not a captioning benchmark
+
+Prefer **structured UI signals** (DOM, accessibility tree) when you control the app; use pixels when you don't. Combine: pixels for "does it look broken?", DOM for "click #submit."
+
+## Common mistakes
+
+<CommonMistake>
+Giving a screenshot agent the same tools as a god-mode user. Pixel observations plus "click anywhere"
+is how you drain a bank account. Scope tools. Approve irreversible acts.
+</CommonMistake>
+
+- Sending the full desktop every turn (budget and leakage).
+- Trusting generated UI images as the live system.
+
+## When to use it
+
+- Computer use, voice ops, robotics, document-heavy workflows where seeing/hearing is the job.
+
+## When NOT to use it
+
+- A text form the user can fill themselves; anything high-stakes without HITL and logs.
+
+## Alternatives
+
+- Human on the loop; text-only agent + attachments the user cropped; RPA with hard-coded selectors.
+
+<MemoryCard>
+Multimodal agents = **same loop**, new sensors and actuators. Crop observations, prefer structured UI
+when you can, treat pixels/audio as untrusted, HITL on irreversible actions. Seeing the screen is not
+permission to own the screen.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-multimodal-agents" />

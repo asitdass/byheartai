@@ -1,0 +1,102 @@
+---
+id: user-vs-agent-memory
+slug: user-vs-agent-memory
+title: User Memory vs Agent Memory
+category: memory
+level: intermediate
+summary: User memory is personal data about the human; agent memory is operational — skills and run state. Split the stores.
+keywords: [user memory, agent memory, profile, privacy, scoping]
+prerequisites: [memory-types]
+next: [memory-storage]
+related: [long-term-memory, agent-memory]
+alternatives: []
+confusedWith: [agent-memory]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-user-vs-agent-memory
+estimatedMinutes: 7
+---
+
+<OneLine>User memory is about the person (preferences, profile, history they own). Agent memory is about how the system works (playbooks, this run's todos). Keep them in different scopes so privacy and behavior don't collide.</OneLine>
+
+## Explain like I'm new to AI
+
+Two questions:
+
+- "What do we know **about Ada**?" → **User memory**
+- "How should **this agent** book lunch or file a ticket?" → **Agent memory**
+
+<UserVsAgentMemory />
+
+If you dump both into one "memories" index, two disasters appear: Ada's medical note gets retrieved for Bob, and a playbook line ("always refund") gets treated as Ada's personal policy.
+
+## Mental model
+
+A hospital. The **patient chart** is user memory (access-controlled, erasable). The **nursing protocol binder** is agent/procedural memory (shared by staff, versioned). You would never file protocols inside a patient's chart — or charts in the protocol binder.
+
+## How it works
+
+**User memory**
+
+- Scoped by `user_id` / tenant on every write and retrieve
+- Visible in a UI: list, edit, delete (GDPR-style erasure)
+- High sensitivity: minimize, encrypt, audit
+- Semantic (preferences) + episodic (their past tickets)
+
+**Agent memory**
+
+- Scoped by `agent_id` / environment, **not** by end-user when it's a shared skill
+- Procedural playbooks, tool-use patterns, org-level constraints
+- Run-level **state** (todos) is agent memory that should die with the job, not land in Ada's profile
+
+A coding assistant's `AGENTS.md` is agent/procedural memory. "Ada prefers tabs" is user memory. "Current PR checklist" is run state.
+
+## Real-world example
+
+A travel agent stores `Ada.diet = vegetarian` (user, semantic). It also has a procedure "never book without checking visa" (agent, procedural). When Bob chats, you load **Bob's** user memory + the **shared** procedure — never Ada's diet.
+
+## Technical explanation
+
+Authorization is part of the retrieve path: metadata filters (`user_id = current_user`) are **security controls**. Hybrid search without filters is a data leak.
+
+Multi-agent systems need the same split: a researcher agent may share **procedural** memory with a writer, but must not share **user** memory across customers. Isolated stores beat "one big brain."
+
+Product-wise, show users their stored facts. Silent user memory destroys trust and is a compliance problem (right to access/erasure). Agent memory can stay internal, but still needs versioning.
+
+## Common mistakes
+
+<CommonMistake>
+One vector namespace called "memory" for everyone and every agent. You will eventually retrieve the
+wrong person's life into the wrong prompt.
+</CommonMistake>
+
+- Writing run todos into the user's long-term profile ("Ada is currently debugging auth.ts").
+- Training users that "the AI just remembers" with no way to inspect or wipe.
+
+## When to use it
+
+- Always, as soon as you persist anything about a person or share an agent across users.
+
+## When NOT to use it
+
+- A single-user local tool with no persistence beyond the session — still keep run state out of "profile" if you add memory later.
+
+## Alternatives
+
+- Fetch profile from the real CRM/IdP with a tool instead of duplicating it in a memory DB (source of truth wins).
+
+<MemoryCard>
+**User memory** = personal, scoped, inspectable, erasable. **Agent memory** = skills and run state,
+shareable across users. Filter retrieves by whose data it is — mixing stores is how leaks happen.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-user-vs-agent-memory" />

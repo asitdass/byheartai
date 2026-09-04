@@ -1,0 +1,96 @@
+---
+id: what-is-inference
+slug: what-is-inference
+title: What is Inference?
+category: inference
+level: beginner
+summary: Inference is using a trained model to produce outputs — prefill the prompt, then decode tokens. Chat latency is those two phases plus queue, not "the GPU being on."
+keywords: [inference, prefill, decode, ttft, serving]
+prerequisites: [training-vs-inference]
+next: [batching-continuous-batching]
+related: [what-is-llm, kv-cache, quality-latency-cost]
+alternatives: []
+confusedWith: [training-vs-inference]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-what-is-inference
+estimatedMinutes: 8
+---
+
+<OneLine>Inference is running a finished model to get an answer: first **prefill** (eat the prompt), then **decode** (emit tokens). Training changed the weights; inference uses them.</OneLine>
+
+## Explain like I'm new to AI
+
+The foundations lesson **Training vs Inference** is the fork: learn vs use. This category is **use at scale** — GPUs, queues, money, milliseconds.
+
+<InferenceIdea />
+
+A chat reply is not one magic step:
+
+1. **Queue** — wait for a slot (often the silent killer of TTFT).
+2. **Prefill** — the whole prompt runs in parallel. Heavy compute. Ends when the first token can be sampled. That's most of **time to first token**.
+3. **Decode** — one token, then another. The KV cache (transformers lesson) makes this not quadratic. The GPU is often **memory-bound**, rereading cache. Streaming is this loop.
+
+2026 reasoning models spend a lot of decode on **hidden** tokens you never show. Same physics, bigger bill (observability token lesson).
+
+## Mental model
+
+A restaurant: training is writing the cookbook (rare). Inference is cooking tonight. Prefill is mise en place for this ticket; decode is plating bite by bite.
+
+## How it works
+
+Weights stay frozen (unless you load a LoRA). Input tokens → hidden states → next-token distribution → sample (temperature lesson) → append → repeat until stop.
+
+**Throughput** is how many tokens (or successful requests) the fleet emits. **Latency** is how long *this* user waited. They move in opposite directions when you batch (next lessons).
+
+Self-hosting vs an API: same phases. The API hides the GPU; you still pay for prefill, decode, and retries.
+
+## Real-world example
+
+A support bot "feels slow." Traces show prefill is 200ms but **queue is 1.8s**. Buying a smarter model would not help. More replicas or better batching would.
+
+## Technical explanation
+
+Prefill scales with prompt length (attention over the prompt). Decode scales with output length × cache size. Long context hurts both: more prefill, fatter KV per token of decode.
+
+Speculative decoding, quantization, routing, and prefix cache are all tricks on these two phases — coming up.
+
+Security still applies: inference is where injection becomes a tool call. Caps on tokens are also **denial-of-wallet** controls.
+
+## Common mistakes
+
+<CommonMistake>
+Calling every GPU-second "training." If the weights aren't updating, it's inference.
+</CommonMistake>
+
+- Optimizing decode when the user is waiting in queue.
+- Ignoring reasoning-token decode when comparing "same" models.
+
+## When to use it
+
+- Every production answer, embedding call, and reranker is inference. Design for prefill vs decode explicitly.
+
+## When NOT to use it
+
+- Don't run huge interactive decode on a box you sized for training jobs (different utilization pattern).
+- Don't "infer" to update facts — that's RAG or tools.
+
+## Alternatives
+
+- Distill / smaller model / retrieve-then-extract without a giant decode. Still inference, just cheaper.
+
+<MemoryCard>
+**Inference** = frozen weights → prefill then decode. TTFT ≈ queue + prefill.
+Decode is often memory-bound (KV). Reasoning models hide extra decode tokens.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-inference" />

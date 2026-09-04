@@ -1,0 +1,100 @@
+---
+id: why-mcp-exists
+slug: why-mcp-exists
+title: Why MCP Exists
+category: mcp
+level: intermediate
+summary: MCP exists to kill the N×M connector problem — without a shared protocol, every AI app rebuilds the same GitHub, Slack, and database integrations from scratch.
+keywords: [mcp, n times m, integrations, usb-c for ai, interoperability]
+prerequisites: [what-is-mcp]
+next: [mcp-architecture]
+related: [what-is-mcp, mcp-and-agents]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Model Context Protocol specification"
+    url: "https://modelcontextprotocol.io"
+    kind: spec
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-why-mcp-exists
+estimatedMinutes: 6
+---
+
+<OneLine>MCP exists because AI apps and tools were multiplying faster than anyone could wire them together — a shared protocol turns N apps × M systems into N + M, not N × M.</OneLine>
+
+## Explain like I'm new to AI
+
+Suppose four AI apps each need GitHub, Slack, Postgres, and Drive. That's **16 custom connectors**. Add one more app or one more system and the work explodes. Users also suffer: "this tool works in Cursor but not in Claude."
+
+MCP's job is to make that grid collapse. Each system publishes **one** MCP server. Each app speaks **one** protocol. New hosts get old servers for free; new servers show up in old hosts.
+
+<McpNByM />
+
+## Mental model
+
+It's the same reason we have **USB, HTTP, and SMTP**. Nobody wants a unique cable, a unique web, or a unique email dialect per vendor. Shared protocols create ecosystems. MCP is that bet for "how models touch the rest of the computer."
+
+## How it works — the problem it solves
+
+Three pressures made a protocol necessary:
+
+1. **Hosts multiplied** — IDEs, chat apps, internal agents, Slack bots. Each wanted the same tools.
+2. **Tools multiplied** — every SaaS wanted "works with AI." Custom plugins per host didn't scale.
+3. **Security and identity needed one shape** — OAuth, least privilege, and audit are easier when every connection looks the same.
+
+A protocol also lets **the system vendor** own the connector (GitHub writes the GitHub server) instead of every app vendor re-implementing GitHub's API poorly.
+
+## Real-world example
+
+Linear, Sentry, Figma, GitHub, and thousands of internal tools now ship MCP servers. A company can point Cursor, Claude, and an internal agent at the *same* servers — one identity policy, one tool catalog, three surfaces. That is the N+M world MCP was built for.
+
+## Technical explanation
+
+The N×M problem is an **ecosystem** problem, not a model problem. Function calling solved "how does *this* model request *this* function in *this* app." It did not solve "how does *any* host discover *any* vendor's tools, with auth and a stable schema."
+
+MCP adds:
+
+- A **capability catalog** (tools / resources / prompts) any client can list.
+- **Transports** so local (stdio) and remote (HTTP) servers share one mental model.
+- **Auth** so remote servers aren't "paste an API key in a config file" forever.
+- **Stability** — a deprecation window (twelve months) so hosts and servers can upgrade on purpose.
+
+The 2026-07-28 **stateless core** exists for the same reason HTTP stayed stateless: N×M at *runtime* (sticky sessions, handshake state) was blocking scale.
+
+## Common mistakes
+
+<CommonMistake>
+Building a private "our-company protocol" that only your agent speaks. You re-create the N×M problem
+the moment a second host (an IDE, a chat app) needs the same tools.
+</CommonMistake>
+
+- Wrapping every tiny internal function as an MCP server — overhead without ecosystem benefit.
+- Expecting MCP to make a bad API good. A confusing tool schema is still confusing over MCP.
+
+## When to use it
+
+- Capabilities that should work in more than one host, or that a vendor should maintain once.
+
+## When NOT to use it
+
+- A throwaway tool used by a single script in a single app.
+
+## Alternatives
+
+- Per-host plugins; wrapping OpenAPI yourself; a central "tool gateway" that is secretly just MCP with extra steps.
+
+<MemoryCard>
+MCP exists to end the **N apps × M systems** explosion. One protocol, one server per system, any
+host can plug in — the USB-C idea applied to AI tools. Function calling was never going to solve that.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-why-mcp-exists" />

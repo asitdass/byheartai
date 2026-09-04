@@ -1,0 +1,94 @@
+---
+id: design-rag-chatbot
+slug: design-rag-chatbot
+title: Design a RAG Chatbot
+category: ai-system-design
+level: intermediate
+summary: A RAG chatbot retrieves an approved corpus, reranks, and answers with real citations — not an agent, not a fine-tuned wiki.
+keywords: [rag chatbot, grounded qa, citations, rag architecture]
+prerequisites: [how-to-design-ai-system, what-is-rag]
+next: [design-enterprise-assistant]
+related: [rag-architecture, rag-evaluation, hybrid-search]
+alternatives: [what-is-fine-tuning]
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-design-rag-chatbot
+estimatedMinutes: 8
+---
+
+<OneLine>A RAG chatbot is grounded Q&A: ingest an approved corpus, hybrid-retrieve, rerank, generate only from chunks, cite real ids. It is a chatbot with retrieval — not an agent and not a fine-tune of the handbook.</OneLine>
+
+## Explain like I'm new to AI
+
+This is the default "ask our docs" product. The RAG category taught the pieces. Here they sit in the **design loop**.
+
+<RagChatbotDesign />
+
+**Job:** answer questions using *our* sources, or say we don't know. **SLO:** faithfulness high, p95 a couple of seconds, cheap enough for FAQ volume.
+
+**Shape:** chatbot (maybe a tiny workflow: rewrite query → retrieve → generate). Not an agent unless the user must *do* something.
+
+**Knowledge:** the index. Update docs, not weights. Fine-tune later only if *format* still slips.
+
+## Mental model
+
+An open-book exam with a bibliography. If the book isn't on the desk, the student must pass.
+
+## How it works
+
+- Ingest: chunk, embed, metadata (source, date). Recrawl on a schedule.
+- Query: optional rewrite; **hybrid + rerank** (those lessons).
+- Generate: "only from context"; citations the UI can open.
+- Eval: context precision/recall vs faithfulness (RAG evaluation). Gold questions from real users.
+- Security: retrieved text is untrusted; no send-email on summarize-URL turns; encode HTML.
+- Serve: prefix-cache the system prompt; route easy FAQs to a small model.
+
+Empty retrieval is a **success path** ("I don't know"), not a quality fail.
+
+## Real-world example
+
+Internal handbook bot. 120 gold questions. Hybrid search lifted recall; the generator was fine. They almost fine-tuned. They needed rerank, not LoRA.
+
+## Technical explanation
+
+Long-context "paste the wiki" dies at corpus scale (lost-in-the-middle, cost). RAG scales. Citations without id verification are theater.
+
+Prompt version + index version on traces so a bad ingest is visible.
+
+## Common mistakes
+
+<CommonMistake>
+Calling it RAG but only embedding the query and taking top-3 cosine — no hybrid, no rerank, no gold chunks.
+</CommonMistake>
+
+- Fine-tuning PDFs into the model.
+- Averaging one "quality" score so you never see retrieval was the hole.
+
+## When to use it
+
+- Q&A over a corpus you can approve and update. The usual first production AI system.
+
+## When NOT to use it
+
+- The user needs multi-step *actions* (that's support/coding agents). Tiny static 20-page packet → maybe long context instead.
+
+## Alternatives
+
+- Search UI without generation (next: AI search). Agent with tools if they must act. Fine-tune for voice after RAG is solid.
+
+<MemoryCard>
+**RAG chatbot** = approved index + hybrid/rerank + grounded answers + real citations.
+Eval two halves. "I don't know" is a win on empty retrieve. Don't FT the wiki.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-design-rag-chatbot" />

@@ -1,0 +1,131 @@
+---
+id: overfitting-vs-underfitting
+slug: overfitting-vs-underfitting
+title: Overfitting vs Underfitting
+category: machine-learning
+level: beginner
+summary: Overfitting memorizes training noise; underfitting is too simple. Watch train vs val curves — that is how later evaluation makes sense.
+keywords: [overfitting, underfitting, generalization, regularization, validation set]
+prerequisites: [what-is-machine-learning]
+next: [decision-trees]
+related: [what-is-machine-learning, cross-validation, decision-trees, classification-metrics]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-overfitting-vs-underfitting
+estimatedMinutes: 14
+---
+
+<OneLine>A model that aces the training sheet but fails new rows is overfit; a model too stiff to fit the sheet at all is underfit. Validation error is the adult in the room.</OneLine>
+
+## Explain like I'm new to AI
+
+Training error is how well the model recites **the examples it was allowed to study**. That number wants to go to zero. It will cheat if you let it: memorize ids, odd zip codes, the one typo that appeared twice.
+
+**Overfitting** is that cheat. The model learned the *sample*, including noise, not the *pattern*.
+
+**Underfitting** is the opposite cheat: the model is too simple (or stopped too soon, or missing features). It cannot even recite the training sheet, so it will not magically work on new rows either.
+
+**Generalization** is doing well on rows that were not in the training pile. You estimate it with a **validation** (and later **test**) split you do not train on. Every later lesson on metrics, cross-validation, and — in the LLM world — frozen gold sets is this idea wearing a new hat.
+
+<OverfittingUnderfitting />
+
+If you remember one picture: two curves vs training effort (epochs, tree depth, number of boosting rounds). Train error falls. Val error falls, then **rises**. The rise is overfitting. The left side where both stay high is underfitting. You ship near the val minimum, not the train minimum.
+
+## Mental model
+
+Two exams.
+
+- Train = take-home quiz you keep. You can memorize the answer key.
+- Validation = a new quiz from the same course, sealed until scoring.
+
+A student with a photographic memory of the take-home (overfit) bombs the sealed quiz. A student who never learned the chapter (underfit) bombs both. The student you hire did *okay* on the take-home and *well* on the sealed quiz.
+
+Regularization is a teacher who docks points for an overly elaborate story. **More data** is more quizzes in the take-home so memorizing one odd question stops paying. A **simpler model** is a shorter essay format that cannot fit the odd questions.
+
+## How it works
+
+1. **Split.** At minimum: train / validation. Ideally: train / val / test, where test is touched once at the end. Peeking at test is how a “holdout” becomes a second train set.
+2. **Plot both errors** (or both accuracies) as you increase capacity: polynomial degree, tree depth, n_estimators, epochs, hidden size.
+3. **Diagnose.**
+   - Train *and* val bad → underfit. Capacity, features, or training time.
+   - Train great, val bad → overfit. Less capacity, more data, stronger regularization, earlier stop, dropout, weight decay.
+   - Both good, small gap → you may be done. Confirm on a true test slice.
+4. **Regularize.** Penalty on weights (Ridge/Lasso), max_depth, min_samples_leaf, learning-rate in boosting, early stopping on val.
+5. **Do not** tune 40 knobs on the same 80 val rows for three months. That overfits the *val set* — cross-validation and a frozen final test exist because of this. LLM teams do the same thing to a gold eval set.
+
+## Real-world example
+
+A tree on 800 loans, depth unrestricted, 100% train accuracy. Production defaults look random. The leaves had three rows each and encoded “this one street repaid.” Capping depth, requiring `min_samples_leaf=40`, and watching val AUC would have shown the train trophy was fake.
+
+A linear model on the same data with two features underfits: train and val AUC both ~0.55. The fix is not more epochs (linear models don’t work that way); it is better features or a more flexible model *plus* the same val discipline.
+
+## Technical explanation
+
+Bias–variance (cartoon that still helps):
+
+- **Underfit ≈ high bias** — the hypothesis class cannot represent the true function.
+- **Overfit ≈ high variance** — the hypothesis class *can* represent noise, so the particular sample’s noise gets baked in.
+
+The **bias–variance tradeoff** is not “always pick the middle model.” With huge data, flexible models can have low bias *and* low variance. With tiny tabular data, a stiff linear model can beat a deep net. 2026 still looks like that on spreadsheets; images and language flipped the other way because data and compute scaled.
+
+**Double descent** (over-parameterized nets) complicates the cartoon: past the interpolation point, more parameters can *help* again. You still do not skip the val curve. You still need held-out data. The curve shape changed; the need for a sealed quiz did not.
+
+Evaluation metrics (precision, recall, AUC) are *how you number* the sealed quiz. They do not replace the split. A perfect F1 on train is as untrustworthy as a perfect MSE on train.
+
+<Compare
+  a="Underfitting"
+  b="Overfitting"
+  rows={[
+    { label: "Train error", a: "High", b: "Very low" },
+    { label: "Val error", a: "High, similar to train", b: "Much worse than train" },
+    { label: "Typical cause", a: "Too simple, too little training, missing features", b: "Too flexible, too little data, trained too long" },
+    { label: "First lever", a: "Richer model or features", b: "Regularize, simplify, more data, early stop" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Tuning until train accuracy is 99% and calling it done. You optimized the take-home. Production is the sealed quiz you never printed.
+</CommonMistake>
+
+- Using the test set as a dashboard during development. It becomes val, and you need a new sealed quiz.
+- Adding features that are **leaks** (the label in disguise). Train and val both look miraculous; production does not have that column.
+- Regularizing at random without reading the two curves. Dropout cannot fix a model that cannot fit train.
+- In LLM products: polishing prompts on the same 40 eval items until the gold set is memorized. Same disease, different stack — see **Why Evaluation Matters**.
+
+## When to use it
+
+- Every trained model, including “just a baseline.” If you cannot show train vs val, you cannot claim you learned.
+- Whenever someone says “it works on the data we have.” Ask: which split?
+
+## When NOT to use it
+
+- Do not “fix overfitting” by reporting only train metrics. That hides the disease.
+- Do not copy a huge net onto 200 rows and hope dropout is a personality. Get data or use a smaller class of models.
+- Do not treat a single val number as destiny — that is why **cross-validation** exists (next-next lessons). Still: one honest val beats zero.
+
+## Alternatives
+
+- **More representative data** often beats a clever regularizer.
+- **Simpler models** (linear, shallow trees) when n is small.
+- **Ensembles** (forests, boosting) reduce variance of trees without you hand-drawing the bias.
+- For LLMs: a frozen eval set and a true holdout, not a bigger prompt that recites the eval questions.
+
+<MemoryCard>
+**Overfit** = train hero, val zero. **Underfit** = both bad. Plot both curves.
+Regularize, simplify, or add data — never trust a metric computed on the training sheet. This is why eval exists.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-overfitting-vs-underfitting" />

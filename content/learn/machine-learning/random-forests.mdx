@@ -1,0 +1,126 @@
+---
+id: random-forests
+slug: random-forests
+title: What are Random Forests?
+category: machine-learning
+level: intermediate
+summary: A random forest averages many trees trained on bootstrap samples and random features, so the ensemble beats one overfit tree.
+keywords: [random forest, bagging, bootstrap, feature subsample, ensemble]
+prerequisites: [decision-trees]
+next: [gradient-boosting]
+related: [decision-trees, gradient-boosting, overfitting-vs-underfitting]
+alternatives: [gradient-boosting, decision-trees]
+confusedWith: [gradient-boosting]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-random-forests
+estimatedMinutes: 12
+---
+
+<OneLine>A random forest is many decision trees trained on random row samples and random feature subsets, then averaged or voted — a crowd that forgets each tree’s superstitions.</OneLine>
+
+## Explain like I'm new to AI
+
+One deep tree is a storyteller who overfit last year’s loans. Ask a slightly different sample of customers and the story changes (high **variance**).
+
+A **random forest** hires hundreds of those storytellers and makes them disagree *on purpose*:
+
+1. **Bagging (bootstrap aggregating):** each tree trains on a random sample of rows, drawn **with replacement**. Some rows appear twice; some never appear in that tree.
+2. **Feature subsample:** at each split, only a random subset of columns is allowed. The strongest predictor cannot boss every tree.
+3. **Aggregate:** classification → majority vote (or mean probability). Regression → mean of the leaf predictions.
+
+<RandomForests />
+
+The ensemble is duller than the flashiest tree and usually **more right** on new rows. You lose a single printable flowchart; you gain stability.
+
+## Mental model
+
+A noisy committee. Each member studied a shuffled photocopy of the workbook and was banned from using some columns. Their private mistakes do not line up, so the vote cancels noise. The signal (income really does matter) shows up in enough photocopies to survive.
+
+Boosting (next lesson) is not a committee meeting in parallel. It is a sequence of specialists, each hired to fix what the previous ones still get wrong.
+
+## How it works
+
+1. Choose `n_estimators` (number of trees). Hundreds is common; diminishing returns after a point, little extra overfit from *adding* trees if they are bagged (the forest saturates).
+2. For each tree: bootstrap the rows; grow a tree, often **deep**, with random feature subsets (`max_features` — historically `sqrt(p)` for classification).
+3. Do **not** prune as aggressively as a single tree. Individual trees are allowed to overfit; the average is the regularizer.
+4. Predict by vote / mean.
+
+**Out-of-bag (OOB) error:** rows left out of a given bootstrap can score that tree. Average those to get a cheap validation-like number. Still keep a true holdout for the claim you will publish.
+
+**Why the ensemble beats one tree**
+
+- Variance drops because errors are less correlated (row + column randomness).
+- Bias stays similar to a deep tree’s bias (still piecewise constant regions).
+- Result: better generalization on tabular classification and regression than a lone CART tree, with almost no extra conceptual machinery.
+
+## Real-world example
+
+Credit features: income, utilization, inquiries, zip. One tree splits on a zip that happened to repay. In the forest, most trees never see that zip at the crucial split, or that zip’s rows were missing from their bootstrap. The vote follows utilization and history instead.
+
+Ops likes forests because they parallelize (trees are independent) and they are hard to catastrophically overfit by setting `n_estimators` too high. You can still overfit with pathological features (user_id) — bagging does not delete a leak.
+
+## Technical explanation
+
+If you have B i.i.d. predictors each with variance σ² and correlation ρ, the average’s variance is `ρ σ² + (1−ρ) σ² / B`. Bagging and random features drive **ρ** down so the `1/B` term helps. If every tree is a clone, ρ ≈ 1 and the forest is one tree in a trench coat.
+
+Random forests do **not** usually win modern tabular competitions against well-tuned **gradient boosting**. They remain a strong default when you want fewer knobs, native parallelism, and a model that degrades gracefully.
+
+Feature importances are still correlational. **Permutation importance** on a holdout is more honest than impurity importance on train.
+
+<Compare
+  a="One decision tree"
+  b="Random forest"
+  rows={[
+    { label: "Training", a: "One table, all features at every split", b: "Bootstrap rows + random columns" },
+    { label: "Variance", a: "High — different sample, different story", b: "Lower — vote cancels noise" },
+    { label: "Readable path", a: "Yes, if shallow", b: "No single path; importances only" },
+    { label: "Add more trees", a: "N/A", b: "Usually helps or plateaus, rarely hurts" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Assuming a forest cannot overfit because “it’s an ensemble.” A leak column or target encoding fitted on the full data still sails through 500 trees.
+</CommonMistake>
+
+- Tuning `max_depth=3` on every tree “to prevent overfit” and ending up with 500 underfit stumps. Forests want relatively grown trees; boosting wants shallow ones — do not mix the recipes.
+- Comparing train accuracy of the forest to val accuracy of a linear model. Same split, same metric.
+- Forgetting that votes can still be wrong on a shifted population (new country, new product). Drift is not solved by bagging.
+
+## When to use it
+
+- Tabular data, mixed types, nonlinearities, and you want a strong baseline with modest tuning.
+- You need parallel training and a model that is robust to `n_estimators`.
+- Explainability can be global importances plus a few example trees, not one signed flowchart.
+
+## When NOT to use it
+
+- You must print *the* rule. Use a shallow tree or a linear model.
+- Images and language. Wrong inductive bias.
+- You are chasing the last point of tabular accuracy — try gradient boosting (XGBoost / LightGBM / CatBoost family).
+- Extremely sparse huge-dimension text without a representation; linear models on n-grams can still be the right 2006-and-still-fine tool.
+
+## Alternatives
+
+- **A single pruned tree** for policy text.
+- **Gradient boosting** for typical 2026 tabular leaderboards.
+- **Linear models** with good features when n is small or you need coefficients.
+- Deep learning when the input is perceptual or linguistic.
+
+<MemoryCard>
+**Random forest** = **bagging** + **random features** + a vote. Many overfit trees, one calmer average.
+Parallel, few knobs, great tabular baseline. Boosting is sequential and usually sharper; a single tree is the explanation.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-random-forests" />

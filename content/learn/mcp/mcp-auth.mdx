@@ -1,0 +1,105 @@
+---
+id: mcp-auth
+slug: mcp-auth
+title: MCP Authentication & Authorization
+category: mcp
+level: advanced
+summary: Remote MCP uses OAuth 2.1 with audience-bound tokens; local stdio servers use env credentials — never pass tokens through.
+keywords: [mcp auth, oauth 2.1, pkce, audience, resource indicator, cimd, token passthrough]
+prerequisites: [mcp-architecture]
+next: [building-mcp-server]
+related: [mcp-security, consuming-mcp-server, least-privilege]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "The 2026-07-28 Specification (authorization changes)"
+    url: "https://blog.modelcontextprotocol.io/posts/2026-07-28/"
+    kind: article
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-mcp-auth
+estimatedMinutes: 8
+---
+
+<OneLine>Remote MCP uses OAuth 2.1: the user signs in, a token is minted *for that server*, and the server rejects anything else — local stdio servers skip OAuth and read credentials from the environment.</OneLine>
+
+## Explain like I'm new to AI
+
+Two different situations, two different keys:
+
+- **Local server on your laptop** (stdio): the host started it. Secrets live in **environment variables**. OAuth would be theater.
+- **Remote server on the internet** (HTTP): many users, many hosts. That's **OAuth 2.1**. You sign in, a token is issued **only for that MCP server**, and the server checks it on every call.
+
+<McpAuthFlow />
+
+The sentence to remember: **a token for server A must not work on server B.** That's the audience check.
+
+## Mental model
+
+A hotel key card encoded for **room 412**. The lock on 412 opens; the lock on 415 does not, even though both cards came from the same front desk. OAuth **audience** (`aud` / resource indicator) is that room number. **Token passthrough** is lending your 412 card to a courier who then tries every door.
+
+## How it works
+
+For **Streamable HTTP**:
+
+1. The host starts an OAuth 2.1 authorization code flow with **PKCE**.
+2. The client sends the MCP server's URI as the **resource** (RFC 8707) so the token is bound to *that* server.
+3. The server validates issuer, audience, expiry — and **does not** forward that token to GitHub/Stripe/your DB. It uses a **separate** upstream credential.
+4. Client identity is moving from **Dynamic Client Registration (DCR)** to **Client ID Metadata Documents (CIMD)**. DCR still works for now; new work should use CIMD. Clients must validate the `iss` parameter (RFC 9207) before redeeming a code.
+
+**Enterprise Managed Authorization (EMA)** is an official extension for companies that want a gateway to broker identity, not every server talking to every identity provider.
+
+## Real-world example
+
+You connect Sentry's remote MCP from Cursor. A browser opens, you sign in to Sentry, Cursor stores a token whose audience is Sentry's MCP. That token is useless against your internal finance MCP even if both use the same company identity provider — each server checks `aud`.
+
+## Technical explanation
+
+MCP servers on HTTP are **OAuth 2.0 resource servers**. Important rules from the spec and security best practices:
+
+- **Reject tokens not issued for you.** Audience mismatch = 401, not "close enough."
+- **No token passthrough.** Upstream APIs get a token minted for *them*, issued to the MCP server as client.
+- **PKCE** is mandatory; redirect URIs match **exactly**.
+- Credentials are **bound to the issuer** that minted them — no reuse across authorization servers.
+- `application_type` exists so desktop/CLI apps with `localhost` redirects aren't rejected.
+- Request **all scopes an operation needs** in one challenge (don't drip-feed).
+- **stdio transports SHOULD NOT use OAuth**; env vars are the right pattern.
+
+Authorization is where implementers spend the most time. Get audience and passthrough right before adding fancy scopes.
+
+## Common mistakes
+
+<CommonMistake>
+Forwarding the client's bearer token to an upstream API. The spec forbids it. It breaks audience
+checks, muddies audit logs, and turns your server into a proxy for stolen tokens.
+</CommonMistake>
+
+- Accepting any JWT from "our company IdP" without checking `aud`.
+- Putting OAuth on a local stdio server, or an API key in a remote URL query string.
+
+## When to use it
+
+- **OAuth** for every remote multi-user server. **Env credentials** for local stdio. **EMA / a gateway** when an enterprise needs one policy plane.
+
+## When NOT to use it
+
+- Don't skip auth on a public HTTP MCP "because it's only listing docs" — listings still leak, and tools get added later.
+
+## Alternatives
+
+- Mutual TLS or network isolation *in addition to* OAuth, not instead of audience-bound tokens for internet-facing servers.
+
+<MemoryCard>
+Remote MCP = **OAuth 2.1 + PKCE + audience-bound tokens**. Local stdio = **env credentials**. Never
+**pass tokens through**. A token minted for server A must fail on server B. CIMD replaces DCR.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-mcp-auth" />

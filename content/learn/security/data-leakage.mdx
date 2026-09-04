@@ -1,0 +1,92 @@
+---
+id: data-leakage
+slug: data-leakage
+title: Data Leakage and Sensitive Disclosure
+category: security
+level: intermediate
+summary: Secrets leak through logs, chatty system prompts, retrieval that skipped ACLs, and training or memory — not only through a user who "asked nicely."
+keywords: [data leakage, sensitive disclosure, system prompt leakage, pii, llm02]
+prerequisites: [prompt-injection]
+next: [tool-abuse]
+related: [what-is-observability, memory-conflicts]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-data-leakage
+estimatedMinutes: 8
+---
+
+<OneLine>Sensitive disclosure is OWASP LLM02 (and LLM07 for system prompts): PII and secrets leave through traces, prompts that were never secret, retrieval without ACLs, and data you trained or remembered. Assume the window can be quoted.</OneLine>
+
+## Explain like I'm new to AI
+
+The cinematic leak is a stranger tricking the bot. The boring leak is **you** putting the customer transcript in an unredacted log, stuffing an API key in the system prompt, or retrieving tenant B's chunk for tenant A.
+
+<DataLeakagePaths />
+
+OWASP 2025 added **system prompt leakage** as its own item because teams treated the prompt as a vault. It isn't. If a rule must hold, enforce it in **code**. If a string must stay secret, **don't put it in the window**.
+
+## Mental model
+
+A glass meeting room. Everything you say in the room can be repeated. Don't hold the combination in that room; hold it in a safe the intern cannot open.
+
+## How it works
+
+- **Minimize** what enters context (context engineering). Less PII in the window = less to leak.
+- **ACL retrieve** with the caller's identity. Metadata filters are security, not UX.
+- **Redact traces** (observability category). Debug access is a privilege.
+- **No secrets in prompts.** Vault + runtime env. Rotate if a prompt ever had a key.
+- **Don't train / remember secrets.** Fine-tune and memory lessons: sticky data.
+- Output filtering for known PII patterns is a backstop, not a substitute for not loading PII.
+
+Cross-user bugs are often **missing tenant id on the query**, not a genius attack.
+
+## Real-world example
+
+An agent "helpfully" pastes another customer's invoice because hybrid search returned it. The chat UI looks fine. The retrieve span shows the foreign id. Fix the filter; don't add "never reveal other customers" to the prompt as the control.
+
+## Technical explanation
+
+Providers may log prompts on their side — read the data-use policy; enterprise endpoints and zero-retention exist for a reason. Your subprocessors inherit this risk.
+
+Prompt caching stores prefixes: don't put per-user secrets in a shared cached prefix.
+
+Exfiltration via the model (encode a secret into a URL the UI fetches) is **indirect + insecure output**. Block it with no-untrusted-outbound and encoded UI, not with a promise in the prompt.
+
+## Common mistakes
+
+<CommonMistake>
+Putting the production API key in the system prompt "so the model can call the API." The model should never hold the key.
+</CommonMistake>
+
+- Using one vector index for all tenants without filters.
+- Pasting a prod trace into a public chatbot to "debug."
+
+## When to use it
+
+- Always: data map of what can enter the window, logs, and indexes.
+
+## When NOT to use it
+
+- Don't skip tenant ACLs because "it's an internal bot." Internal is how most leaks start.
+
+## Alternatives
+
+- Keep secrets and PII out of the LLM path entirely: the model drafts; code fills ids from a server-side session.
+
+<MemoryCard>
+**Don't put secrets in the prompt.** ACL retrieval. Redact traces. System prompts leak.
+Minimize PII in context. Training and memory are sticky — don't feed them keys.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-data-leakage" />

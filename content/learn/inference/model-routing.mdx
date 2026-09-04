@@ -1,0 +1,96 @@
+---
+id: model-routing
+slug: model-routing
+title: Model Routing and Fallbacks
+category: inference
+level: intermediate
+summary: Send easy turns to a cheap model, hard turns to a strong one, and failures to a fallback — route with eval slices, not hallway demos, and don't hedge every call.
+keywords: [model routing, cascade, fallback, model router]
+prerequisites: [what-is-inference, what-is-llm]
+next: [inference-caching]
+related: [quality-latency-cost, latency-vs-throughput]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-model-routing
+estimatedMinutes: 8
+---
+
+<OneLine>Routing picks *which* model (or size, or reasoning profile) handles this turn. Fallbacks pick what happens when that call dies. The default "always the smartest model" is how you miss SLOs and invoices.</OneLine>
+
+## Explain like I'm new to AI
+
+<ModelRouting />
+
+Patterns that work in 2026:
+
+- **Cascade:** try small/fast; escalate if the small model is unsure, needs tools, or fails a cheap validator (JSON schema).
+- **Task route:** FAQ vs coding vs long reasoning — known up front from the product surface, not from a mystical classifier you never eval.
+- **Fallback:** timeout, 429, empty, provider incident → retry with jitter, then another model, then a degraded honest message.
+- **Shadow:** new model scores on live traffic without user visibility (eval + observability).
+
+Hedging (send two models, take the first) is a **latency** trick that **doubles** cost. Use for a tiny VIP slice, not default.
+
+## Mental model
+
+A hospital triage nurse: band-aids don't go to surgery; chest pain doesn't wait for the intern. The nurse is policy + a few measurements, not "whoever looks smartest."
+
+## How it works
+
+1. Write **slices** on the gold set (easy/hard/tools). A router that wins overall but fails the hard slice is a fail.
+2. Features for a learned router: length, tool-need heuristics, retrieval confidence — keep it simple until data exists.
+3. Timeouts shorter than the user's patience; fallback must still be **safe** (no extra tools).
+4. Tag `model_id` on every span (observability). You cannot debug mix without it.
+5. Prompt versions per model — a v13 prompt on the 8B is not v13 on the 70B.
+
+Provider model names churn. Route to **roles** (`faq_fast`, `reasoner`) bound to ids in config, not to a hardcoded trophy string in the app.
+
+## Real-world example
+
+100% frontier model. Cost 8×. Quality +2 on FAQs that a small model already nailed. You route FAQs down, keep the large model for conflicts, eval both slices. Quality holds; invoice drops.
+
+## Technical explanation
+
+Uncertainty: if the small model can emit a calibrated "I don't know" or fail schema, escalate. Don't escalate because the prose was short.
+
+Fallbacks must not **widen agency** (security). A backup that suddenly has `refund` when the primary didn't is an incident.
+
+Canary: 5% to the new role, kill switch, gold-set gate.
+
+## Common mistakes
+
+<CommonMistake>
+Always-on dual-model hedge because p50 looked nicer in a demo week.
+</CommonMistake>
+
+- Routing on vibes from five chats.
+- Fallback that retries infinitely (unbounded consumption).
+
+## When to use it
+
+- More than one model in the product, or one model that is too slow/expensive for the easy majority.
+
+## When NOT to use it
+
+- Don't add a router before you have an eval slice. Don't route every token through a giant "router model" that costs more than the small path.
+
+## Alternatives
+
+- One mid-size model for everything (simpler ops). Distill. Cache (next).
+
+<MemoryCard>
+**Cheap when you can, strong when you must, fallback when it dies.** Eval slices, not demos.
+Tag `model_id`. Hedge is a VIP tax. Fallback must not gain extra tools.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-model-routing" />

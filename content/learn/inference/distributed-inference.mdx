@@ -1,0 +1,99 @@
+---
+id: distributed-inference
+slug: distributed-inference
+title: GPU Memory and Distributed Inference
+category: inference
+level: advanced
+summary: When weights plus KV exceed one GPU, you split tensors, pipeline layers, or — in 2026 — disaggregate prefill from decode. The interconnect becomes the bottleneck.
+keywords: [tensor parallel, pipeline parallel, disaggregated serving, moe, gpu memory]
+prerequisites: [what-is-inference, kv-cache-serving]
+next: [how-to-design-ai-system]
+related: [model-serving, serving-quantization]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-distributed-inference
+estimatedMinutes: 8
+---
+
+<OneLine>One GPU holds a limited pile of weights + KV. Distributed inference splits the *model* (tensor / pipeline / experts) or splits the *phases* (prefill GPUs vs decode GPUs). Faster fabric beats wishful sharding.</OneLine>
+
+## Explain like I'm new to AI
+
+<DistributedGpu />
+
+**Fit** is not "parameter count × 2 bytes." It's weights + optimizer (training only) + **activations** + **KV for every live user**. Serving OOMs are usually KV.
+
+If it still doesn't fit:
+
+- **Tensor parallel (TP):** slice big matmuls across GPUs that can talk quickly.
+- **Pipeline parallel (PP):** stacks of layers on different GPUs; watch pipeline bubbles.
+- **Expert parallel:** MoE — different experts on different GPUs; routing must not melt one expert.
+- **Disaggregated serving (2025–2026):** prefill is compute-heavy; decode is KV-heavy. Separate pools, ship KV over the network. Matches the two inference phases.
+
+Replication (many copies of the same replica) is **scale-out for QPS**, not a way to fit a bigger model. You often do both: 4-GPU TP replicas × N.
+
+## Mental model
+
+A too-small kitchen: split the stove burners (TP), put pastry in another room (PP), or have a prep kitchen and a pass (disaggregated prefill/decode). The hallway between rooms is the interconnect. A slow hallway ruins the split.
+
+## How it works
+
+NVLink / intra-node for TP. Cross-node PP and disagg need serious networking. Measure **communication vs compute** or you'll "scale" to slower.
+
+KV-aware placement: decode replicas sized for cache, prefill replicas sized for FLOPs.
+
+Quantization and GQA reduce how soon you must shard. Try those first.
+
+Next category — **AI System Design** — picks these knobs only after requirements, eval, and security. Don't start a design with "we'll TP 8-way" before you know TTFT and token mix.
+
+## Real-world example
+
+70B TP-8 because "that's what the reference repo did." Prefill is fine; decode is communication-bound. A 4-bit 70B on TP-2 plus prefix cache would have been cheaper and faster for *their* traffic.
+
+## Technical explanation
+
+Sequence parallelism and context parallelism appear for very long context. Same theme: split the work that doesn't fit, pay in network.
+
+Don't ignore **CPU offload** and **disk offload** for hobby serving — they're latency poison in production chat.
+
+Failure domains: if one GPU in a TP group dies, the whole replica is dead. Health checks at replica grain.
+
+## Common mistakes
+
+<CommonMistake>
+Sharding because the model card is 70B, without measuring KV and interconnect.
+</CommonMistake>
+
+- Mixing tenants' KV on a disagg pool without isolation.
+- One giant PP with empty bubbles and no microbatching.
+
+## When to use it
+
+- Weights+KV don't fit; or you must separate prefill/decode mixes; or MoE experts don't fit one device.
+
+## When NOT to use it
+
+- Don't distribute a 7B on eight GPUs "for fun." Overhead will own you.
+- Don't skip quant/paging/prefix before you buy a cluster.
+
+## Alternatives
+
+- Smaller model, more aggressive quant, shorter context, provider API, more *replicas* of a model that already fits.
+
+<MemoryCard>
+**Fit = weights + KV.** TP splits matmuls; PP splits layers; 2026 often **disaggregates prefill vs decode**.
+Interconnect is the tax. Replicate for QPS. Try quant and paging before a cluster.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-distributed-inference" />

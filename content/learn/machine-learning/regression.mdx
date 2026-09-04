@@ -1,0 +1,166 @@
+---
+id: regression
+slug: regression
+title: What is Regression?
+category: machine-learning
+level: beginner
+summary: Regression predicts a number from features — a line, a curve, or a tree — scored by how far predictions miss, usually with MSE.
+keywords: [regression, linear regression, mse, continuous target, logistic regression]
+prerequisites: [supervised-unsupervised-rl]
+next: [classification]
+related: [classification, overfitting-vs-underfitting, supervised-unsupervised-rl]
+alternatives: [classification]
+confusedWith: [classification]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-regression
+estimatedMinutes: 13
+---
+
+<OneLine>Regression is supervised learning whose target is a number: price, delay, temperature, score — not a category name.</OneLine>
+
+## Explain like I'm new to AI
+
+You have examples with a **numeric answer** already filled in. Hours studied → exam points. Square feet → sale price. Tokens in a prompt → milliseconds of latency.
+
+**Regression** learns a function from those features to a **continuous** (or at least numeric) output. After training, you pass a *new* row and get a number back.
+
+That is different from **classification**, which answers “which bucket?” (spam / ham). The names collide in one famous place: **logistic regression** predicts a probability and is used as a *classifier*. The word “regression” in that name is historical. If you threshold 0.5 to say spam, you are classifying.
+
+<RegressionIdea />
+
+## Mental model
+
+A scatter plot: x-axis is the feature, y-axis is the number you care about. Regression draws a **curve** (often a straight line first) that comes close to the dots, then reads the curve at a new x.
+
+The vertical gap from a dot to the curve is a **residual**. Training tries to make residuals small *in a chosen sense* — usually squared error.
+
+## How it works — linear regression by hand
+
+Three points: hours `x` and score `y`.
+
+| x (hours) | y (score) |
+| --- | --- |
+| 1 | 2 |
+| 2 | 3 |
+| 3 | 5 |
+
+We fit `ŷ = b₀ + b₁ x`.
+
+1. Means: `x̄ = 2`, `ȳ = 10/3 ≈ 3.333`.
+2. Slope:
+
+   `b₁ = Σ(x − x̄)(y − ȳ) / Σ(x − x̄)²`
+
+   Numerator: `(1−2)(2−10/3) + 0 + (3−2)(5−10/3) = 3`
+
+   Denominator: `1 + 0 + 1 = 2`
+
+   So `b₁ = 1.5`.
+3. Intercept: `b₀ = ȳ − b₁ x̄ = 10/3 − 3 = 1/3`.
+4. Predictions: `ŷ(1) = 1.833`, `ŷ(2) = 3.333`, `ŷ(3) = 4.833`.
+5. Residuals: `+0.167`, `−0.333`, `+0.167`.
+6. **MSE** (mean squared error) = mean of residual² ≈ **0.056**.
+
+MSE is the usual training loss for a first linear model. Square so large misses dominate, and so the calculus is smooth. **MAE** (mean absolute error) is easier to explain in dollars; **RMSE** is √MSE so the unit matches `y`.
+
+A new student who studied 4 hours gets `ŷ = 1/3 + 1.5×4 = 6.33`. That is interpolation’s cousin — **extrapolation**. The algebra will happily emit 6.33 even if scores cap at 5.
+
+## Code
+
+Copy this locally (`pip install scikit-learn numpy`):
+
+```python title="regression_mse.py"
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import numpy as np
+
+X = np.array([[1.0], [2.0], [3.0]])
+y = np.array([2.0, 3.0, 5.0])
+
+model = LinearRegression().fit(X, y)
+y_hat = model.predict(X)
+
+print("intercept b0:", model.intercept_)
+print("slope b1:", model.coef_[0])
+print("predictions:", y_hat)
+print("MSE:", mean_squared_error(y, y_hat))
+print("predict 4 hours:", model.predict([[4.0]])[0])
+```
+
+You should see `b0 ≈ 0.333`, `b1 = 1.5`, MSE ≈ 0.0556. No API key. No download.
+
+## Real-world example
+
+A marketplace predicts **delivery minutes** from distance, hour-of-day, and courier load. The label is a number (actual minutes). They start with linear regression as a baseline, then often a boosted tree (later lesson) because the effect of “lunch rush” is not a straight line.
+
+They do **not** use this model to output “on time / late” as the primary target if they already have the minutes — that would throw away information. They *can* threshold the number later for a badge.
+
+## Technical explanation
+
+Ordinary least squares solves `min_b ‖y − Xb‖²`. With one feature, that is the slope/intercept above. With many features, same idea: a hyperplane.
+
+Assumptions people forget:
+
+- **Linearity** (or you add transforms: `log(price)`, polynomials, interactions).
+- **i.i.d. rows** — time series and networks violate this; then the split must change (cross-validation lesson).
+- **Homoscedastic noise** is a textbook wish; in prices, errors grow with `y`. Then log-`y` or a different loss.
+
+Regularization (`Ridge`, `Lasso`) shrinks coefficients so a 200-column table does not memorize. That is the overfitting lesson wearing a linear costume.
+
+**Logistic regression** models `p(y=1 | x) = σ(b₀ + b₁x + …)` with a log-loss. The output is a probability. The *task* is classification. Do not put it on a regression dashboard next to RMSE unless you are scoring the probabilities with a proper rule (log-loss, Brier).
+
+<Compare
+  a="Regression"
+  b="Classification"
+  rows={[
+    { label: "Target y", a: "A number (price, minutes)", b: "A class name (spam, ham)" },
+    { label: "Typical loss", a: "MSE, MAE, Huber", b: "Log-loss, hinge; then F1 / AUC" },
+    { label: "Success looks like", a: "Predictions close to y", b: "The right bucket, at the right threshold" },
+    { label: "Famous name trap", a: "Linear regression is this", b: "Logistic “regression” is that" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Reporting training MSE as if the model works. A cubic polynomial can get MSE ≈ 0 on three points and be nonsense at x = 4. Always hold out data — overfitting vs underfitting is the next skill after this family of lessons.
+</CommonMistake>
+
+- Treating ordinal ratings (1–5 stars) as interval numbers without checking whether “2 vs 3” equals “4 vs 5.”
+- Optimizing MSE when the business cares about *under*-prediction (late deliveries). Then a pinball / quantile loss matches the cost.
+- Calling every `sklearn` estimator that has `predict` a regressor. `predict` on a classifier returns a class.
+
+## When to use it
+
+- The thing you will act on is a **quantity**: bid, forecast, remaining useful life, expected tokens, expected cost.
+- You want a simple, auditable baseline before trees or nets.
+- You need to explain “+1 bedroom is +$12k, holding the rest fixed” — linear models still earn their keep.
+
+## When NOT to use it
+
+- The target is a label. Use classification (and classification metrics), not RMSE on `0/1` as your only story — though a probability model may still sit underneath.
+- The input is raw images or language. A linear model on pixels is a 1990s homework; use deep learning.
+- You have three rows and twelve features. You can interpolate; you cannot *learn*. Get data or use a rule.
+
+## Alternatives
+
+- **Classification** if the decision is a bucket.
+- **Quantile regression** if you need a P90 delay, not the mean.
+- **Tree ensembles** (random forests, gradient boosting) when relationships are jagged and tabular.
+- A human formula when the physics is known (`distance / speed`).
+
+<MemoryCard>
+**Regression** predicts a **number**. Fit by shrinking residuals (usually **MSE**). Linear regression is the first tool; logistic regression is classification with a probability. Hold out data or the line is a selfie.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-regression" />

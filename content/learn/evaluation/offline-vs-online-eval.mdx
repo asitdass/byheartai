@@ -1,0 +1,98 @@
+---
+id: offline-vs-online-eval
+slug: offline-vs-online-eval
+title: Offline vs Online Evaluation
+category: evaluation
+level: intermediate
+summary: Offline eval is a frozen test set in CI; online eval is live users. Ship with offline gates, confirm in production — real queries always drift.
+keywords: [offline evaluation, online evaluation, ab test, shadow eval, ci eval]
+prerequisites: [why-evaluation-matters]
+next: [human-evaluation]
+related: [benchmarks-regression, quality-latency-cost, llm-as-a-judge, what-is-observability, prompt-versioning]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-offline-vs-online-eval
+estimatedMinutes: 8
+---
+
+<OneLine>Offline evaluation grades a frozen set in the lab (CI, PRs). Online evaluation watches live users. You need both: offline so you don't ship a regression, online because the real questions are never exactly your gold set.</OneLine>
+
+## Explain like I'm new to AI
+
+**Offline** is a dress rehearsal: the same 120 tickets every time, scored by code, a rubric, or a judge. Fast, cheap, nobody is hurt.
+
+**Online** is opening night: thumbs, "did the ticket close?", p95 latency, cost per session, A/B tests. Honest about the real mix of questions — and slow, noisy, and able to hurt people.
+
+<OfflineVsOnline />
+
+2026 default: **evals as code**. A prompt change is a PR. CI runs the gold set. If faithfulness drops, the PR fails. Then you **shadow** the new prompt on a slice of traffic (score it, don't show it) and only then A/B.
+
+## Mental model
+
+Crash tests vs real roads. You do not skip the crash test because "we'll see how customers drive." You also do not ship a car that only survived the lab if the lab never included rain.
+
+## How it works
+
+**Offline**
+
+- Gold questions, gold answers and/or gold retrieved chunks, plus unit checks (JSON schema, tool name, citation id exists).
+- Run on every change. Store traces (inputs, outputs, scores) so you can debug a drop.
+- Refresh the set when production queries shift — quarterly is common; after a new product line, immediately.
+
+**Online**
+
+- Task success (refund issued correctly), CSAT/thumbs, human review samples, latency, cost, error rate.
+- A/B only after offline pass. High variance: you need more traffic than a button color test.
+- **Shadow / canary:** new system scores in parallel; users still see the old one until the delta is boring.
+
+## Real-world example
+
+Offline: new chunker lifts context recall +11 on the gold set. Online: a new mobile FAQ nobody labeled appears; recall looks fine in CI and users still get empty answers. You add those FAQs to the gold set. That loop is the job.
+
+## Technical explanation
+
+Offline **overfits** if you tune prompts against the same 80 items for months (Goodhart: the measure becomes the target). Online **confounds** season, UI, and model-provider drift.
+
+Replay production traces **offline** (strip PII): yesterday's real queries become tomorrow's lab. That is the bridge — not a bigger public benchmark.
+
+Do not A/B a prompt you never gated. Do not trust a 99% gold-set score if you never sample live thumbs.
+
+## Common mistakes
+
+<CommonMistake>
+Only online thumbs. You will learn slowly, hurt users, and never know which component failed.
+</CommonMistake>
+
+- Only offline: a beautiful lab score on last quarter's tickets.
+- Calling a 200-chat A/B "statistically significant" on a noisy LLM.
+
+## When to use it
+
+- Offline: every PR that can change answers.
+- Online: after the gate, continuously, with a kill switch.
+
+## When NOT to use it
+
+- Don't skip offline "because we'll A/B." Don't skip online "because CI is green."
+
+## Alternatives
+
+- Shadow eval is the compromise when A/B is expensive. Human spot-checks of live traces when you cannot instrument task success yet.
+
+<MemoryCard>
+**Offline** = frozen set in CI (don't ship regressions). **Online** = live users (the real mix).
+Shadow before A/B. Replay production traces into the lab. Either one alone lies.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-offline-vs-online-eval" />

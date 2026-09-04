@@ -1,0 +1,91 @@
+---
+id: tool-abuse
+slug: tool-abuse
+title: Tool Abuse and Excessive Agency
+category: security
+level: advanced
+summary: If the model can call a powerful tool, injection can try to. Shrink the kit, validate args, and require humans for irreversible actions.
+keywords: [excessive agency, tool abuse, llm06, agent permissions]
+prerequisites: [prompt-injection, what-is-agent]
+next: [rag-poisoning]
+related: [human-in-the-loop, mcp-security, least-privilege]
+alternatives: []
+confusedWith: [least-privilege]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-tool-abuse
+estimatedMinutes: 8
+---
+
+<OneLine>Excessive agency (OWASP LLM06) is giving the model more power than the job needs. Tool abuse is what happens when that power is aimed badly — by a user, a plant, or a bug. The fix is a smaller kit plus gates, not a stricter paragraph.</OneLine>
+
+## Explain like I'm new to AI
+
+Agents are useful because they **act**. Every action is a loaded permission. If one process can read mail, send mail, refund, and run shell, then **one successful injection** has a buffet.
+
+<ExcessiveAgency />
+
+MCP security is the catalog version of this: poisoned descriptions, over-scope servers. Same moral: the model proposing `delete_account` is not authorization.
+
+## Mental model
+
+A receptionist with the master key vs a receptionist with a button that prints a *request* for the manager. Agency is how many keys hang on the hook.
+
+## How it works
+
+1. Inventory tools. For each: what's the worst case if it fires with attacker-chosen args?
+2. Split **read** routes from **write** routes. Summarize-URL should not include send-mail.
+3. Args: schema, enums, server-side identity (the user id comes from the session, not from the model).
+4. Irreversible: HITL with the **exact args** shown (human-in-the-loop lesson).
+5. Trace every tool span (agent-traces). Polite text can still have called the bomb.
+
+Rate-limit and cap loops so a confused agent doesn't refund 400 times (unbounded consumption).
+
+## Real-world example
+
+"Cancel my order" → model calls delete-user because the tool names were vague. That's abuse without a genius attacker. Good names + schema + confirm would have stopped it. Injection would have used the same hole.
+
+## Technical explanation
+
+Authorization in **your API**, not in the prompt: the token is the user's, scoped. The model never gets a god token "for convenience" (token passthrough in MCP).
+
+Dual-LLM: untrusted reader cannot invoke privileged tools; a policy layer in code maps *intents* to allow-listed functions.
+
+Don't implement "are you sure?" as another model call. That's still the model.
+
+## Common mistakes
+
+<CommonMistake>
+One mega-agent with every plugin enabled so demos look magic.
+</CommonMistake>
+
+- Trusting tool args for `user_id`.
+- No HITL on money, mail, or delete.
+
+## When to use it
+
+- Any tool-using system. Start from the smallest kit that still does the job.
+
+## When NOT to use it
+
+- Don't add shell "just in case." Don't skip HITL because staging data "isn't real."
+
+## Alternatives
+
+- Workflow with explicit steps (no open tool pick). Less flexible, much smaller agency.
+
+<MemoryCard>
+**If the model can do it, injection can try it.** Shrink the kit. Session identity, not model-supplied ids.
+HITL for irreversible. Trace tools. Don't ask the model to approve itself.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-tool-abuse" />

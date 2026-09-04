@@ -1,0 +1,96 @@
+---
+id: model-serving
+slug: model-serving
+title: Model Serving and Inference Servers
+category: inference
+level: intermediate
+summary: An inference server is API plus scheduler plus engine — OpenAI-shaped HTTP is the lingua franca, not the architecture. Scale on queue and KV memory, not CPU.
+keywords: [inference server, vllm, sglang, openai compatible, speculative decoding]
+prerequisites: [what-is-inference]
+next: [latency-vs-throughput]
+related: [batching-continuous-batching, kv-cache-serving]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-model-serving
+estimatedMinutes: 8
+---
+
+<OneLine>Serving is a stack: a stable HTTP API, a scheduler that packs work, and a GPU engine. The brand on the chart is a product; the architecture is those three layers.</OneLine>
+
+## Explain like I'm new to AI
+
+Clients should not speak CUDA. They send a chat request; something returns a stream.
+
+<InferenceServer />
+
+2026 de facto: an **OpenAI-compatible** (or similar) HTTP surface so apps don't rewrite when you swap engines. Engines change (vLLM-class, SGLang-class, TensorRT-LLM-class, llama.cpp-class). Don't teach a vendor as the concept.
+
+Inside: **continuous batching**, **paged KV**, optional **speculative decoding** (tiny draft model proposes tokens; the large model verifies — extra compute, less wall-clock if it agrees).
+
+LoRA multiplex: many adapters on one base, scheduler picks the adapter per request. That's how you serve ten fine-tunes without ten full copies.
+
+## Mental model
+
+A kitchen pass: waiters (API), expediter (scheduler), line cooks (kernels). Renaming the restaurant doesn't change the stations.
+
+## How it works
+
+- Auth, quotas, request ids at the API (security + observability).
+- Autoscaling: **queue depth, KV utilization, TTFT** — not CPU. LLM servers can have low CPU and a 10-second queue.
+- Backpressure: 429 before you OOM.
+- Health: a liveness ping is not a decode test. Synthetic prefill/decode canaries.
+- Multi-LoRA and prompt-version headers so traces stay honest.
+
+Batch APIs (offline JSONL) use the same engine with throughput-oriented scheduling.
+
+## Real-world example
+
+Kubernetes scales on CPU 30%. GPUs are 90% KV-full; TTFT is 6s. You scale on the wrong signal. Fix the HPA metric, then maybe add replicas.
+
+## Technical explanation
+
+Speculative decoding helps **decode-bound** chat; it does little if you're stuck in queue or huge prefill.
+
+Function/tool calls: the server must pause decode, return tool spans, resume with the tool message — still one logical request, many engine steps.
+
+Don't run the engine as root with host GPU unlocked on a laptop "because it's local" (secrets-sandboxing).
+
+## Common mistakes
+
+<CommonMistake>
+Equating "we deployed vLLM" with having SLOs, canaries, and a scheduler policy.
+</CommonMistake>
+
+- One replica holding every LoRA and every tenant.
+- No request id from API through engine traces.
+
+## When to use it
+
+- Any shared model. Even one GPU deserves a real server if more than one app calls it.
+
+## When NOT to use it
+
+- Don't put a research notebook on the public internet and call it serving.
+- Don't copy a cloud API's every undocumented header as if it were a standard.
+
+## Alternatives
+
+- Provider APIs: you still need routing, timeouts, and fallbacks (next lessons) — you just didn't buy the GPU.
+
+<MemoryCard>
+**API + scheduler + engine.** Scale on queue and KV, not CPU. Compatible HTTP ≠ one vendor.
+Speculative decoding speeds decode, not a 5s queue. Multiplex LoRAs; canary real prefill/decode.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-model-serving" />

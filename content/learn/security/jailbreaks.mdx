@@ -1,0 +1,105 @@
+---
+id: jailbreaks
+slug: jailbreaks
+title: Jailbreaks
+category: security
+level: intermediate
+summary: A jailbreak tries to make a model ignore its safety policy. Injection hijacks your app's task and tools. Labs patch jailbreaks; you still must assume injection.
+keywords: [jailbreak, safety policy, refusal, llm jailbreak]
+prerequisites: [prompt-injection]
+next: [data-leakage]
+related: [hallucination-safety-eval, prompt-injection]
+alternatives: []
+confusedWith: [prompt-injection]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-jailbreaks
+estimatedMinutes: 8
+---
+
+<OneLine>A jailbreak is an attempt to make the model drop its safety policy. Prompt injection is an attempt to hijack *your product*. They overlap in the model; they are different jobs for you vs the lab.</OneLine>
+
+## Explain like I'm new to AI
+
+People use the words as synonyms. Split them:
+
+<JailbreakVsInjection />
+
+- **Jailbreak:** "stop refusing harmful or disallowed content." Mostly a **model + eval** problem (red-team sets in the Evaluation category).
+- **Injection:** "do this other *application* job / call this tool / leak this tenant's context." Your architecture problem.
+
+A model that refuses bomb recipes can still email a customer's tickets if you wired `send_mail`. A model that jailbreaks in a playground still should not have production credentials.
+
+This lesson will **not** teach recipes. Publishing working bypasses is how you harm other people's systems. You need the *distinction* and the *controls*.
+
+## Mental model
+
+Picking a lock on a diary vs stealing the office master key because you left it in the lobby. Jailbreak is the diary. Agency is the master key.
+
+## How it works
+
+Labs train refusals and run safety evals. Attackers iterate. Filters and policy models help and **lag**. Your product should:
+
+1. Not depend on refusals as the only control for **actions**.
+2. Measure **over-refusal** too (it said no to a normal refund) — safety eval lesson.
+3. Keep a small, versioned **red-team set** of *your* policy (medical overclaim, PII, disallowed topics) without copying public exploit lists into docs.
+4. Log **refusals and tool denials** as first-class (observability).
+
+OWASP notes jailbreaking as a form of injection aimed at safety protocols. Fine as taxonomy. In engineering, still split **policy** vs **agency**.
+
+## Real-world example
+
+A consumer chatbot is jailbroken into toxic text — provider incident. An enterprise agent is injected into transferring funds — **your** incident, even if the model "sounded polite." Different dashboards, different owners.
+
+## Technical explanation
+
+Do not store secrets in the system prompt hoping jailbreaks won't print them (next lesson). Do not use "the model refused" as evidence a tool was not called — **trace the tool span**.
+
+Unbounded consumption (LLM10) sometimes rides along: a jailbreak-shaped chat that forces huge generations. Cap tokens regardless of policy.
+
+## Common mistakes
+
+<CommonMistake>
+Blocking a list of public jailbreak names and declaring the agent safe for production tools.
+</CommonMistake>
+
+- Equating a passing lab leaderboard with "our refund tool cannot be invoked wrongly."
+
+## When to use it
+
+- Consumer chat, public models: invest in refusal eval.
+- Any tool-using app: invest in injection/agency controls *even if* refusals look great.
+
+## When NOT to use it
+
+- Don't teach or hoard exploit strings in the company wiki "for science" without access control. That's a payload stash.
+
+## Alternatives
+
+- For high-stakes domains, don't put an open chat in front of tools. Forms + code, model as a drafter.
+
+<Compare
+  a="Jailbreak"
+  b="Prompt injection"
+  rows={[
+    { label: "Target", a: "Model safety policy", b: "Your app's task, data, and tools" },
+    { label: "Owner", a: "Mostly the model provider + your safety eval", b: "Your architecture (privileges, HITL, output handling)" },
+    { label: "Looks like", a: "Policy-violating chat", b: "Often a normal user + a hostile document" },
+  ]}
+/>
+
+<MemoryCard>
+**Jailbreak** = drop safety policy. **Injection** = hijack the product. Labs patch the first.
+You still design as if the model can be talked into trying the second. Trace tools, not vibes.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-jailbreaks" />

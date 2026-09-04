@@ -1,0 +1,168 @@
+---
+id: parameters-vs-hyperparameters
+slug: parameters-vs-hyperparameters
+title: Parameters vs Hyperparameters
+category: foundations
+level: beginner
+summary: Parameters are numbers a model learns from data; hyperparameters are knobs you set before training, like learning rate and size.
+keywords: [parameters, weights, hyperparameters, learning rate, batch size, checkpoint]
+prerequisites: [what-is-model]
+next: [datasets-features-labels]
+related: [what-is-model, training-vs-inference, datasets-features-labels, optimization-gradient-descent]
+alternatives: []
+confusedWith: [training-vs-inference]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-parameters-vs-hyperparameters
+estimatedMinutes: 11
+---
+
+<OneLine>Parameters are the numbers inside the model that training writes; hyperparameters are the settings you choose before that training run starts.</OneLine>
+
+## Explain like I'm new to AI
+
+A **model** is mostly a pile of numbers plus a recipe for using them. Those numbers are **parameters** (also called **weights** and **biases**). Training's whole job is to change parameters so predictions get less wrong.
+
+**Hyperparameters** are the *other* numbers: you pick them, the data does not. Learning rate, batch size, number of layers, how many epochs to run, weight decay — none of those are "learned from this spreadsheet" in the ordinary training loop. They live in a config file. Change a hyperparameter and you are running a *different experiment*, not updating the same checkpoint.
+
+If you remember one test: **if `fit()` writes it, it is a parameter. If you typed it before `fit()`, it is a hyperparameter.**
+
+<ParametersVsHyperparams />
+
+## Mental model
+
+Think of baking bread.
+
+- **Parameters** = the dough after kneading. The process *changed the dough*. The saved loaf is the checkpoint.
+- **Hyperparameters** = oven temperature, bake time, how much yeast you used. You chose those. The dough did not invent 220°C.
+
+A bigger oven (larger architecture) is also a hyperparameter choice: you pick the empty recipe; training fills it.
+
+## How it works
+
+1. You choose an **architecture** (layers, width) — that choice *is* a hyperparameter, and it decides *how many* parameters exist.
+2. Parameters start **random** (or from a pretrained checkpoint).
+3. Each training step: predict → compute **loss** → **gradient descent** nudges every parameter a little.
+4. You save the parameters as a **checkpoint**. Inference loads them and **does not** keep writing them.
+5. If the result is bad, you usually do **not** hand-edit millions of weights. You change hyperparameters (or the data) and train again.
+
+A linear model `ŷ = w·x + b` has two parameters: `w` and `b`. The learning rate `η` is not in that formula. It only appears in the *update rule* `w ← w − η · ∂L/∂w`.
+
+## Real-world example
+
+**Spam filter.** Parameters: the weights that say "free money" is suspicious. After training, those weights sit in a file. Hyperparameters: how large the network is, `η = 3e-4`, batch size 32, train for 4 epochs. You never "learn" the learning rate from the inbox in vanilla gradient descent.
+
+**Chat model.** A "7B model" means ~7 billion parameters. That count is a size hyperparameter (which checkpoint family you downloaded). Temperature at *inference* is neither: it is a **decoding** setting. People still loosely call it a hyperparameter of *serving*, which is why the word gets messy. In this lesson, hyperparameter = **training/config choice**, not a sampled token.
+
+**Fine-tuning.** You freeze most parameters and train a small adapter. The adapter weights are new parameters. Rank, which layers to attach to, and learning rate are hyperparameters.
+
+## Technical explanation
+
+Let θ be the parameter vector. Training solves (approximately)
+
+```text
+θ* = argmin_θ  (1/N) Σ_i  L( f(x_i; θ), y_i )  +  regularizer(θ)
+```
+
+Gradient descent does **not** optimize η, batch size, or architecture inside that same loop. Those are outside the argmin. Searching them is a **different** (usually much more expensive) process: grid search, random search, Bayesian optimization, or "copy a recipe from a paper and tweak."
+
+**Parameter count** ≈ memory and compute. Rule of thumb: at 16-bit, 1 billion parameters ≈ 2 GB of weights alone (activations and optimizer states are extra during training). That is why people talk about 1B / 8B / 70B as product choices.
+
+**Not parameters:**
+
+- The **dataset** (but dataset size and mix *are* experiment knobs).
+- **Tokens you pass at inference** (prompt, RAG chunks).
+- **Sampling** (temperature, top-p) — decode-time, like inference hyperparameters.
+
+**Almost parameters:** optimizer **moments** (Adam's m and v) are extra state *during* training. You usually do not ship them. The product artifact is θ.
+
+Worked numbers. Model `ŷ = w x` with one example `x=3`, `y=10`, `w=1`, MSE `L = (ŷ − y)² = (3 − 10)² = 49`. The parameter is `w`. If you set `η = 0.01`, that 0.01 never appears in `L`. It only appears when you update `w`.
+
+```python
+# One parameter w, one hyperparameter eta. Copy-paste this.
+w = 1.0
+eta = 0.01          # you chose this
+x, y = 3.0, 10.0
+
+y_hat = w * x
+loss = (y_hat - y) ** 2
+grad_w = 2 * (y_hat - y) * x   # dL/dw
+w = w - eta * grad_w
+
+print(f"new w={w:.4f}  (loss was {loss:.1f})")
+# new w=1.4200  (loss was 49.0)
+```
+
+sklearn makes the split obvious: `coef_` / `intercept_` are parameters; `C`, `max_depth`, `learning_rate` in the constructor are hyperparameters.
+
+```python
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+
+X, y = load_iris(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=0, stratify=y
+)
+
+# C is a hyperparameter. After fit, clf.coef_ are parameters.
+clf = LogisticRegression(C=1.0, max_iter=200)
+clf.fit(X_train, y_train)
+print(clf.coef_.shape, clf.score(X_test, y_test))
+```
+
+## Common mistakes
+
+<CommonMistake>
+Calling every config a "parameter." If training does not write it from the loss, it is not a
+model parameter. Mixing the words makes papers, dashboards, and job interviews unnecessarily hard.
+</CommonMistake>
+
+- Thinking a bigger parameter count always wins. Extra capacity overfits small, noisy data.
+- Hand-tuning thousands of weights. That is not how neural nets are trained.
+- Treating a prompt as "the model's parameters." Prompts are **context**, not θ. See context engineering later.
+- Forgetting optimizer states when estimating **training** RAM (Adam ≈ 2 extra copies of θ in fp32-ish).
+
+## When to use it
+
+- Any time you load, train, fine-tune, or compress a model: you are touching parameters.
+- Any time you write a training config, sweep, or "why did this run diverge?": you are debugging hyperparameters.
+
+## When NOT to use it
+
+- Do not hunt hyperparameters to fix a **wrong dataset** (leaked labels, train/test mix, shifted production features).
+- Do not add parameters (a bigger model) when a **feature** is missing or the label definition is sloppy.
+- Do not "learn" learning rate from one lucky run and freeze it as if it were a law of nature.
+
+## Alternatives
+
+- **Random search / schedulers** instead of guessing η once.
+- **Pretrained checkpoints** so you inherit parameters instead of training from scratch.
+- **Adapters (LoRA)** so you train few new parameters rather than all of θ.
+
+<Compare
+  a="Parameter"
+  b="Hyperparameter"
+  rows={[
+    { label: "Who writes it", a: "The optimizer, from data + loss", b: "You, before the run" },
+    { label: "Examples", a: "Weights, biases, adapter matrices", b: "η, batch size, depth, epochs, wd" },
+    { label: "Stored in", a: "Checkpoint / model file", b: "Config, CLI, sweep dashboard" },
+    { label: "At inference", a: "Loaded and frozen", b: "Mostly irrelevant (decode has its own knobs)" },
+  ]}
+/>
+
+<MemoryCard>
+**Parameters (θ)** = learned weights inside the model. **Hyperparameters** = your config (learning
+rate, batch, size, epochs). Training updates θ. You change hyperparameters between experiments.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-parameters-vs-hyperparameters" />

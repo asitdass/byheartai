@@ -1,0 +1,95 @@
+---
+id: what-is-fine-tuning
+slug: what-is-fine-tuning
+title: What is Fine-tuning?
+category: fine-tuning
+level: intermediate
+summary: Fine-tuning continues training a finished model on your examples so new behavior — tone, format, skill — lives in the weights.
+keywords: [fine-tuning, sft, continued training, adaptation, weights]
+prerequisites: [what-is-llm, training-vs-inference]
+next: [full-vs-peft]
+related: [rag-vs-fine-tuning, prompt-engineering]
+alternatives: [what-is-rag]
+confusedWith: [what-is-rag]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-what-is-fine-tuning
+estimatedMinutes: 8
+---
+
+<OneLine>Fine-tuning is extra training on a model that already works: you show it your input→output examples so habits like format and tone get baked into the weights — not a way to paste a wiki into the network.</OneLine>
+
+## Explain like I'm new to AI
+
+Pretraining taught the model **language**. **Fine-tuning** is sending that graduate to **your** job: a few hundred to a few thousand examples of "when the user says X, answer like Y."
+
+The weights move a little. Afterward, you don't have to repeat a 2,000-token style guide every call (or it works more reliably when you do).
+
+<FineTuningIdea />
+
+It is **not** how you add next week's prices. Those belong in **RAG**. Fine-tuning for facts goes stale, can't cite, and often makes the model *confidently wrong*.
+
+## Mental model
+
+A chef who already knows how to cook. Fine-tuning is **stage practice** for your restaurant's plating rules. It is not trucking in tonight's fish — that's the market (retrieval).
+
+## How it works
+
+1. Start from a **base** or **instruct** checkpoint (usually instruct).
+2. Collect **high-quality** pairs: prompt + the reply you actually want. Garbage in, garbage personality out.
+3. Train (today: almost always **LoRA/QLoRA**, next lessons) for a small number of epochs.
+4. **Evaluate** on a held-out set *and* on general skills (did you break math?).
+5. Ship the new weights or a small **adapter** file.
+
+Side effects: **catastrophic forgetting** (it gets worse at things you didn't show) if you train too hard on a narrow set. Mix some general data, keep learning rates modest, stop early.
+
+## Real-world example
+
+A claims team needs four fixed headings and no markdown. Prompting hits ~70%. A few hundred gold summaries via QLoRA make the structure reliable. The *policy text* still comes from RAG, because it changes.
+
+## Technical explanation
+
+Fine-tuning is the same next-token loss as pretraining, on a smaller, specialized distribution. **Instruction tuning** is SFT on chat-shaped examples. **Preference** methods (DPO) come after, using chosen/rejected pairs.
+
+Data quality dominates size. 200 clean examples beat 20,000 scraped ones. Don't train on secrets or PII you wouldn't put in a prompt. Version datasets like code.
+
+Always try **prompting** (and RAG for knowledge) first. Fine-tuning is the expensive lever for **behavior**.
+
+## Common mistakes
+
+<CommonMistake>
+Fine-tuning the employee handbook into the weights. Next month Legal rewrites a paragraph and you
+retrain. That's a RAG job.
+</CommonMistake>
+
+- No holdout eval — "it looks good on the training chats."
+- One epoch too many: the model memorizes and forgets general competence.
+
+## When to use it
+
+- Stable **format, tone, tool-calling style, domain dialect** that prompting cannot lock.
+
+## When NOT to use it
+
+- Changing facts; tiny tasks few-shot already solves; you have no eval set.
+
+## Alternatives
+
+- Prompting, **RAG**, long context, a smaller specialized model API.
+
+<MemoryCard>
+**Fine-tuning** = continue training so **behavior** lives in weights. Use it for tone/format/skill.
+Use **RAG** for facts. Quality examples + eval beat huge dirty dumps. Don't forget what the base
+model was good at.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-fine-tuning" />

@@ -1,0 +1,103 @@
+---
+id: multimodal-rag
+slug: multimodal-rag
+title: Multimodal Embeddings & RAG
+category: multimodal-ai
+level: advanced
+summary: Multimodal RAG retrieves images, frames, OCR, and audio — keep native media when pixels or sound are the answer.
+keywords: [multimodal rag, clip, multimodal embeddings, visual retrieval]
+prerequisites: [what-is-rag, what-are-embeddings, vision-language-models]
+next: [multimodal-agents]
+related: [audio-video-understanding, hybrid-search, indirect-prompt-injection]
+alternatives: []
+confusedWith: [what-is-rag]
+frameworks: []
+products: []
+papers:
+  - title: "Learning Transferable Visual Models From Natural Language Supervision (CLIP) — Radford et al., 2021"
+    url: "https://arxiv.org/abs/2103.00020"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-multimodal-rag
+estimatedMinutes: 8
+---
+
+<OneLine>Multimodal RAG is retrieval that can return a picture, a video second, or a sound — because embeddings (or parallel indexes) let a text question search non-text evidence.</OneLine>
+
+## Explain like I'm new to AI
+
+Text RAG searches **paragraphs**. Real companies also have **screenshots, decks, camera footage, call recordings**. Multimodal RAG means: the right *object* comes back, not only a transcript of it.
+
+**CLIP-style embeddings** put images and captions in one vector space: the phrase "red bike by a river" is close to photos of that scene. You can also keep **separate indexes** (OCR text, ASR text, audio events) and fuse them — often more accurate for numbers and speech.
+
+<MultimodalRag />
+
+## Mental model
+
+A museum search desk. "Impressionist boats" should fetch **paintings**, not only a wall label. Sometimes you want the label (OCR). Sometimes you want the canvas (pixels). A good system knows which.
+
+## How it works
+
+**Shared space:** one embedding model for text and images (CLIP and descendants; some models add audio). Query in language, retrieve media.
+
+**Parallel indexes (usually better in production):**
+
+| Bank | Built from | Query |
+| --- | --- | --- |
+| Text / OCR | PDFs, slide text | keywords + dense |
+| Frames | sampled video stills | CLIP-like |
+| Speech | STT chunks + times | text RAG |
+| Audio events | beeps, music | audio embeddings |
+
+Then **rerank**, pack **small** evidence into a VLM/omni model (context budget!). Don't retrieve 40 full-res photos.
+
+**Don't transcribe-only:** a fire alarm may never become a word. **Don't pixel-only:** "$120" on a slide wants OCR.
+
+## Real-world example
+
+"When did we show the Q3 chart?" → OCR/text index hits the slide title; you still attach the **image** so the VLM can read the bars. Two banks, one answer.
+
+## Technical explanation
+
+Ingest is the job: chunking video (time), images (whole vs tiles), audio (windows). Store **pointers** to blob storage, not giant vectors of raw files.
+
+Late fusion (retrieve each modality, then merge) is easier to debug than one magical omni vector. Native omni embeddings are improving; eval on *your* queries.
+
+Same RAG hygiene: rerank, citations (include timestamp / bbox), evaluation (did we fetch the right *frame*?), and **injection** (malicious text drawn into an image).
+
+## Common mistakes
+
+<CommonMistake>
+Transcribing every video and throwing the media away. You can search words and still be unable to
+show what the camera saw.
+</CommonMistake>
+
+- Stuffing retrieved 4K frames into the window (selection still applies).
+- One CLIP index for invoices (use OCR).
+
+## When to use it
+
+- Mixed corpora: product photos + manuals, lectures, design files, support screenshots.
+
+## When NOT to use it
+
+- Pure documentation sites — text RAG is enough.
+
+## Alternatives
+
+- Caption everything at ingest (lossy); human tagging; VLM over a folder without retrieval (doesn't scale).
+
+<MemoryCard>
+Multimodal RAG = retrieve the right **media**. Shared CLIP-like space for "looks like." Parallel
+**OCR / STT / frames / audio** indexes for truth. Pack a few snippets into a VLM — don't dump the
+archive.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-multimodal-rag" />

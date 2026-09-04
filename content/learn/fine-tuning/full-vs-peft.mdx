@@ -1,0 +1,91 @@
+---
+id: full-vs-peft
+slug: full-vs-peft
+title: Full Fine-tuning vs PEFT
+category: fine-tuning
+level: advanced
+summary: Full fine-tuning updates every weight; PEFT freezes the base and trains a small adapter you can swap, merge, or stack.
+keywords: [peft, parameter efficient fine tuning, adapter, full fine-tune]
+prerequisites: [what-is-fine-tuning]
+next: [lora-qlora]
+related: [lora-qlora, quantization]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-full-vs-peft
+estimatedMinutes: 7
+---
+
+<OneLine>Full fine-tuning lets every parameter move. PEFT (parameter-efficient fine-tuning) freezes the pretrained model and trains a tiny adapter — cheaper, safer, and how almost everyone fine-tunes in 2026.</OneLine>
+
+## Explain like I'm new to AI
+
+A 7B–70B model has billions of knobs. Turning **all** of them (full fine-tune) needs a cluster, a full copy of the weights to store, and a high risk of wrecking general skill.
+
+**PEFT** says: leave the original knobs alone. Glue on a small set of new knobs (an **adapter**). Train those. Ship `base + 50–300MB adapter` instead of another 14–140GB clone.
+
+<FullVsPeft />
+
+LoRA is the PEFT method you will actually meet. Prefix-tuning and older adapter blocks exist; LoRA won the ecosystem (vLLM, Ollama, TGI all load adapters).
+
+## Mental model
+
+Renovating a house. Full FT is knocking down every wall. PEFT is adding a well-fitted **extension**. Same foundation; you can unscrew the extension and put a different one on for another product.
+
+## How it works
+
+- **Full FT:** optimizer states for all params (Adam ≈ 8–16 bytes extra per parameter). Multi-GPU. Used by labs, or tiny models.
+- **PEFT:** freeze `W`. Train adapter θ. At inference, `y = f(W, θ, x)`. Merge LoRA into W for a single file if you don't need to swap, or keep adapters separate for many tenants.
+
+**Multi-adapter:** one base, many LoRAs (legal tone vs casual). Load per request. Don't train one mega-adapter for unrelated jobs.
+
+## Real-world example
+
+A company has a 8B open model. Support, coding, and HR each get a LoRA. One GPU image. Swap adapter by product. Full FT would be three full models and three times the drama.
+
+## Technical explanation
+
+PEFT reduces **trainable** parameters by orders of magnitude, which cuts VRAM (gradients + optimizer) more than it cuts frozen weight storage. QLoRA then shrinks the *frozen* storage too.
+
+Trade-off: if you truly need to rewrite the model (new language, extreme domain), full FT or continued pretraining of more layers can beat a rank-8 LoRA. For product SFT/DPO, PEFT is the default until eval says otherwise.
+
+Merging is lossy in the sense you can't unmerge as cleanly if you quantize after — plan the serving stack.
+
+## Common mistakes
+
+<CommonMistake>
+Full-fine-tuning a 70B on a weekend because "more weights = better." You overfit, forget, and pay
+the cluster. Try LoRA first.
+</CommonMistake>
+
+- One adapter for ten unrelated tasks.
+- Forgetting to freeze eval of the base behavior.
+
+## When to use it
+
+- **PEFT** for almost all product fine-tunes. **Full FT** when you have lab-scale data/compute and PEFT saturates.
+
+## When NOT to use it
+
+- Don't full-FT to add a FAQ. Don't PEFT as a substitute for RAG.
+
+## Alternatives
+
+- Prompting; distillation into a smaller model; vendor fine-tune APIs (still PEFT under the hood).
+
+<MemoryCard>
+**Full FT** = all weights move, expensive. **PEFT** = frozen base + small adapter. LoRA adapters are
+tiny, swappable, and the 2026 default. Full FT is the exception, not the starting point.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-full-vs-peft" />

@@ -1,0 +1,93 @@
+---
+id: indirect-prompt-injection
+slug: indirect-prompt-injection
+title: Indirect Prompt Injection
+category: security
+level: intermediate
+summary: Indirect injection hides instructions in pages, files, mail, or images the app retrieves. The user typed a normal question — treat retrieved content as hostile.
+keywords: [indirect prompt injection, rag injection, multimodal injection]
+prerequisites: [prompt-injection]
+next: [jailbreaks]
+related: [rag-poisoning, multimodal-rag]
+alternatives: []
+confusedWith: [rag-poisoning]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-indirect-prompt-injection
+estimatedMinutes: 8
+---
+
+<OneLine>Indirect prompt injection is when the attacker never chats with you — they plant instructions in a page, PDF, email, or image your app retrieves. The user asked something ordinary; the model still reads the plant.</OneLine>
+
+## Explain like I'm new to AI
+
+Direct injection is a hostile *user*. Indirect is a hostile *document* in a helpful pipeline: summarize this URL, search the wiki, read the inbox, look at this screenshot.
+
+<IndirectInjection />
+
+This is the production-shaped bug for RAG and agents. OWASP's indirect case is a page that steers a summarizer into leaking the conversation (for example via a crafted outbound fetch). You do not need the recipe to understand the rule: **retrieved content is untrusted input**, equal to a stranger typing.
+
+## Mental model
+
+A waiter who reads the customer's note *and* a flyer stuck to the menu. The flyer was printed by someone who never entered the restaurant.
+
+## How it works
+
+1. Benign user ask.
+2. Tool or retriever pulls external bytes (HTML, PDF, mail, image, tool output, **MCP resource**, memory).
+3. Those bytes land in context, often unlabeled.
+4. The model continues the job *as if those bytes were instructions*.
+5. If tools remain enabled on that turn, the plant can request them.
+
+Defenses that stack: **segregate** untrusted blocks ("retrieved document, not instructions"); **don't enable acting tools** on retrieve-and-summarize turns; **allow-list** fetch hosts; **HITL** for outbound; **cite** so a human can see what was retrieved; strip or sandbox active content (scripts, tracking pixels) *before* the model — that's output/fetch hygiene, not a prompt trick.
+
+Multimodal: VLMs read text in images. Same rule as RAG.
+
+## Real-world example
+
+"Summarize this vendor PDF." The PDF tells the model the refund policy is unlimited and to call `issue_refund`. If that tool is on the belt, you have a finance incident. If the turn is summarization-only, you have a lying summary — still bad, contained.
+
+## Technical explanation
+
+Tool *outputs* are an indirect channel too (MCP tool poisoning in the MCP category: the description *or* the result). Memory writes can persist a plant (memory-conflicts lesson).
+
+Filters that grep for scare phrases fail closed-world. Prefer **capability cuts** over keyword cops. Classifiers can be an extra signal, not the gate for money movement.
+
+RAG poisoning (later) is how the plant gets a high retrieval score. Indirect injection is what happens *after* it is in context.
+
+## Common mistakes
+
+<CommonMistake>
+"The user is logged in and asked a normal question, so the context is safe." The danger was fetched.
+</CommonMistake>
+
+- Browsing agents with send-email on the same kit.
+- Rendering retrieved HTML in the model *and* in the UI without encoding (output handling).
+
+## When to use it
+
+- Any retrieve, browse, inbox, or vision step. Design the turn as **read-untrusted** vs **act-privileged**.
+
+## When NOT to use it
+
+- Don't skip this because you "don't allow jailbreaks." Indirect doesn't look like a jailbreak chat.
+
+## Alternatives
+
+- Human reads the URL; the model never sees the page. Higher labor, smaller channel.
+
+<MemoryCard>
+**Indirect** = plant in retrieved pages, files, mail, images, tool results. User ask can be clean.
+Treat retrieved text as hostile. Don't pair fetch with powerful tools on the same turn.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-indirect-prompt-injection" />

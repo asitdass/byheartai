@@ -1,0 +1,92 @@
+---
+id: batching-continuous-batching
+slug: batching-continuous-batching
+title: Batching and Continuous Batching
+category: inference
+level: advanced
+summary: Static batches wait for the slowest request. Continuous batching fills GPU slots at every token step; chunked prefill keeps long prompts from stalling streams.
+keywords: [continuous batching, in-flight batching, chunked prefill, scheduler]
+prerequisites: [what-is-inference]
+next: [kv-cache-serving]
+related: [latency-vs-throughput, model-serving]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-batching-continuous-batching
+estimatedMinutes: 8
+---
+
+<OneLine>Static batching groups requests that start together and holds the GPU until the longest one finishes. Continuous (iteration-level) batching lets new chats join between tokens so the GPU stays packed.</OneLine>
+
+## Explain like I'm new to AI
+
+GPUs like **fat parallel work**. One short "yes" and one 800-token essay should not lock a table together until dessert.
+
+<ContinuousBatching />
+
+**Static batch:** pad everyone to the same length, run, wait. Simple. Brutal for mixed chat.
+
+**Continuous / in-flight batching:** each decode step, finished sequences drop out and waiting ones enter. This is the 2024–2026 default in serious engines.
+
+**Chunked prefill:** a 50k-token prompt would otherwise monopolize the chip. The scheduler interleaves *pieces* of prefill with decode so live streams don't freeze.
+
+## Mental model
+
+An elevator that only moves when it's full and everyone is going to the top floor (static) vs one that lets people off at every floor and others on (continuous).
+
+## How it works
+
+The scheduler tracks per-request KV pages, remaining tokens, and priorities. Preemption: a huge prefill can be paused so interactive decode meets SLO.
+
+Fairness: without it, one agent loop starves humans. Caps (security unbounded-consumption) and scheduler quotas meet here.
+
+Padding waste dies down because you don't reserve max-length for everyone up front — that needs **paged KV** (next lesson).
+
+## Real-world example
+
+p95 TTFT explodes at lunch. GPU util is 40% because static batches wait for stragglers. Continuous batching lifts tokens/s and cuts queue — same hardware.
+
+## Technical explanation
+
+Iteration-level scheduling was popularized in production engines (the idea is bigger than any one name). Combine with **prefix-aware** packing so shared system prompts batch well.
+
+Watch **prefill vs decode ratio**. Too many new long prompts and decodes starve (chunked prefill). Too much decode and new TTFT suffers (admit fewer prefills).
+
+## Common mistakes
+
+<CommonMistake>
+Raising max batch size until latency SLOs die, then blaming the model.
+</CommonMistake>
+
+- No chunked prefill on a long-context app.
+- One tenant's agent loops occupying every slot.
+
+## When to use it
+
+- Any multi-user LLM server. Single-request scripts can stay simple.
+
+## When NOT to use it
+
+- Don't continuous-batch when each request needs a totally different LoRA *and* you didn't build adapter multiplexing — you'll thrash.
+- Tiny CPU demos: overhead can exceed gain.
+
+## Alternatives
+
+- Separate pools: interactive vs batch jobs (also a form of scheduling). Disaggregated prefill/decode (distributed lesson).
+
+<MemoryCard>
+**Static** = wait for the slowest. **Continuous** = join/leave every token step.
+**Chunked prefill** = long prompts don't freeze streams. Scheduler + paged KV go together.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-batching-continuous-batching" />

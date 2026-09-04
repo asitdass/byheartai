@@ -1,0 +1,206 @@
+---
+id: optimization-gradient-descent
+slug: optimization-gradient-descent
+title: Optimization and Gradient Descent
+category: foundations
+level: intermediate
+summary: Gradient descent walks downhill on the loss by subtracting a step times the slope — that is how models update parameters.
+keywords: [gradient descent, sgd, learning rate, optimizer, adam, minibatch]
+prerequisites: [loss-functions]
+next: [backpropagation]
+related: [loss-functions, backpropagation, parameters-vs-hyperparameters, training-vs-inference]
+alternatives: []
+confusedWith: [backpropagation]
+frameworks: []
+products: []
+papers:
+  - title: "Adam: A Method for Stochastic Optimization (Kingma & Ba, 2014)"
+    url: "https://arxiv.org/abs/1412.6980"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-optimization-gradient-descent
+estimatedMinutes: 14
+---
+
+<OneLine>Gradient descent updates parameters by walking downhill on the loss: new weights equal old weights minus learning rate times the slope.</OneLine>
+
+## Explain like I'm new to AI
+
+You have a loss L(θ) — a hilly landscape over the parameters θ. You want a **low** place. You cannot plot a billion-dimensional surface, but you *can* ask: **which way is downhill from here?** That direction is the **gradient** ∇L, the vector of partial derivatives.
+
+**Gradient descent (GD)** is the rule:
+
+```text
+θ  ←  θ  −  η  ∇L(θ)
+```
+
+- **∇L** points to *steeper loss* (uphill). The minus sign goes the other way.
+- **η** (eta), the **learning rate**, is how big a step you take. Too small: you crawl. Too large: you jump past the valley and sometimes **diverge** (loss explodes).
+
+**Stochastic / minibatch GD (SGD)** estimates ∇L from a *batch* of examples, not the full dataset. That estimate is noisy, which is annoying and also useful: noise helps escape some bad basins. Almost all neural net training is minibatch SGD or a cousin (**Adam**).
+
+Click through steps on a 1D bowl — a parabola you can do by hand.
+
+<GradientDescent />
+
+## Mental model
+
+You are in fog on a hillside, holding a spirit level.
+
+- The level tells you the **slope under your feet** (gradient).
+- You take a step downhill of length η.
+- You do **not** see the global minimum. You only see local slope.
+- If you step too far, you leap onto the opposite slope or off a cliff.
+
+Batch size is how many "survey shots" you average before stepping. One example = very noisy compass. The whole dataset = true but expensive compass.
+
+## How it works
+
+1. Initialize θ (random, or a pretrained checkpoint).
+2. Sample a batch `(X, y)`.
+3. Forward pass → ŷ, then L.
+4. Backward pass (next lesson) → ∇L with respect to θ.
+5. Optimizer applies `θ ← θ − η ∇L` (Adam also tracks running averages of the gradient).
+6. Repeat for many steps. An **epoch** is one pass over the training set.
+
+**Full-batch GD:** ∇L uses every row. Rare for large data.
+**SGD:** batch size 1. Noisy, chatty.
+**Minibatch:** 32–2 million tokens depending on the stack. The production default.
+
+**Learning rate schedules.** Start higher, **decay** (cosine, linear warmup then decay). Warmup avoids wrecking a pretrained model on step 1.
+
+## Real-world example
+
+**Fit a line to houses.** θ = `(w, b)`, ŷ = w·sqft + b, L = MSE. Each batch of houses gives a slope for w and b. After enough steps, w ≈ "dollars per square foot."
+
+**Train a small neural net on digits.** Same rule, more parameters. If η = 10, loss becomes NaN by step 20. If η = 1e-8, loss barely moves after an hour. If η ≈ 1e-3 with Adam, it often trains. That η was a **hyperparameter**, not a learned weight.
+
+**LLMs.** The optimizer is still AdamW (Adam + weight decay). The "magic" is scale, data, and architecture — not a different *idea* than `θ − η g`. **Test-time** "thinking" (reasoning models) is extra *decode*, not extra gradient steps. Do not confuse serving compute with training GD.
+
+## Technical explanation
+
+The visual uses L(w) = (w − 2)². On paper we will use a shifted bowl L(w) = (w − 4)² so the arithmetic stays in friendly fractions. Same algorithm.
+
+```text
+L(w) = (w − 4)²
+dL/dw = 2(w − 4)
+```
+
+**Worked steps.** Start w₀ = 1, η = 0.25.
+
+**Step 1.**
+
+```text
+w₀ = 1
+g₀ = 2(1 − 4) = −6
+w₁ = 1 − 0.25 · (−6) = 1 + 1.5 = 2.5
+L(w₀) = 9,   L(w₁) = (2.5 − 4)² = 2.25
+```
+
+**Step 2.**
+
+```text
+g₁ = 2(2.5 − 4) = −3
+w₂ = 2.5 − 0.25 · (−3) = 2.5 + 0.75 = 3.25
+L(w₂) = (3.25 − 4)² = 0.5625
+```
+
+Loss: 9 → 2.25 → 0.5625. Two steps, same formula you will use in 7B-parameter models.
+
+**When it diverges.** The 1D map is w ← (1 − 2η)w + 8η for this L. If |1 − 2η| > 1, i.e. η > 1, steps grow. Try η = 1.1 in the snippet below.
+
+**SGD noise.** With a batch, g is an **estimate**. Theory talks about unbiased gradients and variance. Practice talks about "this batch size fit in HBM."
+
+**Adam** (Kingma & Ba): keep exponential moving averages of g and g², then step with a normalized direction. It is still gradient descent, with a fancier η per coordinate. It does not excuse a wrong loss or leaked labels.
+
+```python
+import numpy as np
+
+def loss(w):
+    return (w - 4.0) ** 2
+
+def grad(w):
+    return 2.0 * (w - 4.0)
+
+w, eta = 1.0, 0.25
+for step in range(1, 3):
+    g = grad(w)
+    w = w - eta * g
+    print(f"step {step}: w={w:.4f}  L={loss(w):.4f}  g={g:.4f}")
+
+# Minibatch GD on y ≈ 3x + 1
+rng = np.random.default_rng(0)
+x = rng.normal(size=200)
+y = 3 * x + 1 + 0.1 * rng.normal(size=200)
+w = b = 0.0
+eta = 0.05
+batch = 32
+for epoch in range(40):
+    idx = rng.permutation(len(x))
+    for start in range(0, len(x), batch):
+        xb, yb = x[idx[start:start+batch]], y[idx[start:start+batch]]
+        yhat = w * xb + b
+        # dL/dŷ = 2(ŷ − y) / n  with L = mean square
+        n = len(xb)
+        d_yhat = 2 * (yhat - yb) / n
+        w -= eta * np.dot(d_yhat, xb)
+        b -= eta * np.sum(d_yhat)
+print("learned w, b ≈", w, b)
+```
+
+sklearn hides the loop: `SGDRegressor`, `LogisticRegression(solver="saga")`. For neural nets you will use autodiff (PyTorch/JAX) so you never write `d_yhat` by hand — but you should still be able to do the 1D parabola on paper.
+
+## Common mistakes
+
+<CommonMistake>
+Confusing gradient descent with backpropagation. GD is the <em>update</em>. Backprop is how you
+<em>get the gradient</em> in a layered net. You can do GD on a one-weight model with a handwritten
+derivative and never mention backprop.
+</CommonMistake>
+
+- η copied from a blog for a different batch size / precision. Adam's default 1e-3 is not sacred.
+- Full-batch on huge data "because noise is bad." You cannot afford it; minibatch is the method.
+- Calling a failed run "the model doesn't work" when θ diverged (check for NaNs, clip, lower η).
+- Optimizing on the test set (early-stop on test). That is silent overfitting to the holdout.
+
+## When to use it
+
+- Training or fine-tuning almost every modern model: some flavor of (stochastic) gradient descent.
+
+## When NOT to use it
+
+- Tiny closed-form problems (ordinary least squares has a formula; still OK to SGD, just unnecessary).
+- Discrete search (architecture choices, prompt strings) — you cannot take ∂L/∂prompt in the usual way; use eval + search.
+- When you have **no differentiable loss** and refuse to build a proxy (then you need RL, black-box search, or to redefine the task).
+
+## Alternatives
+
+- **Closed-form OLS** for linear MSE with small n.
+- **Second-order** methods (Newton, L-BFGS) on small θ.
+- **Evolutionary / Bayesian** search for hyperparameters, not for 7B weights.
+- **AdamW, Lion, Muon** — still "follow a gradient," different preconditioning.
+
+<Compare
+  a="Gradient descent"
+  b="Backpropagation"
+  rows={[
+    { label: "Question it answers", a: "How do I change θ to lower L?", b: "What is ∇L for every layer?" },
+    { label: "Needs a neural net?", a: "No. Works for ŷ = w x.", b: "It is the chain rule through layers" },
+    { label: "You see it as", a: "θ ← θ − η g", b: "Autodiff / backward()" },
+  ]}
+/>
+
+<MemoryCard>
+**Gradient descent:** θ ← θ − η ∇L. **η** is a hyperparameter. Minibatch SGD estimates ∇L from a
+batch. Adam is GD with adaptive step sizes. Backprop is how deep nets *compute* ∇L, not a different
+optimizer.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-optimization-gradient-descent" />

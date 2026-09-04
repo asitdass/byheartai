@@ -1,0 +1,100 @@
+---
+id: speech-stt-tts
+slug: speech-stt-tts
+title: Speech-to-Text & Text-to-Speech
+category: multimodal-ai
+level: intermediate
+summary: Cascades transcribe speech to text, think, then speak back — native audio models keep tone but are harder to search; most products still need both.
+keywords: [stt, tts, speech to text, text to speech, whisper, native audio]
+prerequisites: [what-is-llm]
+next: [audio-video-understanding]
+related: [audio-video-understanding, vision-language-models]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "Robust Speech Recognition via Large-Scale Weak Supervision (Whisper) — Radford et al., 2022"
+    url: "https://arxiv.org/abs/2212.04356"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-speech-stt-tts
+estimatedMinutes: 7
+---
+
+<OneLine>Speech-to-text turns sound into words; text-to-speech turns words into sound. Cascading them around an LLM is still the workhorse — native audio models keep emotion and overlap that transcripts throw away.</OneLine>
+
+## Explain like I'm new to AI
+
+A voice assistant is often three specialists in a trench coat:
+
+1. **STT** (speech-to-text / ASR) — microphone → transcript
+2. **LLM** — thinks in text
+3. **TTS** (text-to-speech) — reply → waveform
+
+That **cascade** is cheap, debuggable, and gives you a transcript you can search. The cost: sarcasm, fear, a baby crying, two people talking at once — flattened into words, or dropped.
+
+**Native audio / omni models** tokenize the waveform itself and can answer *or* speak without an explicit transcript. They hear more. They're worse as a filing cabinet.
+
+<SpeechPipeline />
+
+## Mental model
+
+A court stenographer (STT) vs sitting in the room (native audio). The transcript is searchable. The room has the bang of the gavel.
+
+## How it works
+
+**STT:** acoustic features → text, often with timestamps and word confidence. Streaming STT (phone bots) emits partial hypotheses. Domain jargon needs boosting or a custom vocabulary.
+
+**TTS:** text (plus optional marks for pauses/emphasis) → audio. Modern neural TTS is natural; cloning a real person's voice is a **consent and fraud** problem, not just a demo.
+
+**Latency:** cascade adds two model hops. Streaming STT + streaming TTS + a fast LLM is how "real-time" voice feels. Native models can be faster end-to-end but you lose a clean text log unless you still transcribe in parallel.
+
+## Real-world example
+
+A clinic voice bot: STT + LLM for the medical record (you *need* the text). A separate native pass (or a dedicated audio event model) flags "patient sounds distressed" — something the transcript "I'm fine" would miss.
+
+## Technical explanation
+
+Whisper-class models made multilingual ASR widely available; production voice still cares about **barge-in** (user interrupts TTS), endpointing (when did they stop?), and **PII** in recordings.
+
+Don't store raw audio longer than you must. Transcripts are also sensitive.
+
+For RAG, the cascade wins: embed **transcript chunks** with time ranges back to the audio. Native embeddings of audio exist (next lessons) for non-speech sounds.
+
+## Common mistakes
+
+<CommonMistake>
+Trusting STT as ground truth. Homophones, names, and "IgG" vs "IgE" will be wrong. Show the
+transcript, allow edit, especially in medicine and law.
+</CommonMistake>
+
+- Playing TTS of untrusted model output (prompt injection → the speaker says a scam).
+- Cloning voices without explicit permission.
+
+## When to use it
+
+- Voice UI, meeting notes, accessibility, call centers. Cascade for logs; native when tone is the point.
+
+## When NOT to use it
+
+- Quiet, high-stakes dictation without a human in the loop; noisy rooms without a better mic.
+
+## Alternatives
+
+- Human captions; typed chat; native omni models when you don't need a searchable archive.
+
+<MemoryCard>
+**STT → LLM → TTS** is the cascade: searchable, lossy on emotion. **Native audio** keeps the sound.
+Run both when you need a log *and* the vibe. Never treat transcripts as perfect; never clone voices
+casually.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-speech-stt-tts" />

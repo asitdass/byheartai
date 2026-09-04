@@ -1,0 +1,90 @@
+---
+id: what-is-agent
+slug: what-is-agent
+title: What is an AI Agent?
+category: agents
+level: beginner
+summary: An AI agent is an LLM that can decide and take actions in a loop, using tools to pursue a goal rather than just replying once.
+keywords: [ai agent, agent, autonomy, tools, goal, loop]
+prerequisites: [what-is-llm, function-calling]
+next: [agent-vs-chatbot-vs-workflow]
+related: [agent-loop, function-calling, multimodal-agents, design-support-agent, design-coding-agent]
+alternatives: []
+confusedWith: [agent-vs-chatbot-vs-workflow, multimodal-agents]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-what-is-agent
+estimatedMinutes: 8
+---
+
+<OneLine>An AI agent is a language model that doesn't just answer — it decides what to do, takes actions with tools, sees the results, and keeps going until a goal is achieved.</OneLine>
+
+## Explain like I'm new to AI
+
+A normal LLM chat is **one turn**: you ask, it answers. An **AI agent** is different — it's an LLM given a **goal**, a set of **tools**, and permission to work in a **loop** until the goal is done.
+
+Instead of "here's an answer," an agent thinks: *"What do I need to do? Let me use this tool… okay, that result changes things… now let me do the next step…"* — repeating until finished.
+
+The LLM is the **brain**; tools are its **hands**; the loop is what makes it **act**, not just talk.
+
+## Mental model
+
+- **Plain LLM** = a knowledgeable person answering a question from memory.
+- **Agent** = that same person given a **to-do list, a computer, and a phone**, told "get this done," who then looks things up, makes calls, and checks their work until the task is complete.
+
+## How it works
+
+An agent needs four ingredients:
+
+1. **A model (the brain)** — an LLM that reasons and decides.
+2. **Tools (the hands)** — functions it can call: search, code, APIs, databases (see **function calling**).
+3. **A loop** — it acts, observes the result, and decides the next action, over and over.
+4. **A goal + stopping condition** — what "done" means, and limits so it doesn't run forever.
+
+Each turn, the model chooses: call a tool, or finish. That autonomy is the defining feature.
+
+## Real-world example
+
+You ask an agent: *"Find three well-reviewed Italian restaurants near me open tonight and put them in a table."* It searches the web, checks hours, filters by rating, and formats a table — several tool calls and decisions, not a single canned reply. A coding agent does the same to fix a bug: read files, run tests, edit code, re-run tests, repeat.
+
+## Technical explanation
+
+An agent is an LLM embedded in a **control loop** where the model's output can be a **tool call** (structured, via function calling) rather than final text. The loop feeds tool results back into the context as new observations, so the model conditions each decision on accumulated evidence. Key design concerns: **tool design**, **memory/state**, **stopping conditions** (max steps, budget), **error handling**, and **guardrails/permissions** (agents take real actions, so a bad decision has real consequences). Autonomy exists on a spectrum — from a single tool-augmented call to fully self-directed multi-step systems.
+
+## Common mistakes
+
+<CommonMistake>
+Thinking an agent is a smarter model. It's usually the <em>same</em> model plus a loop and tools. The
+capability jump comes from letting it <em>act and iterate</em>, not from extra intelligence.
+</CommonMistake>
+
+- Giving an agent powerful tools without permission checks or step limits.
+- Using an agent when a single prompt or a fixed workflow would be cheaper and more reliable.
+
+## When to use it
+
+- Open-ended, multi-step tasks where the needed steps aren't known in advance and depend on intermediate results.
+
+## When NOT to use it
+
+- Simple, one-shot tasks (just prompt the model) or well-defined pipelines (use a fixed workflow — cheaper and predictable).
+
+## Alternatives
+
+- Plain prompting for single answers; fixed **workflows** for known step sequences; **RAG** when you just need grounded facts.
+
+<MemoryCard>
+An **AI agent** = an LLM (brain) + **tools** (hands) + a **loop** + a **goal**. It decides and takes
+actions repeatedly until done — the power comes from acting and iterating, not a smarter model.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-what-is-agent" />

@@ -1,0 +1,91 @@
+---
+id: insecure-output-handling
+slug: insecure-output-handling
+title: Insecure Output Handling
+category: security
+level: intermediate
+summary: Model output is untrusted input to the next system — encode HTML, bind SQL, allow-list URLs and hosts. Never eval generated text as code.
+keywords: [insecure output handling, llm05, xss, sql injection]
+prerequisites: [prompt-injection]
+next: [least-privilege]
+related: [structured-output, indirect-prompt-injection]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-insecure-output-handling
+estimatedMinutes: 8
+---
+
+<OneLine>Improper output handling (OWASP LLM05) is trusting the model's text as HTML, SQL, shell, or a URL. The model is an untrusted client. Encode, parameterize, and allow-list in code — the same as you would for a stranger's form post.</OneLine>
+
+## Explain like I'm new to AI
+
+Injection changes what the model *tries* to say. Output handling is what **you do with the string**. If you drop it into a page as HTML, you just built XSS. If you glue it into a query, you just built SQL injection. If you `exec` it, you handed the OS to a paragraph.
+
+<InsecureOutput />
+
+The model can be "helpful" without being "malicious": a quote in a title breaks HTML. Attackers will also *aim* the string. Either way, **you** own the sink.
+
+## Mental model
+
+A translator who shouts in the restaurant. You still don't let the shout become a command to the kitchen's gas valve. You copy it onto a ticket with a pen (encoding).
+
+## How it works
+
+- **UI:** HTML-encode. Markdown in a locked-down subset. No `javascript:` URLs. CSP.
+- **Data:** structured tool args → bound parameters. The LLM never composes SQL.
+- **Network:** parse URLs; block private/link-local/metadata IPs; allow-list schemes and hosts (SSRF).
+- **Mail/headers:** structured fields, not raw header concatenation.
+- **Code:** don't run generated programs outside a sandbox (next lesson). Prefer no generated code in prod.
+
+Structured output (JSON schema) makes sinks easier: you validate the object, then your code does the side effect.
+
+## Real-world example
+
+A summarizer returns a "source" link. The UI uses it as `href` without checks. The link points at an internal cloud metadata URL. That's output handling + agent fetch, not a fancy new LLM bug — it's 2005 web security with a new author.
+
+## Technical explanation
+
+LLM05 is "the LLM is in the same trust class as the user." Downstream interpreters don't get a pass because the bytes came from a GPU.
+
+Streaming: encode incrementally; don't wait to "see if it looks safe."
+
+Logs: encoded or redacted. A payload in a log viewer can XSS your on-call.
+
+## Common mistakes
+
+<CommonMistake>
+`innerHTML = modelReply` because "it's our assistant."
+</CommonMistake>
+
+- `exec` on generated code in production to "be agentic."
+- Trusting `href` or image URLs the model invented (exfil + SSRF).
+
+## When to use it
+
+- Every surface that displays or executes model text. That's the UI, the DB, the browser, the pager.
+
+## When NOT to use it
+
+- Don't skip encoding because a filter "removed script tags." Filters lose; encoders win.
+
+## Alternatives
+
+- Render answers as plain text only. Ugly, robust.
+
+<MemoryCard>
+**Model output = untrusted input.** Encode HTML, bind SQL, allow-list URLs, don't eval.
+Structured args in code, not string-glued interpreters. The GPU is not a sanitizer.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-insecure-output-handling" />

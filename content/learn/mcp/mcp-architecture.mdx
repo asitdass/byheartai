@@ -1,0 +1,102 @@
+---
+id: mcp-architecture
+slug: mcp-architecture
+title: MCP Architecture
+category: mcp
+level: intermediate
+summary: MCP has a host that contains clients, each talking to one server over stdio (local) or Streamable HTTP (remote) — and since 2026 the HTTP core is stateless.
+keywords: [mcp architecture, host, client, server, stdio, streamable http, json-rpc, stateless]
+prerequisites: [what-is-mcp]
+next: [mcp-primitives]
+related: [why-mcp-exists, consuming-mcp-server]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers:
+  - title: "The 2026-07-28 Specification"
+    url: "https://blog.modelcontextprotocol.io/posts/2026-07-28/"
+    kind: article
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-mcp-architecture
+estimatedMinutes: 8
+---
+
+<OneLine>MCP's architecture is simple: a host app contains clients; each client talks to one server over either local stdio or remote Streamable HTTP; messages are JSON-RPC; remote MCP is now stateless.</OneLine>
+
+## Explain like I'm new to AI
+
+Three nouns, two cables:
+
+- **Host** — the app you use (Cursor, Claude, your agent).
+- **Client** — a connector *inside* the host. One client per server.
+- **Server** — a program that wraps GitHub, your files, a database, etc.
+
+The "cables" are **transports**. Local servers run as a subprocess and talk over **stdio** (stdin/stdout). Remote servers sit on the internet and talk **Streamable HTTP**.
+
+<McpArchitecture />
+
+## Mental model
+
+The host is a **power strip**. Each socket is a client. Each plugged-in appliance is a server. The appliances don't talk to each other through MCP — they talk to the strip. If two servers must cooperate, the *host/agent* coordinates them.
+
+## How it works
+
+**Local (stdio):** the host launches `npx …` or a binary, writes JSON-RPC to stdin, reads stdout. Credentials come from the environment. Fast, no network, great for files and git on your machine.
+
+**Remote (Streamable HTTP):** the client `POST`s JSON-RPC. Required headers include `Mcp-Protocol-Version`, `Mcp-Method` (e.g. `tools/call`), and `Mcp-Name` (the tool/resource name). Gateways can route and rate-limit on headers without parsing the body.
+
+**Stateless since 2026-07-28:** there is no `initialize` handshake and no `Mcp-Session-Id`. Each request carries protocol version, client info, and capabilities in `_meta`. Optional `server/discover` exists if you want capabilities up front. Any replica behind a round-robin load balancer can handle any request.
+
+If *your app* needs continuity (a multi-step upload, a cursor), **mint an explicit handle** and pass it as a tool argument. Don't hide state in the transport.
+
+## Real-world example
+
+Cursor on your laptop: a **stdio** filesystem server plus a **stdio** git server, and a **remote HTTP** Linear server. Three clients, three servers, one host. A load-balanced Linear deployment doesn't care which replica sees the next `tools/call`.
+
+## Technical explanation
+
+MCP messages are **JSON-RPC 2.0**. The host, not the model, is the RPC client. Typical methods: `server/discover`, `tools/list`, `tools/call`, `resources/list`, `resources/read`, `prompts/list`, `prompts/get`.
+
+List/read results may include `ttlMs` and `cacheScope` so clients cache catalogs and keep **prompt caches** stable across reconnects (deterministic list order matters here).
+
+When a tool needs input mid-call (confirm a delete, fill a missing field), the server returns `resultType: "input_required"` with the questions — **Multi Round-Trip Requests (MRTR)**. The client retries the same call with `inputResponses`. That replaced always-open bidirectional streams for elicitation.
+
+**Deprecated (still work for ≥12 months, don't start new work on them):** Roots, Sampling, Logging, and the old HTTP+SSE transport. **Tasks** moved to an official extension (`io.modelcontextprotocol/tasks`) with poll-based `tasks/get`.
+
+## Common mistakes
+
+<CommonMistake>
+Keeping sticky sessions "because MCP is stateful." The 2026 core is not. If you need state, put a
+handle in the tool schema so the model can pass it — transport sessions were the thing that didn't scale.
+</CommonMistake>
+
+- Using OAuth on stdio servers (use env credentials) or API keys-in-config for remote servers (use OAuth).
+- Forgetting `Mcp-Method` / `Mcp-Name` on HTTP, so the gateway can't route.
+
+## When to use it
+
+- **stdio** for local, user-owned data. **HTTP** for shared, multi-user, or vendor-hosted servers.
+
+## When NOT to use it
+
+- Don't force HTTP for a local-only file server, and don't force stdio for a SaaS others must reach.
+
+## Alternatives
+
+- Direct HTTP APIs the host wraps itself — more work per host, no shared catalog.
+
+<MemoryCard>
+**Host** contains **clients**; each client talks to one **server**. Local = **stdio** + env creds.
+Remote = **Streamable HTTP** + OAuth. Since 2026 MCP is **stateless** — no handshake, no session id;
+put real state in tool arguments as explicit handles.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-mcp-architecture" />

@@ -1,0 +1,95 @@
+---
+id: human-in-the-loop
+slug: human-in-the-loop
+title: Human-in-the-Loop
+category: agents
+level: intermediate
+summary: Human-in-the-loop inserts a person's approval before risky or irreversible agent actions, combining autonomy with safety and accountability.
+keywords: [human in the loop, hitl, approval, agent safety, guardrails, oversight]
+prerequisites: [what-is-agent]
+next: [multi-agent-systems]
+related: [planning-reflection, agent-loop, least-privilege, tool-abuse, design-support-agent]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-human-in-the-loop
+estimatedMinutes: 6
+---
+
+<OneLine>Human-in-the-loop means an agent pauses to get a person's approval before taking risky or irreversible actions — you keep the agent's speed while a human guards the decisions that really matter.</OneLine>
+
+## Explain like I'm new to AI
+
+Agents take **real actions** — sending emails, spending money, deleting data, changing production systems. Full autonomy on those is dangerous. **Human-in-the-loop (HITL)** adds a **checkpoint**: for risky steps, the agent **proposes** an action and **waits** for a human to approve, edit, or reject it.
+
+<HumanInTheLoop />
+
+The agent still does the heavy lifting; the human just guards the few high-stakes moments.
+
+## Mental model
+
+It's like a **junior employee with a spending limit**: they handle everything themselves, but any purchase over a threshold needs a manager's sign-off. Autonomy for the routine, approval for the risky.
+
+## How it works
+
+- **Classify actions by risk:** read-only/low-risk actions run freely; **irreversible or costly** ones require approval.
+- **Pause & surface:** the agent presents the proposed action (and its reasoning) and halts.
+- **Human decides:** approve, edit the action, or reject with feedback.
+- **Resume:** the agent continues based on the decision — which means the agent's **state must be pausable/resumable**.
+
+Common gates: financial transactions, external communications, data deletion, production changes, and anything touching sensitive information.
+
+## Real-world example
+
+A customer-support agent drafts a refund and a reply email but **pauses** before sending: an agent shows the human "I'll refund \$120 and send this message — approve?" The human tweaks the wording and clicks approve. The agent did 95% of the work; the human owned the final, irreversible send.
+
+## Technical explanation
+
+HITL requires **interruptible execution**: the agent loop checkpoints its state, emits an approval request, and resumes on response (frameworks provide this as "interrupts" or "breakpoints"). Design considerations:
+
+- **Right granularity:** too many approvals kills the productivity benefit; too few reintroduces risk. Gate by **risk and reversibility**.
+- **Rich context for the reviewer:** show the action, its arguments, and the reasoning so approval is informed, not rubber-stamped.
+- **Audit trail:** log proposals and decisions for accountability.
+- **Escalation & timeouts:** what happens if no human responds.
+
+HITL pairs with other guardrails (permissions, sandboxing, spend limits) — it's oversight, not the only safety layer.
+
+## Common mistakes
+
+<CommonMistake>
+Requiring human approval for <em>everything</em>. That destroys the agent's value and trains reviewers to
+click "approve" blindly. Gate only genuinely risky or irreversible actions.
+</CommonMistake>
+
+- Asking for approval without showing enough context, so humans rubber-stamp.
+- No audit log, so you can't trace who approved what.
+
+## When to use it
+
+- Whenever agents can take **irreversible, costly, or sensitive** actions — payments, deletions, external messages, production changes.
+
+## When NOT to use it
+
+- Low-risk, easily reversible, read-only tasks, where constant approvals just add friction.
+
+## Alternatives
+
+- **Guardrails/permissions** and **sandboxing** limit what an agent *can* do; HITL adds a human check on what it *will* do — often used together.
+
+<MemoryCard>
+**Human-in-the-loop**: the agent pauses for human **approval** before risky/irreversible actions
+(payments, deletions, sends). Gate by **risk and reversibility**, give reviewers full context, and keep
+an audit trail — autonomy for routine steps, oversight for the dangerous ones.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-human-in-the-loop" />

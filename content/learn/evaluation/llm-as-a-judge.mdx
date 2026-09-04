@@ -1,0 +1,97 @@
+---
+id: llm-as-a-judge
+slug: llm-as-a-judge
+title: LLM-as-a-Judge
+category: evaluation
+level: intermediate
+summary: LLM-as-a-judge grades outputs against a rubric at scale. Calibrate it on humans, and watch verbosity, position, and self-preference bias.
+keywords: [llm as a judge, model based evaluation, g-eval, pairwise judge]
+prerequisites: [why-evaluation-matters]
+next: [benchmarks-regression]
+related: [human-evaluation, rag-evaluation, offline-vs-online-eval]
+alternatives: [human-evaluation]
+confusedWith: [human-evaluation]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-llm-as-a-judge
+estimatedMinutes: 8
+---
+
+<OneLine>LLM-as-a-judge is a model that grades another model's answer against a rubric (and usually the source context). It scales; it is biased. Trust it only after it agrees with humans on your task.</OneLine>
+
+## Explain like I'm new to AI
+
+You cannot hire a teacher for every draft. You hire a teacher to write the mark scheme, then a **fast grader** who uses that scheme: another LLM.
+
+Give it: the user ask, the answer, the **retrieved context or gold reply**, and a rubric. Demand a **score plus a short why** (structured JSON). That "why" is how you debug a weird 2/5.
+
+<LlmAsJudge />
+
+It is **not** "the AI checking itself" if you do it lazily. Same family, same verbosity taste, first-listed answer wins — you will optimize those bugs.
+
+## Mental model
+
+A substitute teacher with an answer key. Fast. Copyable mistakes if the key is vague or they like long essays.
+
+## How it works
+
+- **Pointwise:** score 1–5 (or pass/fail) per answer. Good for dashboards and CI.
+- **Pairwise:** "which is better, A or B?" Often more stable. **Swap A/B** and average — position bias is real.
+- **Grounded:** for RAG, the judge must see the chunks and punish unsupported claims (faithfulness). A judge with no context will reward world-knowledge that your product was supposed to cite.
+- **Reference-based:** compare to a gold answer when you have one. Exact match still wins for ids, amounts, JSON.
+
+Mitigations that actually matter in 2026: different model **family** than the candidate, verbosity penalty in the rubric, position swap, a **panel** (two judges, flag disagreement for humans), never the sole gate on safety.
+
+## Real-world example
+
+A judge prefers 400-word refund emails. CI "quality" climbs; users want three sentences. You add "penalize extra claims not in the doc" and calibrate on 80 human pairwise labels. Correlation becomes usable. Before that, you were training the product to please the judge.
+
+## Technical explanation
+
+Correlation with humans (Spearman / pairwise agreement) is the meta-metric of the **judge**, not of the product. Recheck when you change the judge prompt or model.
+
+Known failure modes: **verbosity bias**, **position bias**, **self-preference**, and inventing a rationale that doesn't match the score. Chain-of-thought in the judge can help and can also hallucinate a story.
+
+Closed-ended facts: don't use a judge. Use string/number/schema checks. Judges shine on open-ended tone, faithfulness, and "would a support lead send this?"
+
+RAG eval (already in the RAG category) is often a **grounded judge** plus retrieval metrics. This lesson is the general machine; that lesson is the RAG split.
+
+Do not dump vendor product names as if they were the method. The method is: rubric, context, structured score, human calibration, bias controls.
+
+## Common mistakes
+
+<CommonMistake>
+Letting the same model grade its own outputs as the only ship criterion. You will select for that model's accent.
+</CommonMistake>
+
+- No human calibration set.
+- Using a judge to "fact-check" the open web with no source given.
+
+## When to use it
+
+- Volume scoring in CI once humans agree it tracks them.
+- Faithfulness/relevance when you pass the context in.
+
+## When NOT to use it
+
+- Safety-critical sole gate. Tiny closed answers you can check in code. Until calibration exists.
+
+## Alternatives
+
+- Humans (previous lesson). Unit tests. Reward models trained on your pairwise data. Online task success.
+
+<MemoryCard>
+**Judge = rubric + context + structured score.** Calibrate on humans. Swap pairwise order.
+Watch verbosity, position, self-preference. Don't judge facts with no source — use code checks.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-llm-as-a-judge" />

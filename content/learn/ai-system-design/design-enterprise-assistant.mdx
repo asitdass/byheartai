@@ -1,0 +1,93 @@
+---
+id: design-enterprise-assistant
+slug: design-enterprise-assistant
+title: Design an Enterprise Knowledge Assistant
+category: ai-system-design
+level: advanced
+summary: An enterprise assistant is RAG plus identity — ACL at retrieve, provenance on ingest, citations the user is allowed to open, and no shared bot token.
+keywords: [enterprise rag, acl, tenant isolation, knowledge assistant]
+prerequisites: [design-rag-chatbot]
+next: [design-support-agent]
+related: [metadata-filtering, data-leakage, rag-poisoning]
+alternatives: []
+confusedWith: [design-rag-chatbot]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-design-enterprise-assistant
+estimatedMinutes: 8
+---
+
+<OneLine>An enterprise knowledge assistant is a RAG chatbot with a permission wall: every chunk is filtered by who is asking, connectors have provenance, and a shared "bot admin" token is a leak waiting to happen.</OneLine>
+
+## Explain like I'm new to AI
+
+Same generator as the RAG chatbot. Different **trust**. HR, legal, and finance docs in one pretty box without retrieve-time ACL is how you email payroll to the intern.
+
+<EnterpriseAclWall />
+
+**Job:** answer from sources *this employee may see*. **SLO:** zero cross-tenant/cross-ACL answers, then quality.
+
+**Shape:** still mostly a chatbot/workflow. Agency to *email the file* is a different product (HITL).
+
+## Mental model
+
+A library with a badge reader at every stack, not a public park with a polite sign.
+
+## How it works
+
+- **Identity:** SSO. Retrieve and tools run as the user (least privilege, MCP auth).
+- **ACL:** metadata filters or separate indexes **before** chunks enter the window (vector DB filtering lesson). The model never "decides" if you're allowed.
+- **Ingest:** connectors (drive, wiki, tickets) with source ids and ACLs copied in. Open internet crawl is not "enterprise knowledge" (RAG poisoning).
+- **Cite:** UI only opens URLs the user can open. Audit log of chunk ids.
+- **Cache:** never semantic-cache across users. Prefix cache only on non-secret stems.
+- **Eval:** slices per ACL world — a passing overall score can hide a leak.
+
+## Real-world example
+
+Two business units, one index, forgotten `tenant_id` filter. The model "helpfully" quoted the other unit's pipeline. Prompt said "don't reveal other teams." The filter would have stopped it; the prompt did not.
+
+## Technical explanation
+
+Row-level security in the DB/index is the control. Prompt-layer confidentiality is a hint.
+
+On-prem vs VPC vs provider: data-residency is a requirement in **step 1**, not a model-card afterthought. Zero-retention APIs if you must send PII.
+
+Export/summarize-all is high impact — HITL.
+
+## Common mistakes
+
+<CommonMistake>
+One service account that can retrieve every tenant "for simpler ops."
+</CommonMistake>
+
+- Semantic cache on "similar questions" across the company.
+- Treating citations as proof the user was allowed to see the source.
+
+## When to use it
+
+- More than one permission set, regulated data, or connectors to live systems of record.
+
+## When NOT to use it
+
+- Don't skip ACL because "it's only employees." Employees are how most leaks start.
+- Don't use this design for a public FAQ (overkill — use the plain RAG chatbot).
+
+## Alternatives
+
+- Separate assistants per tenant (ops-heavy, easy isolation). Search without generation so the UI's own ACL is the only path.
+
+<MemoryCard>
+**Enterprise assistant = RAG + identity.** ACL at retrieve, not in the prompt.
+Provenance on ingest. No god token. No cross-user semantic cache. Eval leak slices.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-design-enterprise-assistant" />

@@ -1,0 +1,106 @@
+---
+id: hallucination-safety-eval
+slug: hallucination-safety-eval
+title: Hallucination and Safety Evaluation
+category: evaluation
+level: advanced
+summary: Hallucination eval checks groundedness vs context, not "sounds true"; safety eval checks refusals, leaks, and overconfidence. Score them separately.
+keywords: [hallucination, faithfulness, groundedness, safety eval, red team]
+prerequisites: [why-evaluation-matters, llm-as-a-judge]
+next: [quality-latency-cost]
+related: [rag-evaluation, human-evaluation, jailbreaks, prompt-injection]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-hallucination-safety-eval
+estimatedMinutes: 8
+---
+
+<OneLine>Hallucination and safety are different failures. Score groundedness against the context, factuality against a trusted source, citations as real spans, and safety as refusals, leaks, and tool abuse — never one blended "toxicity" number.</OneLine>
+
+## Explain like I'm new to AI
+
+People say "it hallucinated" for four different bugs. If you average them, you will "fix" the wrong one.
+
+<HallucinationSafety />
+
+- **Ungrounded:** not in the context (RAG's faithfulness).
+- **World-false:** wrong about the world — maybe because the doc was wrong.
+- **Fake citation:** a made-up § or URL.
+- **Safety miss:** jailbreak, PII, medical overconfidence, calling a destructive tool.
+
+"Sounds true" is not a metric. A fluent lie scores well on vibes and fails faithfulness.
+
+## Mental model
+
+A witness on the stand. **Grounded** = they only used the documents in front of them. **Factually right** = the documents (or the world) are correct. **Safe** = they didn't take a bribe or shout fire in the courthouse. Three jobs, three scores.
+
+## How it works
+
+**Hallucination / grounding**
+
+- Pass the judge (or a human) the **retrieved text**. Penalize claims with no support. Reward "I don't know" when retrieval is empty.
+- Verify citations in **code**: id exists, span exists, overlap with the claim.
+- Reasoning models: grade the **final answer and citations**, not the length of the scratchpad. Long traces can hide a wrong closer.
+
+**Factuality**
+
+- Gold answers, known amounts, a trusted KB. Separate from groundedness: a model can faithfully quote a stale policy.
+
+**Safety**
+
+- A held-out **red-team** set: jailbreaks, prompt injection (full treatment in Security), PII bait, "just this once" tool abuse.
+- Score **over-refusal** too (it said no to a normal refund). Helpful + harmless is a tradeoff; measure both.
+- Classifiers catch cheap patterns; humans + experts still audit a sample. Do not let an LLM judge be the **only** safety gate.
+
+## Real-world example
+
+Faithfulness is high; users still get the wrong price. The chunk was outdated. That's a **corpus** bug, not a generator bug. A single "hallucination %" would have sent you to rewrite the prompt for a month.
+
+## Technical explanation
+
+Intrinsic vs extrinsic hallucination in the literature maps onto **contradicts context** vs **not in context**. Your dashboard should use those words.
+
+Agents: a polite final message can still have called `delete_account`. Eval the **tool trace**.
+
+Next category (observability) is how you *see* these in production; this lesson is how you *score* them before and after.
+
+## Common mistakes
+
+<CommonMistake>
+One "hallucination rate" that mixes ungrounded claims, world errors, and jailbreaks. You cannot optimize a muddle.
+</CommonMistake>
+
+- Safety = "the model was nice." Nice and leaky is still a fail.
+- Trusting a judge to fact-check the web with no source.
+
+## When to use it
+
+- Any RAG or agent that can invent policy, cite, or act.
+- Before you call a system "safe to try."
+
+## When NOT to use it
+
+- Don't skip safety eval because quality eval is green.
+- Don't treat "I don't know" as a quality failure on empty retrieval — that's a win.
+
+## Alternatives
+
+- Retrieval metrics (RAG eval) find missing context. Human red-team for novel attacks. Security category for injection in depth.
+
+<MemoryCard>
+**Groundedness** vs context ≠ **factuality** vs the world ≠ **safety**. Verify citations in code.
+"I don't know" can be success. Don't use one blended hallucination number. Don't judge safety only with a judge.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-hallucination-safety-eval" />

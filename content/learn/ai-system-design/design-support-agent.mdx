@@ -1,0 +1,93 @@
+---
+id: design-support-agent
+slug: design-support-agent
+title: Design a Customer-Support Agent
+category: ai-system-design
+level: advanced
+summary: Support is identity, policy RAG, a structured action preview, and a human or policy gate — task success is a correctly resolved ticket, not a thumbs-up.
+keywords: [support agent, hitl, refund tool, ticket automation]
+prerequisites: [how-to-design-ai-system, what-is-agent]
+next: [design-coding-agent]
+related: [human-in-the-loop, tool-abuse, design-rag-chatbot]
+alternatives: [agent-vs-chatbot-vs-workflow]
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-design-support-agent
+estimatedMinutes: 8
+---
+
+<OneLine>A support agent looks up this customer, grounds in policy, proposes a structured action, and only then acts — refunds and mail are gated. Success is the ticket done right, not a friendly paragraph.</OneLine>
+
+## Explain like I'm new to AI
+
+Q&A over policy is the RAG chatbot. Support **changes state** (refund, ship, close). That's where excessive agency lives.
+
+<SupportAgentDesign />
+
+**Job:** resolve *this* customer's issue within policy. **SLO:** correct resolutions, p95 that a human can wait, $ per ticket, no unauthorized refunds.
+
+**Shape:** mostly **workflow** with a little agent in the middle (how to phrase, which doc). Not a mega-agent with shell + refund.
+
+## Mental model
+
+A junior specialist with a binder and a stamp that only the supervisor (or a hard-coded rules engine) can press.
+
+## How it works
+
+- Identity from the session/CRM, never from chat ("I am the account owner").
+- Retrieve policy + this ticket (ACL). PII minimized in the window.
+- Tools: `get_order`, `preview_refund` — not `refund` until gate.
+- HITL or deterministic policy ("under $20 auto") in **code**.
+- Memory: session for the thread; long-term preferences carefully (memory-conflicts).
+- Eval: gold tickets with expected tool + outcome. Online: time-to-resolution, reopen rate.
+- Route FAQs to the RAG chatbot path; escalate ambiguity to humans.
+- Traces: tool spans. Polite text can still have called delete.
+
+## Real-world example
+
+Bot "cancels" by deleting the user because tool names were vague. Schema + confirm + session user id would have saved it. Injection in a ticket attachment is the same hole (indirect injection).
+
+## Technical explanation
+
+Structured output for the preview. Your API binds parameters. Encode anything rendered.
+
+Don't put the Stripe key in the prompt. Loop cap so a confused agent doesn't refund 400 times.
+
+## Common mistakes
+
+<CommonMistake>
+One kit: search, refund, send-mail, "run SQL." That's a buffet for injection.
+</CommonMistake>
+
+- Thumbs as the only metric.
+- Skipping HITL in staging because "not real money."
+
+## When to use it
+
+- Issues that need lookup + a small set of actions + policy. High volume FAQs stay RAG-only.
+
+## When NOT to use it
+
+- Don't agent-ize "what's our return window?" — that's the RAG chatbot.
+- Don't let the model invent the customer id.
+
+## Alternatives
+
+- Pure workflow (classify → template). Human-only for high-risk. Fine-tune tone after the gates exist.
+
+<MemoryCard>
+**Support:** session identity → policy RAG → structured preview → HITL/policy engine → scoped API.
+Eval ticket outcomes. Tiny kit. Attachments are untrusted. Trace tools, not tone.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-design-support-agent" />

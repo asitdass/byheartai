@@ -1,0 +1,126 @@
+---
+id: gans
+slug: gans
+title: What are GANs?
+category: deep-learning
+level: intermediate
+summary: A GAN pits a generator against a discriminator. Adversarial training still teaches; in 2026 diffusion and flow models dominate image generation.
+keywords: [gan, generator, discriminator, adversarial, mode collapse, diffusion]
+prerequisites: [neurons-layers-activations]
+next: [why-transformers-replaced-rnns]
+related: [image-video-generation, autoencoders]
+alternatives: [image-video-generation]
+confusedWith: [image-video-generation]
+frameworks: []
+products: []
+papers:
+  - title: "Generative Adversarial Nets (Goodfellow et al., 2014)"
+    url: "https://arxiv.org/abs/1406.2661"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-gans
+estimatedMinutes: 12
+---
+
+<OneLine>A GAN trains a generator to fool a discriminator that is trying to tell real data from fakes. The game is the lesson; in 2026, diffusion and flow models are what you ship for images.</OneLine>
+
+## Explain like I'm new to AI
+
+An autoencoder rebuilds **this** `x`. A **generative adversarial network (GAN)** wants to mint **new** `x` that look like the training set. Two players:
+
+- **Generator G:** takes noise `z ~ N(0,1)` (or a class label, or a text embedding) and emits a fake `x̂ = G(z)`.
+- **Discriminator D:** sees real `x` and fake `x̂`, outputs "probability this is real."
+
+D is trained like a classifier. G is trained to make D say "real" on fakes. Neither has a reconstruction target for a particular training image — the pressure is **statistical**. That is why GANs could look sharper than VAEs (no pixelwise average) and why they were infamously **unstable**.
+
+2026 honesty: **diffusion and flow-matching dominate image (and video) generation products.** StyleGAN-era faces were a cultural moment; they are not what Midjourney / Flux / movie tools run. You still learn GANs because **adversarial training** shows up in distillation, discriminators-as-losses, and "don't let the model score its own homework." For the product picture of pixels-from-prompts, read **Image & Video Generation**.
+
+<GanIdea />
+
+## Mental model
+
+A **forger** (G) and a **detective** (D). The detective studies real paintings and the forger's latest work. The forger only gets a signal through the detective's judgment — not a pixel-by-pixel overlay of a specific Vermeer. If the detective is too good too fast, the forger gets "fake" on everything and no usable gradient. If the detective is lazy, the forger wins with a brown smudge. If the forger finds one face that always fools, they print that face forever (**mode collapse**).
+
+## How it works
+
+The original minimax (Goodfellow 2014):
+
+```text
+min_G max_D  E_x[log D(x)] + E_z[log(1 − D(G(z)))]
+```
+
+In practice G is often trained to **maximize log D(G(z))** (non-saturating loss) because `log(1 − D)` is flat when D is confident the fake is fake.
+
+**Loop (the actual algorithm):**
+
+1. Draw a minibatch of real `x` and noise `z`.
+2. Update D: real → 1, `G(z)` → 0. Freeze G.
+3. Draw new `z`. Update G to increase D(G(z)). Freeze D.
+4. Repeat. Optionally k D steps per G step.
+
+**Tiny 1-d cartoon.** Real data is `x = 3` always. G is `x̂ = z + g` with `z ~ N(0,1)`. D is `σ(w · x + b)`. After D learns "near 3 is real," G's gradient on `g` should push `g` toward 3. If D saturates (`D(x̂) ≈ 0` for all current fakes), `∂loss_G / ∂x̂` vanishes — G stops learning even though it is wrong. That is the instability in one dimension.
+
+Architectures that made this usable: **DCGAN** (conv G/D, 2015), **WGAN-GP** (Earth-Mover distance + gradient penalty — smoother D), **StyleGAN** (style codes, faces). Conditioning: concat a class, or FiLM, or text embeddings (early text-to-image GANs; diffusion ate that product).
+
+## Real-world example
+
+2018: a StyleGAN demo interpolates celebrity faces; every ML course adds a GAN notebook. 2026: the same course should say "this is adversarial training" and then open a diffusion notebook for the image product. Remaining GAN-shaped systems: some **super-resolution** discriminators, **neural compression**, game-texture tools, research on adversarial robustness. A company generating catalog photos from SKU text is almost certainly on a **diffusion / flow** API or checkpoint — see the multimodal lesson.
+
+## Technical explanation
+
+At Nash equilibrium, for a powerful enough D, G's distribution matches the data distribution (in the original derivation). You never reach that. You get **oscillation**, **mode collapse** (low entropy G), **discriminator collapse**, sensitive learning rates, and a loss curve that **does not mean what MSE means** — D loss going down is not "the image got better." Evaluate with FID/IS/human raters, not "G loss."
+
+**Adversarial loss as a component:** train a reconstructor with MSE + `λ log D(x̂)` so D criticizes blur. That hybrid is why "GAN" still appears in papers that are not standalone generators.
+
+**vs diffusion, one stanza.** Diffusion trains a denoiser with a well-behaved regression (or score) loss; sampling is iterative. No second network that must stay perfectly matched. Slower sample, stabler train, better coverage of modes — the 2022–2026 empirical winner for pixels. Flow matching is the close cousin. GANs still sample in **one forward pass**, which is why they linger in real-time graphics.
+
+<Compare
+  a="GAN"
+  b="Diffusion / flow (2026 default)"
+  rows={[
+    { label: "Train signal", a: "Fool a discriminator (minimax)", b: "Denoise / match a flow — a regression-like loss" },
+    { label: "Stability", a: "Fragile; mode collapse; two timescales", b: "Much calmer; loss actually trends" },
+    { label: "Sample speed", a: "One (or few) forwards", b: "Many steps (unless distilled)" },
+    { label: "Product image/video", a: "Legacy / niches", b: "What you actually ship" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Starting a 2026 image product by training a GAN from scratch because the 2018 tutorial was memorable. Learn the game, then use diffusion/flow (or a vendor generator). Adversarial losses can still be a topping, not the whole meal.
+</CommonMistake>
+
+- Watching G/D losses like training accuracy. They are a match score, not image quality.
+- Updating G and D with the same learning rate and the same number of steps "for fairness" — the heuristic is usually **keep D a little ahead, not a god**.
+- Evaluating only on cherry-picked fakes; mode collapse looks great in a 4×4 grid of the same face.
+
+## When to use it
+
+- To understand adversarial training, papers 2014–2021, and one-shot sampling constraints.
+- As an **auxiliary** discriminator loss, or in domains where a fast G already works.
+
+## When NOT to use it
+
+- Greenfield text-to-image / video — **Image & Video Generation** (diffusion, autoregressive visual tokens, flows).
+- Any setting where you cannot afford a week of "maybe it will collapse on Tuesday."
+
+## Alternatives
+
+- **VAEs / VQ-VAEs** — likelihood + latents; often the tokenizer in front of diffusion.
+- **Diffusion and flow-matching** — default generators.
+- **Autoregressive image transformers** — next-token on patches; another 2024–2026 line.
+
+<MemoryCard>
+**GAN = generator vs discriminator**, a game not a reconstruction. Unstable; mode collapse is the failure mode.
+2026 image gen: diffusion/flow. Keep GANs in your head for adversarial training and fast sampling niches.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-gans" />

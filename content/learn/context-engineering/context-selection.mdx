@@ -1,0 +1,97 @@
+---
+id: context-selection
+slug: context-selection
+title: Selection & Prioritization
+category: context-engineering
+level: intermediate
+summary: Treat the context window as a budget — keep instructions and the current question, select only relevant retrieval and tools, and drop or compress the rest.
+keywords: [context selection, token budget, prioritization, attention dilution, packing]
+prerequisites: [prompt-engineering-vs-context-engineering, context-window]
+next: [context-compression]
+related: [what-is-rag, tool-selection, reranking]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-context-selection
+estimatedMinutes: 8
+---
+
+<OneLine>Selection is deciding what earns a token this call: keep the question and instructions, retrieve only what is relevant, expose only the tools you need, and treat everything else as optional.</OneLine>
+
+## Explain like I'm new to AI
+
+The context window is not storage. It is a **budget**. Every token you add is a token the model must attend to — and pay for. Stuffing "just in case" is how agents get slower, costlier, and *dumber*.
+
+Toggle the layers. Watch what still fits. History and bulky retrieval should lose first; the current question should never fall out.
+
+<ContextPacking />
+
+## Mental model
+
+Packing a **carry-on suitcase** for one flight. Passport and tickets stay. One outfit. Not your entire closet. If it doesn't fit, you don't buy a bigger plane first — you pack less.
+
+## How it works
+
+A practical priority, from must-keep to first-to-cut:
+
+1. **Current user message** (+ any required output contract).
+2. **System / developer instructions** that still apply.
+3. **Tools this step might need** — not the full catalog of 80 MCP tools.
+4. **High-ranked retrieval & memories** (after rerank, small *k*).
+5. **Recent conversation / tool traces**.
+6. **Older history and raw dumps** — compress or drop.
+
+**Select** tactics you already know from other categories: RAG + reranking, hybrid search, tool retrieval, just-in-time `resources/read` instead of pasting a whole repo.
+
+Measure **tokens per layer** in production. If "history" is 70% of the window, you don't have a prompting problem — you have a packing problem.
+
+## Real-world example
+
+An IDE agent with 40 MCP tools and the last 80 chat turns stuffed into every call. The model picks the wrong tool and misses a file you opened two minutes ago. Fix: retrieve the top few tools, keep the last few turns literal, compact the rest, attach only the active file. Same model, better payload.
+
+## Technical explanation
+
+Attention is finite. Irrelevant tokens don't just waste money; they **dilute** the weights on the tokens that matter. That is why a 200k window filled to the brim often underperforms a 20k carefully selected one.
+
+Prioritization is also **positional**. Instructions and the live question should not be buried. Cache-friendly hosts put a **stable prefix** (tools + system + pinned policy) first and the **variable question** last — see **context caching**.
+
+Don't confuse advertised context length with **quality at that length**. Selection exists because the cheapest, most reliable token is the one you never send.
+
+## Common mistakes
+
+<CommonMistake>
+Dumping the whole tool catalog and the whole corpus "so the model has options." Options without
+selection become noise. Retrieve a shortlist; rerank; then pack.
+</CommonMistake>
+
+- Equal priority for every layer ("everything is important").
+- Never measuring which layer ate the budget.
+
+## When to use it
+
+- Every multi-source call (RAG, agents, MCP). Selection is the default, not an optimization.
+
+## When NOT to use it
+
+- Tiny, single-prompt tasks that already fit with room to spare.
+
+## Alternatives
+
+- Buy a longer-context model *after* you select — not instead of selecting. **Compression** when you must keep a long thread.
+
+<MemoryCard>
+The window is a **budget**, not a warehouse. **Must-keep**: question + instructions. **Select** tools
+and docs with retrieval/rerank. Cut history and dumps first. Extra tokens compete for attention.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-context-selection" />

@@ -1,0 +1,151 @@
+---
+id: clustering
+slug: clustering
+title: What is Clustering?
+category: machine-learning
+level: beginner
+summary: Clustering groups unlabeled examples by similarity. k-means is the starter method; k is a choice, and clusters are not classes.
+keywords: [clustering, k-means, unsupervised, segments, k]
+prerequisites: [supervised-unsupervised-rl]
+next: [overfitting-vs-underfitting]
+related: [classification, supervised-unsupervised-rl]
+alternatives: [classification]
+confusedWith: [classification]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-clustering
+estimatedMinutes: 12
+---
+
+<OneLine>Clustering is unsupervised grouping: you pick a notion of “nearby,” and the algorithm piles unlabeled examples together. The piles are not official classes.</OneLine>
+
+## Explain like I'm new to AI
+
+You have a spreadsheet with **no target column**. Still, some rows look like each other.
+
+**Clustering** assigns each row a **group id** so that rows in a group are similar and groups are different — according to a distance you chose.
+
+**k-means**, the first algorithm to learn, asks you for **k** (how many piles). It places k **centroids** (average points) and iterates: assign each row to the nearest centroid, then move each centroid to the mean of its rows. Repeat until things stop moving.
+
+<ClusteringIdea />
+
+You chose k. The data did not whisper “there are three customer types.” If you set k = 17 you will get 17 piles. Whether they are *useful* is a product question.
+
+## Mental model
+
+Sorting a mixed drawer of cables with no labels on the hooks. You make piles: USB-C, barrel, mystery. Tomorrow a colleague names them. The names came from a human, not from k-means.
+
+Classification is sorting into hooks that *already have* printed signs. Clustering prints nothing until you do.
+
+## How it works — k-means intuition
+
+1. Pick k and (usually) random initial centroids — in practice, **k-means++** spreads them out.
+2. **Assign:** every point joins its nearest centroid (Euclidean distance on the features you scaled).
+3. **Update:** centroid = mean of its members.
+4. Repeat. The quantity that drops is **inertia** — sum of squared distances to the assigned centroid.
+
+**Choosing k**
+
+- **Elbow:** plot inertia vs k. Look for a bend. Soft, easy to over-read.
+- **Silhouette** (and similar scores): how tight vs separated the piles are. Still not “truth.”
+- **Downstream:** did the marketing team get segments they can write email for? That is the real test.
+- **Stability:** rerun with different seeds. If membership shuffles wildly, the geometry is not cluster-shaped.
+
+**Scaling matters.** k-means on raw `[income, age]` lets income dominate because the numbers are bigger. Standardize columns first.
+
+k-means wants **blob-shaped**, similar-size clouds. Rings, moons, and a dense clump plus a sparse clump want other methods (DBSCAN, GMM, hierarchical).
+
+## Code
+
+```python title="cluster_kmeans.py"
+from sklearn.datasets import make_blobs
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
+X, true_ids = make_blobs(n_samples=180, centers=3, cluster_std=0.9, random_state=0)
+Xs = StandardScaler().fit_transform(X)
+
+for k in (2, 3, 4):
+    km = KMeans(n_clusters=k, n_init=10, random_state=0).fit(Xs)
+    print("k", k, "inertia", round(km.inertia_, 1), "silhouette", round(silhouette_score(Xs, km.labels_), 3))
+
+# k=3 usually wins on this synthetic three-blob set.
+# true_ids are ONLY for your curiosity — k-means never saw them.
+```
+
+There is no `y` in `fit`. If you find yourself passing labels into clustering, you wanted classification.
+
+## Real-world example
+
+A shop clusters last year’s orders on recency, frequency, monetary value (**RFM**). k = 4 yields “hibernating,” “loyal big spenders,” “new and curious,” “discount-only.” A human names the piles and designs campaigns.
+
+They must **not** report “precision of the loyal cluster” against a class that did not exist at train time. If they later *label* “will buy the membership,” that is a new supervised problem.
+
+## Technical explanation
+
+k-means minimizes within-cluster sum of squares. It is **NP-hard** in general; Lloyd’s algorithm finds a local minimum. `n_init` restarts are not optional on real data.
+
+**Not the same as classification**
+
+- No decision boundary trained to recover a ground-truth name.
+- Cluster 2 on Monday may be cluster 0 after a rerun (label switching).
+- New points can be assigned to the nearest centroid — that is *out-of-sample assignment*, still not a certified class.
+
+Hierarchical clustering gives a tree of merges (a dendrogram) so you can cut k later. DBSCAN finds density islands and can mark **noise** instead of forcing every point into a pile — useful for fraud-ish “odd rows,” still not a labeled detector.
+
+<Compare
+  a="k-means clustering"
+  b="Classification"
+  rows={[
+    { label: "Needs y?", a: "No", b: "Yes" },
+    { label: "You choose", a: "k and a distance", b: "A label schema and a threshold" },
+    { label: "Wrong k", a: "Always returns k piles anyway", b: "Wrong schema is a different dataset" },
+    { label: "Success metric", a: "Usefulness / stability", b: "Precision, recall, AUC on holdout" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Training k-means, then computing F1 against labels you secretly had. If you have labels, train a classifier and keep a holdout. Clustering is for when those labels do not exist yet.
+</CommonMistake>
+
+- Forgetting to scale. One column becomes the whole geometry.
+- Treating k as a trained parameter you “learned from inertia” without looking at the points.
+- Clustering raw user ids or timestamps as if they were Euclidean features.
+- Shipping cluster ids into production without a story for *new* users and for drift (the clouds move).
+
+## When to use it
+
+- Exploration: “what lumps exist in this unlabeled pile?”
+- Compression of behavior into a few segments a team can name.
+- A first pass before expensive labeling: cluster, then label *cluster samples*, then train a classifier.
+
+## When NOT to use it
+
+- You already have the names you need. Classify.
+- You need a legally defined group (“defaulted / did not”). Clustering cannot invent a credit label.
+- The features are high-dimensional text or images without a representation step. Cluster **embeddings**, not raw pixels or raw bag-of-words, unless you know why.
+
+## Alternatives
+
+- **Classification** once labels exist.
+- **Dimensionality reduction** (PCA, UMAP) to *look* at structure without committing to k piles.
+- Simple business rules (“spent &gt; $500 and orders ≥ 4”) when the segment definition is already a sentence.
+
+<MemoryCard>
+**Clustering** groups unlabeled rows. **k-means** needs **k**, distance, and scaling. Piles are not classes.
+If you have names and a holdout, you wanted classification.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-clustering" />

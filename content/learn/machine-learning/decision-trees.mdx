@@ -1,0 +1,128 @@
+---
+id: decision-trees
+slug: decision-trees
+title: What are Decision Trees?
+category: machine-learning
+level: intermediate
+summary: A decision tree asks yes/no questions to split tabular data. Depth buys fit and interpretability — and quickly overfits.
+keywords: [decision tree, splits, depth, gini, tabular, interpretability]
+prerequisites: [classification, overfitting-vs-underfitting]
+next: [random-forests]
+related: [random-forests, gradient-boosting, overfitting-vs-underfitting, classification]
+alternatives: [random-forests, gradient-boosting]
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-decision-trees
+estimatedMinutes: 13
+---
+
+<OneLine>A decision tree is a flowchart of feature splits: each fork asks a question, each leaf predicts a class or a number. Easy to read, eager to memorize.</OneLine>
+
+## Explain like I'm new to AI
+
+Imagine a loan officer with a clipboard:
+
+- Is income above $80k? If no → lean “default.”
+- If yes: is credit score at least 700? If yes → “repay.”
+- If not: is the amount small? … and so on.
+
+A **decision tree** learns those questions from a table. At each step it picks the **split** (feature + threshold, or a category grouping) that most purifies the labels in the two child piles. It repeats until leaves are pure, or you **stop** (max depth, min samples per leaf).
+
+<DecisionTreesViz />
+
+On **tabular** data — columns with meaning — a shallow tree is a gift: you can print it in a risk memo. A deep tree is a trap: leaves with three rows are biographies, not policy. The overfitting lesson is not optional here. Forests and boosting exist because one deep tree is unstable.
+
+## Mental model
+
+A game of twenty questions, but the questions are chosen to reduce **impurity** (how mixed the labels are) as fast as possible.
+
+- **Classification tree:** a leaf votes the majority class (or stores class percentages).
+- **Regression tree:** a leaf predicts the mean `y` of the rows that fell there.
+
+Unlike a linear model, a tree can say “income helps *only if* the region is X.” Interactions are native. Smooth straight-line effects are *not* native — you get staircases.
+
+## How it works
+
+1. Start with all training rows in the root.
+2. For each candidate split, score how much **impurity** would drop. Classification often uses **Gini** or **entropy**; regression uses variance reduction.
+3. Take the best split. Recurse on the left and right child.
+4. **Stop** when depth, leaf size, or impurity improvement hits your cap — or you will grow until each leaf is one row (perfect train, ruined val).
+5. Predict by sending a new row down the same questions.
+
+**Depth** is the main capacity knob. Depth 1 is a stump (one question). Depth 20 on a small table is a lookup.
+
+**Interpretability:** you can list the path: “because income ≤ 80k and credit &lt; 620.” Feature importance (how often a column was used, weighted by impurity drop) is a summary, not a causal story — correlated columns steal credit from each other.
+
+## Real-world example
+
+A hospital wants a **readable** rule for “likely no-show.” A depth-3 tree: prior no-shows, distance, time of day. Clinicians can argue with the splits. A 400-leaf tree that uses a hashed device id will not survive governance, even if train AUC is 0.99.
+
+For raw MRI pixels, a tree on flattened values is the wrong species. That is deep learning. Trees shine when a human already built columns.
+
+## Technical explanation
+
+CART-style binary trees greedily optimize a local impurity criterion. Greedy means **not** globally optimal; a slightly worse first split might win later. In practice greedy is what everyone ships.
+
+Missing values: some implementations send “missing” down a learned direction or use surrogate splits. You still should not treat “null” as a magic number without a policy.
+
+Categorical features with huge cardinality (zip, user id) let a tree isolate individuals. That is overfitting with extra steps. Encode with care, or cap how small a leaf may be.
+
+A single tree has **high variance**: a different bootstrap of the table grows different questions. That sentence is the thesis of **random forests**. **Gradient boosting** keeps the tree but adds them in sequence to attack residuals.
+
+<Compare
+  a="Shallow tree"
+  b="Deep tree"
+  rows={[
+    { label: "Train fit", a: "May underfit", b: "Can go to ~100%" },
+    { label: "Val", a: "Often honest if the pattern is simple", b: "Often a cliff vs train" },
+    { label: "Story for a human", a: "A paragraph", b: "A novel nobody should sign" },
+    { label: "Use", a: "Baseline, rules, explainability", b: "Almost never alone — ensemble it" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Growing until train accuracy is perfect, then being shocked in production. You built a database of the training rows. Cap depth. Watch val. Then consider a forest.
+</CommonMistake>
+
+- One-hot exploding a tree into thousands of dummy columns without `min_samples_leaf`.
+- Reading feature importance as “this caused the default.” It is “this was useful for splitting this sample.”
+- Using a tree on unaggregated time series without lag features — it cannot see order unless you give it columns that encode order.
+
+## When to use it
+
+- Tabular problems where a **picture of the policy** matters.
+- A baseline before ensembles: if a depth-3 tree is already good, stop.
+- Nonlinear interactions on mixed type columns without scaling (trees do not need standardized features the way k-means and linear models do).
+
+## When NOT to use it
+
+- As your only model once depth creeps up to chase train metrics.
+- Images, audio, raw language. Use deep learning.
+- Smooth physical relationships you already have an equation for.
+- Tiny n and huge p without brutal leaf-size constraints.
+
+## Alternatives
+
+- **Linear / logistic models** when effects are additive and you need coefficients.
+- **Random forests** to average many trees (next).
+- **Gradient boosting** when you want tabular accuracy and will tune carefully.
+- A handwritten rule if the tree’s first split *is* the policy the lawyers already wrote.
+
+<MemoryCard>
+A **decision tree** is learned **if/else** splits on columns. Great on tables, readable when shallow, **overfits** when deep.
+Depth is capacity. Forests and boosting exist to keep the splits and lose the memorization.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-decision-trees" />

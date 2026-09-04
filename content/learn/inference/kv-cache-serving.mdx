@@ -1,0 +1,98 @@
+---
+id: kv-cache-serving
+slug: kv-cache-serving
+title: KV Cache at Serving Time
+category: inference
+level: advanced
+summary: Serving is limited by KV memory, not just weights. Paged blocks and shared prefixes pack more chats; this is the engine view of the transformers KV-cache lesson.
+keywords: [paged attention, prefix cache, kv memory, gqa]
+prerequisites: [what-is-inference, kv-cache]
+next: [serving-quantization]
+related: [context-caching, context-window, batching-continuous-batching]
+alternatives: []
+confusedWith: [context-caching, kv-cache]
+frameworks: []
+products: []
+papers:
+  - title: "Efficient Memory Management for Large Language Model Serving with PagedAttention"
+    url: "https://arxiv.org/abs/2309.06180"
+    kind: paper
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-kv-cache-serving
+estimatedMinutes: 8
+---
+
+<OneLine>The KV cache lesson explained *why* generation is fast. Serving is *where it lives*: GPU RAM grows with users × layers × sequence. Paged blocks and shared prefixes are how engines fit more chats than a naive reservation.</OneLine>
+
+## Explain like I'm new to AI
+
+Transformers: **KV cache** stores past keys/values so each new token isn't quadratic. Read that lesson if the idea is new.
+
+This lesson is the **ops** problem: cache is often **larger than the weights** once you have long context and many concurrent sessions. You ran out of users before you ran out of model.
+
+<PagedKvCache />
+
+**Paged KV** (PagedAttention-style): allocate cache in blocks, like an OS allocates pages. No giant empty tensors per request.
+
+**Prefix sharing:** one copy of the system-prompt KV, many user suffixes. Same physics as **Context Caching** (provider HTTP cache) — here it's inside the engine.
+
+**GQA / MQA:** fewer KV heads, smaller cache, standard in 2026 open weights.
+
+## Mental model
+
+Weights are the restaurant's stove (fixed). KV is the **open tickets on the counter**. Too many long tickets, the counter overflows even if the stove is fine.
+
+## How it works
+
+Capacity ≈ `(VRAM − weights − activations) / (bytes per token of KV)`. Quantizing KV (next lesson) and shrinking context raise concurrency.
+
+Prefix cache keys must include **prompt version** (observability). A prefix edit that doesn't bust cache serves stale instructions.
+
+Windowed / sliding KV and compression exist for extreme context; they trade recall (lost-in-the-middle / long-context lessons).
+
+## Real-world example
+
+A 70B "fits" on the GPU. At 32k context and 50 users, KV explodes. You never OOM on *load*; you OOM at lunch. Paging + prefix + GQA is the fix, not a bigger trophy model.
+
+## Technical explanation
+
+Fragmentation with naive allocators was the original PagedAttention pitch. Continuous batching needs paging; they are a pair.
+
+Multi-GPU: KV may be sharded with the tensors (tensor parallel) or moved in disaggregated decode pools (distributed lesson).
+
+Don't confuse: **context window** = max tokens the model can see. **KV cache** = stored K/V for the tokens you actually generated/prefilled. **Prompt cache** = reuse of a prefix across calls.
+
+## Common mistakes
+
+<CommonMistake>
+Sizing hardware from model-parameter GB only. You sized the stove and forgot the ticket rail.
+</CommonMistake>
+
+- Putting per-user PII in a "shared" prefix so it caches (security + wrong hits).
+- Thinking provider prompt caching replaces engine paging. You often want both.
+
+## When to use it
+
+- Always on a multi-user server. Always when context is long.
+
+## When NOT to use it
+
+- Don't prefix-share across tenants. Don't keep KV forever — sessions end, free the pages.
+
+## Alternatives
+
+- Shorter prompts (context engineering). Smaller model. More GPUs. Offload KV to CPU (slower decode).
+
+<MemoryCard>
+**Serving KV** is the concurrency budget. **Pages** beat empty reservations. **Shared prefixes** skip repeat prefill.
+Window ≠ cache ≠ HTTP prompt cache. Size GPUs for weights **plus** KV.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-kv-cache-serving" />

@@ -1,0 +1,168 @@
+---
+id: cross-validation
+slug: cross-validation
+title: What is Cross-Validation?
+category: machine-learning
+level: intermediate
+summary: Cross-validation rotates which slice is the test set so one lucky split cannot lie. Watch leakage; time series needs a forward split.
+keywords: [cross-validation, k-fold, leakage, time series split, holdout]
+prerequisites: [overfitting-vs-underfitting]
+next: [why-evaluation-matters]
+related: [overfitting-vs-underfitting, why-evaluation-matters, classification-metrics]
+alternatives: []
+confusedWith: [why-evaluation-matters]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-cross-validation
+estimatedMinutes: 13
+---
+
+<OneLine>Cross-validation reuses the table as several train/test plays so a single lucky split cannot flatter you. Leakage and time still break it if you shuffle the future into the past.</OneLine>
+
+## Explain like I'm new to AI
+
+You already know not to grade a model on the rows it studied (**overfitting vs underfitting**). The next lie is subtler: you cut **one** 80/20 split, the test 20% happened to be easy, and you ship.
+
+**k-fold cross-validation** cuts the data into k slices (often 5 or 10). Each slice gets to be the **test** set once; the other k−1 train. You average the k scores and look at the spread. No single photograph of “the” test set.
+
+<CrossValidation />
+
+A single test set still has a job: a **final** sealed exam after you are done peeking at CV. CV is for choosing models and knobs. The sealed slice is for the number you quote.
+
+**LLM gold sets** are the same idea in another stack. One frozen eval file is one fold. If you tune prompts against it every week for a quarter, you overfit the gold — Goodhart, same as training on the test fold. Rotate items, hold out a true final set, or treat production traces as a new exam. **Why Evaluation Matters** is that lesson for AI systems; this lesson is the classical mechanism underneath.
+
+## Mental model
+
+Five quizzes instead of one. Each student (model) takes a quiz they did not cram from. The average grade is stabler than quiz #2, which happened to be the chapter they like.
+
+If the quizzes leak (answer key printed on the back — you scaled features using the test fold), all five grades are fake. If the quizzes are dated (Wednesday’s quiz includes Thursday’s news), shuffled k-fold is cheating on a timeline.
+
+## How it works
+
+**k-fold**
+
+1. Shuffle *only if* rows are i.i.d. (not a time series, not grouped patients).
+2. Split into k folds. Prefer **stratified** folds for classification so each fold keeps the spam rate.
+3. For each fold: fit on the rest, score on the held fold. Use a **Pipeline** so scalers and feature selectors refit on train only.
+4. Report mean ± std. A huge std means the metric is noisy or the data is heterogeneous.
+
+**Why a single test set lies**
+
+- Small n: one split’s metric has huge variance.
+- Unlucky / lucky class mix.
+- You already used that test to choose `max_depth`. It is val now.
+
+**Leakage**
+
+- `StandardScaler.fit(X)` on all rows, then CV. The test fold’s mean leaked.
+- Filling missing values with the global median.
+- Tuning on test. CV does not save you if the outer loop saw the answers.
+
+**Time series**
+
+Use a **forward** split: train on the past, test on the future (`TimeSeriesSplit`). Random k-fold lets the model train on next week’s promotions to “predict” this week.
+
+**Grouped data**
+
+Multiple rows per user or hospital: split by **group**, not by row, or the same person is in train and test.
+
+## Code
+
+```python title="cv_pipeline.py"
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import StratifiedKFold, cross_val_score, TimeSeriesSplit
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+X, y = make_classification(
+    n_samples=240, n_features=8, n_informative=4, weights=[0.9, 0.1], random_state=0
+)
+
+pipe = Pipeline([
+    ("scale", StandardScaler()),
+    ("clf", LogisticRegression(max_iter=1000)),
+])
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+f1s = cross_val_score(pipe, X, y, cv=cv, scoring="f1")
+print("F1 mean", f1s.mean().round(3), "std", f1s.std().round(3), "folds", f1s.round(3))
+
+# Time-ordered data: do NOT shuffle. Example API:
+# tscv = TimeSeriesSplit(n_splits=5)
+# cross_val_score(pipe, X_time, y_time, cv=tscv, scoring="neg_mean_squared_error")
+```
+
+The pipeline is the leakage vaccine: each fold’s scaler sees only that fold’s training rows.
+
+## Real-world example
+
+A churn model with 2,000 customers. One 20% test happens to contain a campaign that never repeats; AUC 0.91. Five stratified folds: 0.74, 0.71, 0.80, 0.69, 0.72. Mean 0.73. The 0.91 was a postcard, not a model.
+
+A prompt engineer has 80 gold tickets. After a month of edits the score is 96%. Ten new tickets from last week score 61%. They overfit the gold fold. Same plot as a data scientist who tuned `n_estimators` on the test CSV.
+
+## Technical explanation
+
+CV estimates expected prediction error under the resampling distribution. It is not magic: if the future is unlike the past, every fold is still the past. Drift needs a time split and monitoring.
+
+**Nested CV** (outer loop for the reported number, inner loop for hyperparams) is the honest version when you tune a lot. Expensive; still cheaper than lying.
+
+Leave-one-out (k = n) is high variance and slow. k = 5 or 10 is the default adult choice.
+
+For LLMs you rarely rerun k-fold on 10 million pretraining tokens. You *do* need the *principle*: a number computed on data that influenced the prompt, the few-shot examples, or the judge rubric is not an unseen exam.
+
+<Compare
+  a="One train/test split"
+  b="k-fold CV"
+  rows={[
+    { label: "Cost", a: "One fit", b: "k fits" },
+    { label: "Luck", a: "High — one mix of rows", b: "Lower — every row tested once" },
+    { label: "Still needed", a: "A final sealed test after you stop peeking", b: "Same — CV is not the press-release number if you tuned on it" },
+    { label: "Fails when", a: "Always, if you peek", b: "Leakage, shuffle on time, grouped rows" },
+  ]}
+/>
+
+## Common mistakes
+
+<CommonMistake>
+Preprocessing the whole CSV, then calling <code>cross_val_score</code> on the transformed matrix. The folds were already contaminated. Put the scaler in a Pipeline.
+</CommonMistake>
+
+- Shuffling a time series.
+- Reporting the best fold instead of the mean.
+- Nested-tuning in your head (“we tried 40 configs on these folds”) and quoting the winner’s CV as unbiased.
+- A gold eval set that is also the few-shot library.
+
+## When to use it
+
+- Model choice and hyperparameter search on medium tabular data.
+- Anytime n is small enough that one split’s metric jumps around.
+- As the mental model for why LLM eval sets must stay frozen *and* not be the only set you ever tune on.
+
+## When NOT to use it
+
+- Do not k-fold shuffle when order is the point (quotes, sensors, “next month’s demand”).
+- Do not use CV as an excuse to skip a true production-like holdout.
+- Billion-row training where even one extra pass is money — then a single well-cut time holdout plus monitoring. The *principle* remains.
+
+## Alternatives
+
+- A large, well-cut **holdout** when data is plentiful and i.i.d.
+- **TimeSeriesSplit** / rolling origin for temporal problems.
+- **GroupKFold** when rows cluster by identity.
+- For AI systems: offline gold + a final holdout + online eval (**Why Evaluation Matters**).
+
+<MemoryCard>
+**k-fold CV** rotates the test slice so one split cannot lie. **Pipeline** against leakage. **Time-aware** splits when rows have a clock.
+A single test set — or a single LLM gold file you tune on — is one photograph. You need more than one.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-cross-validation" />

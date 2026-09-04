@@ -1,0 +1,94 @@
+---
+id: prompt-versioning
+slug: prompt-versioning
+title: Prompt Versioning and Evaluation Traces
+category: observability
+level: advanced
+summary: Tag every span with prompt, model, and retriever versions. Eval traces match prod shape so you can replay an incident, then flip the flag.
+keywords: [prompt versioning, eval traces, replay, prompt registry]
+prerequisites: [what-is-observability, why-evaluation-matters]
+next: [prompt-injection]
+related: [benchmarks-regression, offline-vs-online-eval]
+alternatives: []
+confusedWith: []
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-prompt-versioning
+estimatedMinutes: 8
+---
+
+<OneLine>Prompts, retrievers, tools, and models are versioned artifacts. Every production span carries those versions. Evaluation runs emit the *same* trace shape so you can compare v12 vs v13 on gold — and replay a real incident — before you flip traffic.</OneLine>
+
+## Explain like I'm new to AI
+
+If three people edit "the system prompt" in the host, traces cannot say which recipe served the user. That's cooking without a recipe card.
+
+<PromptVersionTrace />
+
+**Version** = id + number (or content hash): `prompt_id=support.system@13`, `retriever=policy-v4`, `tools=catalog@9`, `model=…`. Put them on the parent span. CI eval jobs set the same fields.
+
+Then: **replay**. Take prod trace 7f3a (redacted inputs you are allowed to keep, or the retrieved ids + the ask). Run candidate v13 offline. If gold CI is green *and* the incident replay is fixed, flip a flag. That is eval + observability as one loop.
+
+## Mental model
+
+Git for recipes. You don't change production soup by stirring the pot with no tag. You cut a version, taste it on the frozen menu (gold set), reheat yesterday's complaint bowl (replay), then ship.
+
+## How it works
+
+1. Store prompts in git or a registry. Immutable versions. No silent hot-edit.
+2. Ship `prompt_version` (and friends) as required span attributes — like `model`. Missing version is a bug.
+3. **Eval traces:** the gold-set runner uses the same instrumentation as prod. You can open a CI failure as a waterfall, not a spreadsheet cell.
+4. **Online eval samples** join by version: "v13 faithfulness on live traffic this hour."
+5. Feature flags / weighted traffic: 5% v13, kill switch. Observability tells you mix and outliers.
+
+Also version **chunkers, embedding models, indexes**. A prompt v13 on a new index is two changes; don't confound them (eval category: one change at a time when you can).
+
+## Real-world example
+
+Faithfulness drops Monday. Traces: mix of v12 and a "temporary" untagged edit from Friday Slack. You revert by version, not by memory. Next time the PR cannot merge without a version bump and a gold-set job.
+
+## Technical explanation
+
+Content hash is honest when the "prompt" is assembled (tools list + memory + template). If the packed context changes, the hash should change — that's **context engineering** meeting observability. Cache keys (context caching) should align with that prefix; a version bump that doesn't bust cache when it should (or does when it shouldn't) shows up as hit-rate + quality together.
+
+Retention: eval traces can keep more payload (they're curated). Prod traces keep ids + redacted ask. Same *schema*, different redaction policy.
+
+Next category is **Security**. Injection investigations start from these traces (what tool fired, what context was packed). If you didn't version and redact, you will either be blind or leaking.
+
+## Common mistakes
+
+<CommonMistake>
+Hot-editing production prompts because "it's just text." You cannot eval, replay, or roll back text that has no version.
+</CommonMistake>
+
+- Eval in a notebook, prod in another stack — traces don't match, replay is fan fiction.
+- Changing prompt and index in one deploy with no attributes to separate them.
+
+## When to use it
+
+- The first time a prompt leaves your laptop. Treat it as code.
+
+## When NOT to use it
+
+- Don't wait for a "prompt platform" purchase. A git tag + an attribute is enough to start.
+- Don't snapshot every packed megabyte of context in prod "for replay." Store ids; re-fetch under policy.
+
+## Alternatives
+
+- Config-as-code without telemetry still fails: you won't know which version a given user hit. Flags without versions on spans have the same hole.
+
+<MemoryCard>
+**Prompts are code:** `id@version` on every span, plus model and retriever. Eval traces = prod shape.
+Replay incidents through the candidate. No hot-edits. Flip traffic only after CI + replay.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-prompt-versioning" />

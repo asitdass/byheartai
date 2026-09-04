@@ -1,0 +1,201 @@
+---
+id: backpropagation
+slug: backpropagation
+title: What is Backpropagation?
+category: foundations
+level: intermediate
+summary: Backpropagation applies the chain rule through each layer so every weight gets a gradient; then gradient descent can step.
+keywords: [backpropagation, backprop, chain rule, autograd, backward pass, vanishing gradient]
+prerequisites: [optimization-gradient-descent, what-is-neural-network]
+next: [neurons-layers-activations]
+related: [optimization-gradient-descent, what-is-neural-network, training-vs-inference, loss-functions]
+alternatives: []
+confusedWith: [optimization-gradient-descent]
+frameworks: []
+products: []
+papers: []
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-backpropagation
+estimatedMinutes: 14
+---
+
+<OneLine>Backpropagation is the chain rule run backward through a network so each weight learns how much it contributed to the loss.</OneLine>
+
+## Explain like I'm new to AI
+
+Gradient descent needs a **gradient** for every parameter. For `ŷ = w x` you can write `dL/dw` on a napkin. For a stack of layers, ŷ depends on w₂ which depends on h which depends on w₁. The napkin explodes.
+
+**Backpropagation** (backprop) is the efficient way to get **all** those derivatives: run the network **forward** to compute activations and loss, then run **backward**, multiplying local derivatives (the **chain rule**) so each weight receives `∂L/∂w`.
+
+It is not a different optimizer. It does not "teach like a brain." It is bookkeeping for calculus, implemented as **autograd** in every modern framework. After backprop, you still do `w ← w − η ∂L/∂w`.
+
+<BackpropagationViz />
+
+## Mental model
+
+A restaurant chain of blame.
+
+- The customer (loss) is unhappy: dessert was too sweet.
+- **Backward:** the pastry chef (last layer) sees the complaint first and knows how much *their* sugar knob mattered.
+- They pass a residual complaint to the sauce station (earlier layer): "you sent me a puree that was already sweet."
+- Each station adjusts **its** knobs. Nobody re-simulates the whole kitchen from scratch for every knob — that would be naive finite differences, O(parameters) forward passes.
+
+Backprop reuses the forward activations so one backward pass scores **every** knob.
+
+## How it works
+
+A two-weight chain (same numbers as the visual):
+
+```text
+h  = w₁ · x
+ŷ  = w₂ · h
+L  = ½ (ŷ − y)²
+```
+
+**Forward.** x = 2, w₁ = 0.5, w₂ = 1.5, y = 0.5.
+
+```text
+h  = 0.5 · 2 = 1
+ŷ  = 1.5 · 1 = 1.5
+L  = ½ (1.5 − 0.5)² = 0.5
+```
+
+**Backward (chain rule).**
+
+```text
+∂L/∂ŷ  = ŷ − y = 1.0
+∂L/∂w₂ = (∂L/∂ŷ) · (∂ŷ/∂w₂) = 1.0 · h = 1.0
+∂L/∂h  = (∂L/∂ŷ) · (∂ŷ/∂h)  = 1.0 · w₂ = 1.5
+∂L/∂w₁ = (∂L/∂h) · (∂h/∂w₁) = 1.5 · x  = 3.0
+```
+
+**Update** with η = 0.1:
+
+```text
+w₂ ← 1.5 − 0.1 · 1.0 = 1.4
+w₁ ← 0.5 − 0.1 · 3.0 = 0.2
+```
+
+That is backprop + GD. Deeper nets insert **activation functions** (ReLU, GELU) whose local derivative is 0 or 1 (ReLU) or a smooth curve (GELU). The chain just gets longer. Transformers do the same through attention and MLP blocks.
+
+**Autograd** builds a graph of ops during the forward pass, then walks it backward. You almost never write `∂L/∂w₁` by hand after this lesson — but you should be able to for a two-node chain, or you will not debug vanishing gradients.
+
+## Real-world example
+
+**Digit net.** Pixels → hidden → 10 logits → cross-entropy. Backprop tells the first layer whether this "looks like a 7" error should move edge detectors. One backward pass updates millions of weights.
+
+**LLM training.** Next-token CE at each position. Backprop through the transformer (including **attention**). **Gradient checkpointing** trades extra compute for RAM by *recomputing* some forwards during backward. Same algorithm, systems tricks.
+
+**Fine-tuning LoRA.** You freeze base weights (no gradient stored for them) and backprop only through small adapter matrices. Still backprop — smaller graph.
+
+**Not backprop:** evolutionary strategies, zeroth-order attacks on APIs, or "ask the model to rewrite its weights." Those are other search methods.
+
+## Technical explanation
+
+For composition `L = ℓ( f₂( f₁(x, w₁), w₂ ), y )`,
+
+```text
+∂L/∂w₂ = (∂ℓ/∂ŷ) (∂f₂/∂w₂)
+∂L/∂w₁ = (∂ℓ/∂ŷ) (∂f₂/∂h) (∂f₁/∂w₁)
+```
+
+Matrix calculus uses Jacobians; frameworks multiply **vector-Jacobian products** so you never materialize a giant Jacobian.
+
+**Vanishing / exploding gradients.** If many layers have |local derivative| ≪ 1, ∂L/∂w_early → 0 (nothing learns). If |·| ≫ 1, gradients explode (NaNs). Residual connections, normalization, careful init, and Adam exist largely so backprop *signals* survive depth.
+
+**Finite differences check** (debugging):
+
+```text
+∂L/∂w ≈ [ L(w + ε) − L(w − ε) ] / (2ε)
+```
+
+Agree with autograd to ~1e-5 relative error, or you have a bug. Cost: two extra forwards **per** scalar you check — why backprop exists.
+
+```python
+import numpy as np
+
+def forward(x, w1, w2):
+    h = w1 * x
+    yhat = w2 * h
+    return h, yhat
+
+def loss(yhat, y):
+    return 0.5 * (yhat - y) ** 2
+
+x, y = 2.0, 0.5
+w1, w2 = 0.5, 1.5
+h, yhat = forward(x, w1, w2)
+L = loss(yhat, y)
+
+dL_dyhat = yhat - y
+dL_dw2 = dL_dyhat * h
+dL_dh = dL_dyhat * w2
+dL_dw1 = dL_dh * x
+
+eta = 0.1
+w2_new = w2 - eta * dL_dw2
+w1_new = w1 - eta * dL_dw1
+_, yhat2 = forward(x, w1_new, w2_new)
+print(f"L {L:.3f} → {loss(yhat2, y):.3f}")
+print(f"w1 {w1} → {w1_new:.3f}, w2 {w2} → {w2_new:.3f}")
+
+# Finite-difference check on w1
+eps = 1e-5
+Lp = loss(forward(x, w1 + eps, w2)[1], y)
+Lm = loss(forward(x, w1 - eps, w2)[1], y)
+print("autograd dL/dw1", dL_dw1, "numeric", (Lp - Lm) / (2 * eps))
+```
+
+In PyTorch the same network is `loss.backward(); opt.step()`. The lesson is what `backward` *means*.
+
+## Common mistakes
+
+<CommonMistake>
+Saying "we trained with backpropagation" as if it replaced gradient descent. You trained with
+gradient descent (or Adam). Backprop is the gradient engine for layered models.
+</CommonMistake>
+
+- Stopping the tape too late (`detach` / `no_grad` on tensors you still needed) — silent zero gradients.
+- Expecting gradients through **argmax**, **discrete** tool calls, or **non-differentiable** metrics — the chain is broken; use a surrogate or RL.
+- Vanishing gradients in a deep stack of sigmoid/tanh without residuals — historical trap; modern nets are built to avoid it.
+- Thinking backprop updates the model at **inference**. Inference is forward-only unless you are doing test-time training (rare).
+
+## When to use it
+
+- Training any neural network (including transformers, LoRA, diffusion) where L is differentiable w.r.t. parameters.
+
+## When NOT to use it
+
+- Models you can solve in closed form.
+- Objectives with no usable gradient (hard search, some black-box APIs). Then: search, distillation from a teacher, or a differentiable proxy.
+- Production **inference** serving: do not run backward on every user request.
+
+## Alternatives
+
+- **Finite differences / NES** — simple, slow, used in some black-box settings.
+- **Forward-mode autodiff** — better when you have few parameters and many outputs (unusual for deep nets).
+- **Straight-through estimators** — pretend a discrete op had gradient 1; biased but common.
+
+<Compare
+  a="Forward pass"
+  b="Backward pass"
+  rows={[
+    { label: "Direction", a: "x → ŷ → L", b: "L → each w" },
+    { label: "Stores", a: "Activations (needed later)", b: "Gradients" },
+    { label: "Inference?", a: "Yes, this is serving", b: "No (unless you train)" },
+  ]}
+/>
+
+<MemoryCard>
+**Backprop** = chain rule backward through layers to get ∂L/∂w for every weight in one sweep.
+Then **gradient descent** steps. Autograd implements it. Inference is forward-only.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-backpropagation" />

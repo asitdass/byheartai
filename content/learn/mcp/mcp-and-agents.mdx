@@ -1,0 +1,104 @@
+---
+id: mcp-and-agents
+slug: mcp-and-agents
+title: MCP + Agents, IDEs, and Products
+category: mcp
+level: intermediate
+summary: MCP is the plug; agents, IDEs, and products are hosts that decide when to call — a product can also publish a server so other hosts reach it.
+keywords: [mcp agents, mcp ide, cursor mcp, claude mcp, mcp apps]
+prerequisites: [what-is-mcp, what-is-agent]
+next: [mcp-security]
+related: [consuming-mcp-server, agent-loop, tool-selection]
+alternatives: []
+confusedWith: [what-is-agent]
+frameworks: []
+products: []
+papers:
+  - title: "The 2026-07-28 Specification"
+    url: "https://blog.modelcontextprotocol.io/posts/2026-07-28/"
+    kind: article
+status: published
+author: ByHeart AI
+reviewer: ByHeart AI
+datePublished: 2026-09-04
+lastReviewed: 2026-09-04
+version: 1
+quizId: quiz-mcp-and-agents
+estimatedMinutes: 7
+---
+
+<OneLine>MCP does not replace agents or IDEs — those apps are hosts that plug into servers; the agent loop still decides, and a product can be both a host (users chat in it) and a server (other hosts call it).</OneLine>
+
+## Explain like I'm new to AI
+
+Three places you'll meet MCP:
+
+<McpAgentHost />
+
+- **IDEs** (Cursor, VS Code, JetBrains) — the editor is the host. Servers become project-aware tools: git, docs, tickets, browsers.
+- **Agents** (Claude, ChatGPT, your loop) — observe → reason → plan → act, where "act" is often an MCP `tools/call`.
+- **Products** (Slack, Figma, Linear, your SaaS) — users might chat *inside* the product (it's a host), and the product also *publishes* a server so Cursor can file a Linear issue.
+
+Same protocol, different UX.
+
+## Mental model
+
+MCP is **electrical outlets**. The oven (agent), the lamp (IDE), and the workshop (Slack app) all use the same outlet shape. The outlet doesn't cook dinner. The agent still has to plan; the IDE still has to show diffs; the product still has to enforce permissions.
+
+## How it works
+
+**Inside an agent:** after `tools/list`, MCP tools look like ordinary function-calling tools. The loop doesn't change. What changes is **where tools come from** — vendors and internal teams, not only code you wrote.
+
+**Inside an IDE:** extra UX — a server list, a prompt picker (slash commands), resource attachments (open this file as context), and approval for writes. Many IDE actions are still non-agent (you clicked "run prompt").
+
+**Inside a product:** you may implement **both** sides: a host for in-app assistants, a server for the ecosystem. The **MCP Apps** extension covers richer in-context UI; **Tasks** covers long-running jobs agents shouldn't block on.
+
+## Real-world example
+
+A designer generates UI, sends it into **Figma** via Figma's MCP server, then a developer in **Cursor** (host) uses the same company's **Linear** server to file implementation tickets. Nobody rebuilt Figma or Linear integrations for each app. The *agent* in Cursor still chose *when* to file the ticket.
+
+## Technical explanation
+
+Clear boundaries prevent confused architectures:
+
+| Piece | Owns |
+| --- | --- |
+| Agent loop | When to call, when to stop, memory, retries |
+| Host policy | Which servers, which user, HITL, logging |
+| MCP | Catalog + invocation + (remote) auth |
+| Server | Domain actions and data, least privilege |
+
+Multi-agent systems can share MCP servers (a researcher and a writer both read the handbook server) or isolate them (only the finance agent gets the payments server). Isolation is a **host** decision.
+
+Don't hide a whole agent *inside* an MCP tool unless you must — nested agents behind a single `tools/call` are hard to debug, authorize, and evaluate. Prefer the host's loop, with MCP as the hands.
+
+## Common mistakes
+
+<CommonMistake>
+Rewriting your agent framework "in MCP." MCP has no planner and (as of 2026) no protocol session.
+Planning, memory, and stopping conditions stay in the host.
+</CommonMistake>
+
+- Giving every agent in a multi-agent system every server. Least privilege still applies across agents.
+- Assuming IDE = always an agent. Many MCP uses in editors are human-picked prompts and resources.
+
+## When to use it
+
+- Whenever an agent or product should use shared, vendor-maintained, or cross-app tools.
+
+## When NOT to use it
+
+- Tight, single-app functions with no ecosystem story — extra protocol without payoff.
+
+## Alternatives
+
+- Native IDE extensions; in-app tools registered only in that agent runtime.
+
+<MemoryCard>
+**Hosts** (IDEs, agents, products) decide; **MCP servers** expose. The agent loop is unchanged — MCP
+is the catalog of hands. A product can be a host *and* a server. Don't bury a second agent inside a tool.
+</MemoryCard>
+
+## Quick quiz
+
+<Quiz id="quiz-mcp-and-agents" />

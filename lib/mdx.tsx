@@ -16,6 +16,10 @@ export async function renderMdx(source: string) {
     source,
     components: mdxComponents,
     options: {
+      // Lessons are first-party. v6 blocks `{...}` JS by default; Compare
+      // tables and similar components pass arrays as JSX expressions.
+      blockJS: false,
+      blockDangerousJS: true,
       mdxOptions: {
         remarkPlugins: [remarkGfm],
         rehypePlugins: [rehypeSlug, [rehypePrettyCode, prettyCodeOptions]],

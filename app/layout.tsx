@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SiteHeader } from "@/components/nav/site-header";
 import { JsonLd } from "@/components/seo/json-ld";
 import { organizationJsonLd, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL, websiteJsonLd } from "@/lib/site";
@@ -125,6 +126,7 @@ export default function RootLayout({
         </a>
         <SiteHeader />
         <div id="main">{children}</div>
+        <Analytics />
       </body>
     </html>
   );

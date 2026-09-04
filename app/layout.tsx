@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader, JetBrains_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/nav/site-header";
+import { JsonLd } from "@/components/seo/json-ld";
+import { organizationJsonLd, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL, websiteJsonLd } from "@/lib/site";
 import "./globals.css";
 
-// Self-hosted at build time by next/font (no runtime CDN calls).
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -21,33 +22,77 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const siteUrl = "https://byheartai.com";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "ByHeart AI - Learn AI. Know it by heart.",
-    template: "%s | ByHeart AI",
+    default: `${SITE_NAME} - ${SITE_TAGLINE}`,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Understand modern AI concepts through simple explanations, interactive visuals, examples and hands-on learning. Learn AI. Know it by heart.",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  category: "education",
+  keywords: [
+    "learn AI",
+    "RAG",
+    "agents",
+    "MCP",
+    "transformers",
+    "embeddings",
+    "vector database",
+    "LLM",
+    "AI engineering",
+  ],
+  alternates: {
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
     type: "website",
-    siteName: "ByHeart AI",
-    title: "ByHeart AI - Learn AI. Know it by heart.",
-    description:
-      "Understand modern AI concepts through simple explanations, interactive visuals, and hands-on learning.",
-    url: siteUrl,
+    siteName: SITE_NAME,
+    locale: "en_US",
+    title: `${SITE_NAME} - ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "ByHeart AI - Learn AI. Know it by heart.",
-    description:
-      "Understand modern AI concepts through simple explanations, interactive visuals, and hands-on learning.",
+    title: `${SITE_NAME} - ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+  },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+    other: {
+      ...(process.env.BING_SITE_VERIFICATION
+        ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION }
+        : {}),
+    },
   },
 };
 
-// Runs before paint to apply the saved theme + font-size (prevents flash).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7f4ee" },
+    { media: "(prefers-color-scheme: dark)", color: "#17171c" },
+  ],
+};
+
 const themeInit = `(function(){try{
   var t=localStorage.getItem('bh-theme');
   var f=localStorage.getItem('bh-font-size');
@@ -69,6 +114,12 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body>
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@graph": [organizationJsonLd, websiteJsonLd],
+          }}
+        />
         <a href="#main" className="skip-link">
           Skip to content
         </a>

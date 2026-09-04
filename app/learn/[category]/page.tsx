@@ -4,6 +4,8 @@ import Link from "next/link";
 import { categories, getCategory } from "@/data/categories";
 import { getConceptsByCategory, conceptHref } from "@/lib/content";
 import { Breadcrumb } from "@/components/nav/breadcrumb";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbJsonLd, itemListJsonLd, pageMetadata } from "@/lib/seo";
 
 const levelLabel = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" };
 
@@ -19,11 +21,12 @@ export async function generateMetadata({
   const { category } = await params;
   const cat = getCategory(category);
   if (!cat) return {};
-  return {
-    title: cat.title,
-    description: cat.description,
-    alternates: { canonical: `/learn/${category}` },
-  };
+  return pageMetadata({
+    title: `${cat.title} lessons`,
+    description: `${cat.description} Free, prerequisite-linked lessons in the ByHeart AI curriculum.`,
+    path: `/learn/${category}`,
+    keywords: [cat.title, "learn AI", cat.id.replaceAll("-", " ")],
+  });
 }
 
 export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
@@ -35,6 +38,19 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
   return (
     <div className="mx-auto max-w-[52rem] px-4 py-10">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Learn", path: "/learn" },
+          { name: cat.title, path: `/learn/${category}` },
+        ])}
+      />
+      <JsonLd
+        data={itemListJsonLd(
+          `${cat.title} lessons`,
+          cat.description,
+          lessons.map((c) => ({ name: c.title, path: conceptHref(c), description: c.summary })),
+        )}
+      />
       <Breadcrumb items={[{ href: "/learn", label: "Learn" }, { href: `/learn/${category}`, label: cat.title }]} />
       <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold">{cat.title}</h1>
       <p className="mt-3 text-lg" style={{ color: "var(--ink-muted)" }}>

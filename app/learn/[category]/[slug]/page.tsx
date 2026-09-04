@@ -15,6 +15,9 @@ import { Breadcrumb } from "@/components/nav/breadcrumb";
 import { LessonSidebar } from "@/components/nav/lesson-sidebar";
 import { RightRail } from "@/components/nav/right-rail";
 import { NextControl } from "@/components/reading/next-control";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbJsonLd, lessonJsonLd, pageMetadata } from "@/lib/seo";
+import { toIsoDate } from "@/lib/site";
 
 interface Params {
   category: string;
@@ -34,18 +37,15 @@ export async function generateMetadata({
   const concept = getConcept(category, slug);
   if (!concept) return {};
   const url = `/learn/${category}/${slug}`;
-  return {
+  return pageMetadata({
     title: concept.title,
     description: concept.summary,
-    alternates: { canonical: url },
-    openGraph: {
-      type: "article",
-      title: concept.title,
-      description: concept.summary,
-      url,
-    },
-    twitter: { card: "summary_large_image", title: concept.title, description: concept.summary },
-  };
+    path: url,
+    keywords: concept.keywords,
+    ogType: "article",
+    publishedTime: toIsoDate(concept.datePublished),
+    modifiedTime: toIsoDate(concept.dateUpdated ?? concept.lastReviewed ?? concept.datePublished),
+  });
 }
 
 const levelLabel = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" };
@@ -66,19 +66,16 @@ export default async function LessonPage({ params }: { params: Promise<Params> }
     { href: conceptHref(concept), label: concept.title },
   ];
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "TechArticle",
-    headline: concept.title,
-    description: concept.summary,
-    author: concept.author ? { "@type": "Person", name: concept.author } : undefined,
-    datePublished: concept.datePublished,
-    dateModified: concept.dateUpdated ?? concept.lastReviewed ?? concept.datePublished,
-  };
-
   return (
     <div className="mx-auto grid max-w-[80rem] grid-cols-1 gap-8 px-4 py-8 lg:grid-cols-[15rem_minmax(0,1fr)_15rem]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLd data={lessonJsonLd(concept)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Learn", path: "/learn" },
+          { name: cat?.title ?? category, path: `/learn/${category}` },
+          { name: concept.title, path: conceptHref(concept) },
+        ])}
+      />
 
       {/* Left sidebar */}
       <aside className="lesson-aside hidden lg:block">

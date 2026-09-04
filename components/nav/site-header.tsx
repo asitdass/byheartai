@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Heart, Search } from "lucide-react";
 import { ThemeControls } from "./theme-controls";
+import { SearchForm } from "./search-form";
 
 export function SiteHeader() {
   return (
@@ -35,6 +36,15 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <SearchForm size="header" />
+          <Link
+            href="/search"
+            className="rounded-[--radius-sm] p-2 no-underline hover:bg-[--surface] md:hidden"
+            style={{ color: "var(--ink-muted)" }}
+            aria-label="Search lessons"
+          >
+            <Search size={18} aria-hidden />
+          </Link>
           <ThemeControls />
         </div>
       </div>

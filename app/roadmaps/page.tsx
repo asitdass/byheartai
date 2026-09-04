@@ -3,19 +3,24 @@ import Link from "next/link";
 import { CheckCircle2, Circle } from "lucide-react";
 import { learningPaths } from "@/data/paths";
 import { getConceptById, conceptHref } from "@/lib/content";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbJsonLd, courseListJsonLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Learning paths & roadmaps",
+export const metadata: Metadata = pageMetadata({
+  title: "AI learning paths and roadmaps",
   description:
-    "Guided, resumable learning paths: AI Beginner, LLM Developer, AI Engineer, AI Systems Engineer, and AI Agent Engineer.",
-  alternates: { canonical: "/roadmaps" },
-};
+    "Guided tracks: AI Beginner, LLM Developer, AI Engineer, AI Systems Engineer, and AI Agent Engineer. One next lesson at every step.",
+  path: "/roadmaps",
+  keywords: ["AI roadmap", "AI engineer path", "learn agents", "LLM developer"],
+});
 
 const levelLabel = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" };
 
 export default function RoadmapsPage() {
   return (
     <div className="mx-auto max-w-[52rem] px-4 py-10">
+      <JsonLd data={breadcrumbJsonLd([{ name: "Roadmaps", path: "/roadmaps" }])} />
+      <JsonLd data={courseListJsonLd(learningPaths)} />
       <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold">Learning paths</h1>
       <p className="mt-3 text-lg" style={{ color: "var(--ink-muted)" }}>
         Follow a guided track from start to finish. There&apos;s always exactly one next step.

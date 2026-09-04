@@ -2,17 +2,34 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { categories } from "@/data/categories";
 import { getConceptsByCategory } from "@/lib/content";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbJsonLd, itemListJsonLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Learn AI - The full curriculum",
+export const metadata: Metadata = pageMetadata({
+  title: "Learn AI — the full curriculum",
   description:
-    "Browse the full ByHeart AI curriculum: foundations, LLMs, embeddings, vector databases, RAG, agents, MCP, and more.",
-  alternates: { canonical: "/learn" },
-};
+    "Browse 19 topic tracks: foundations, machine learning, deep learning, transformers, LLMs, embeddings, vector databases, RAG, agents, MCP, context engineering, memory, multimodal, fine-tuning, evaluation, observability, security, inference, and AI system design.",
+  path: "/learn",
+  keywords: ["AI curriculum", "learn RAG", "learn agents", "learn MCP", "AI engineering course"],
+});
 
 export default function LearnHub() {
+  const tracks = categories.map((c) => ({
+    name: c.title,
+    path: `/learn/${c.id}`,
+    description: c.description,
+  }));
+
   return (
     <div className="mx-auto max-w-[60rem] px-4 py-10">
+      <JsonLd data={breadcrumbJsonLd([{ name: "Learn", path: "/learn" }])} />
+      <JsonLd
+        data={itemListJsonLd(
+          "ByHeart AI curriculum",
+          "Prerequisite-driven tracks covering foundations through production AI system design.",
+          tracks,
+        )}
+      />
       <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold">Learn AI</h1>
       <p className="mt-3 max-w-2xl text-lg" style={{ color: "var(--ink-muted)" }}>
         A world-class, prerequisite-driven curriculum. Start anywhere — every concept links to what you should

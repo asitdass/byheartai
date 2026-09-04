@@ -1,15 +1,23 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Heart, Search } from "lucide-react";
+import { ArrowRight, Heart } from "lucide-react";
 import { categories } from "@/data/categories";
 import { learningPaths } from "@/data/paths";
 import { getPublishedConcepts, conceptHref } from "@/lib/content";
+import { SearchForm } from "@/components/nav/search-form";
+import { JsonLd } from "@/components/seo/json-ld";
+import { itemListJsonLd, pageMetadata } from "@/lib/seo";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 
-const exampleSearches = [
-  "What is RAG?",
-  "What is an embedding?",
-  "How does attention work?",
-  "What is MCP?",
-];
+export const metadata: Metadata = pageMetadata({
+  title: `${SITE_NAME} - ${SITE_TAGLINE}`,
+  description: SITE_DESCRIPTION,
+  path: "/",
+  keywords: ["learn AI", "AI curriculum", "RAG", "agents", "MCP", "transformers"],
+  absoluteTitle: true,
+});
+
+const exampleSearches = ["What is RAG?", "What is an embedding?", "How does attention work?", "What is MCP?"];
 
 export default function HomePage() {
   const concepts = getPublishedConcepts();
@@ -19,6 +27,13 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-[70rem] px-4">
+      <JsonLd
+        data={itemListJsonLd(
+          "Explore AI",
+          "Core tracks in the ByHeart AI curriculum.",
+          featured.map((c) => ({ name: c.title, path: `/learn/${c.id}`, description: c.description })),
+        )}
+      />
       {/* Hero */}
       <section className="py-16 text-center sm:py-24">
         <h1
@@ -32,23 +47,18 @@ export default function HomePage() {
           hands-on learning — in one calm, reading-first place.
         </p>
 
-        {/* Search (placeholder for Pagefind command palette) */}
-        <div className="mx-auto mt-8 max-w-xl">
-          <Link
-            href="/learn"
-            className="flex items-center gap-3 rounded-full border px-5 py-3 text-left no-underline"
-            style={{ background: "var(--surface)", borderColor: "var(--rule)", color: "var(--ink-faint)" }}
-          >
-            <Search size={18} aria-hidden />
-            What do you want to learn?
-          </Link>
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-sm" style={{ color: "var(--ink-faint)" }}>
+        <SearchForm size="hero" />
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-sm" style={{ color: "var(--ink-faint)" }}>
             {exampleSearches.map((q) => (
-              <span key={q} className="rounded-full border px-3 py-1" style={{ borderColor: "var(--rule)" }}>
+              <Link
+                key={q}
+                href={`/search?q=${encodeURIComponent(q)}`}
+                className="rounded-full border px-3 py-1 no-underline hover:border-[--accent]"
+                style={{ borderColor: "var(--rule)", color: "var(--ink-muted)" }}
+              >
                 {q}
-              </span>
+              </Link>
             ))}
-          </div>
         </div>
       </section>
 

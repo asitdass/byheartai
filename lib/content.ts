@@ -13,6 +13,23 @@ function asArray(v: unknown): string[] {
   return [String(v)];
 }
 
+function asDate(v: unknown): string | undefined {
+  if (v == null || v === "") return undefined;
+  if (v instanceof Date && !Number.isNaN(v.getTime())) {
+    const localMidnight = v.getHours() === 0 && v.getMinutes() === 0 && v.getSeconds() === 0;
+    const y = localMidnight ? v.getFullYear() : v.getUTCFullYear();
+    const m = (localMidnight ? v.getMonth() : v.getUTCMonth()) + 1;
+    const d = localMidnight ? v.getDate() : v.getUTCDate();
+    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  }
+  const s = String(v).trim();
+  const day = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (day) return day[1];
+  const d = new Date(s);
+  if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+  return undefined;
+}
+
 function asRefs(v: unknown): Reference[] {
   if (!Array.isArray(v)) return [];
   return v
@@ -45,9 +62,9 @@ function normalize(data: Record<string, unknown>, filePath: string, body: string
     status: (data.status as Status) ?? "draft",
     author: String(data.author ?? ""),
     reviewer: data.reviewer ? String(data.reviewer) : undefined,
-    datePublished: data.datePublished ? String(data.datePublished) : undefined,
-    dateUpdated: data.dateUpdated ? String(data.dateUpdated) : undefined,
-    lastReviewed: data.lastReviewed ? String(data.lastReviewed) : undefined,
+    datePublished: asDate(data.datePublished),
+    dateUpdated: asDate(data.dateUpdated),
+    lastReviewed: asDate(data.lastReviewed),
     version: Number(data.version ?? 1),
     quizId: data.quizId ? String(data.quizId) : undefined,
     estimatedMinutes: data.estimatedMinutes ? Number(data.estimatedMinutes) : undefined,

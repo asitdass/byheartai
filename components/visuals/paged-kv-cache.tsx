@@ -44,7 +44,7 @@ export function PagedKvCache() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex flex-wrap gap-1.5">
           {views.map((view) => (
             <button
@@ -52,7 +52,7 @@ export function PagedKvCache() {
               type="button"
               onClick={() => setId(view.id)}
               aria-pressed={view.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: view.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: view.id === id ? "var(--accent)" : "var(--rule)",
@@ -66,7 +66,7 @@ export function PagedKvCache() {
           {v.blocks.map((b, i) => (
             <div
               key={`${b.label}-${i}`}
-              className="flex h-14 w-16 flex-col justify-end overflow-hidden rounded-[--radius-sm] border"
+              className="flex h-14 w-16 flex-col justify-end overflow-hidden rounded-(--radius-sm) border"
               style={{ background: "var(--paper)" }}
             >
               <div className="w-full" style={{ height: `${Math.max(b.used, 8)}%`, background: b.used ? "var(--accent)" : "transparent" }} />

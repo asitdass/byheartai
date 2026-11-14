@@ -37,7 +37,7 @@ export function GanIdea() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Two networks, opposite jobs. Click who you are:
         </p>
@@ -48,7 +48,7 @@ export function GanIdea() {
               type="button"
               onClick={() => setId(item.id)}
               aria-pressed={item.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: item.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: item.id === id ? "var(--accent)" : "var(--rule)",
@@ -60,12 +60,12 @@ export function GanIdea() {
         </div>
 
         <div className="mb-3 flex flex-wrap items-center justify-center gap-2 text-xs" role="img" aria-label="Noise goes through the generator to a fake sample. Real and fake samples go to the discriminator.">
-          <span className="rounded-[--radius-sm] border px-2 py-1" style={{ background: "var(--paper)" }}>
+          <span className="rounded-(--radius-sm) border px-2 py-1" style={{ background: "var(--paper)" }}>
             z ~ N(0,1)
           </span>
           <span style={{ color: "var(--ink-faint)" }}>→</span>
           <span
-            className="rounded-[--radius-sm] border px-2 py-1 font-semibold"
+            className="rounded-(--radius-sm) border px-2 py-1 font-semibold"
             style={{
               background: id === "g" ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
               borderColor: id === "g" ? "var(--accent)" : "var(--rule)",
@@ -75,12 +75,12 @@ export function GanIdea() {
           </span>
           <span style={{ color: "var(--ink-faint)" }}>→ x̂</span>
           <span style={{ color: "var(--ink-faint)" }}>and</span>
-          <span className="rounded-[--radius-sm] border px-2 py-1" style={{ background: "var(--paper)" }}>
+          <span className="rounded-(--radius-sm) border px-2 py-1" style={{ background: "var(--paper)" }}>
             real x
           </span>
           <span style={{ color: "var(--ink-faint)" }}>→</span>
           <span
-            className="rounded-[--radius-sm] border px-2 py-1 font-semibold"
+            className="rounded-(--radius-sm) border px-2 py-1 font-semibold"
             style={{
               background: id === "d" ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
               borderColor: id === "d" ? "var(--accent)" : "var(--rule)",
@@ -92,13 +92,13 @@ export function GanIdea() {
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2" aria-live="polite">
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
               Objective
             </div>
             <p className="text-sm">{v.job}</p>
           </div>
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
               Why it is unstable
             </div>
@@ -116,7 +116,7 @@ export function GanIdea() {
               type="button"
               onClick={() => setYear(item.id)}
               aria-pressed={item.id === year}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: item.id === year ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: item.id === year ? "var(--accent)" : "var(--rule)",

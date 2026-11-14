@@ -34,7 +34,7 @@ export function TransformersVsRnns() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Same sentence. Click a later token — how far is it from &quot;The&quot;?
         </p>
@@ -46,7 +46,7 @@ export function TransformersVsRnns() {
               onClick={() => setPair(i)}
               aria-pressed={i === pair}
               disabled={i === 0}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs disabled:opacity-40"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs disabled:opacity-40"
               style={{
                 background: i === pair ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: i === pair ? "var(--accent)" : "var(--rule)",
@@ -58,7 +58,7 @@ export function TransformersVsRnns() {
         </div>
 
         <div className="mb-3 grid gap-2 sm:grid-cols-2" aria-live="polite">
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
               RNN path
             </div>
@@ -67,7 +67,7 @@ export function TransformersVsRnns() {
               The → {tokens.slice(1, pair + 1).join(" → ")}
             </p>
           </div>
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
               Transformer path
             </div>
@@ -85,7 +85,7 @@ export function TransformersVsRnns() {
               type="button"
               onClick={() => setId(item.id)}
               aria-pressed={item.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: item.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: item.id === id ? "var(--accent)" : "var(--rule)",
@@ -96,13 +96,13 @@ export function TransformersVsRnns() {
           ))}
         </div>
         <div className="grid gap-2 sm:grid-cols-2" aria-live="polite">
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
               RNN
             </div>
             <p className="text-sm">{v.rnn}</p>
           </div>
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
               Transformer
             </div>

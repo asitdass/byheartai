@@ -5,14 +5,14 @@ export function PromptVsContext() {
   return (
     <figure className="my-8">
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+        <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
           <div className="mb-2 flex items-center gap-2 text-sm font-bold">
             <PenLine size={15} aria-hidden style={{ color: "var(--accent)" }} /> Prompt engineering
           </div>
           <p className="mb-3 text-xs" style={{ color: "var(--ink-muted)" }}>
             You write the instruction: role, examples, output format.
           </p>
-          <div className="rounded-[--radius-sm] p-3 font-mono text-xs" style={{ background: "var(--paper)" }} role="img" aria-label="A prompt is a single authored instruction.">
+          <div className="rounded-(--radius-sm) p-3 font-mono text-xs" style={{ background: "var(--paper)" }} role="img" aria-label="A prompt is a single authored instruction.">
             You are a careful support agent.<br />
             Answer only from the policy.<br />
             Be brief.
@@ -23,14 +23,14 @@ export function PromptVsContext() {
           </ul>
         </div>
 
-        <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+        <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
           <div className="mb-2 flex items-center gap-2 text-sm font-bold">
             <Layers size={15} aria-hidden style={{ color: "var(--accent)" }} /> Context engineering
           </div>
           <p className="mb-3 text-xs" style={{ color: "var(--ink-muted)" }}>
             Your system assembles everything the model sees on this call.
           </p>
-          <ul className="space-y-1 rounded-[--radius-sm] p-3 text-xs" style={{ background: "var(--paper)" }} role="img" aria-label="Context includes instructions, tools, retrieved docs, memory, history, and the user message.">
+          <ul className="space-y-1 rounded-(--radius-sm) p-3 text-xs" style={{ background: "var(--paper)" }} role="img" aria-label="Context includes instructions, tools, retrieved docs, memory, history, and the user message.">
             <li>instructions</li>
             <li>tool schemas</li>
             <li>retrieved docs</li>

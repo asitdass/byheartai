@@ -1,0 +1,97 @@
+---
+title: "Connect MCP servers to your AI agent"
+summary: "Give your agent real tools by adding MCP servers: a browser with Playwright MCP and your repositories with the GitHub MCP server."
+outcome: "An agent that can drive a browser and work with GitHub issues and pull requests, plus the pattern for adding any other MCP server."
+level: intermediate
+minutes: 20
+tools: [playwright-mcp, github-mcp-server, servers, claude-code]
+tags: [mcp server setup, model context protocol, playwright mcp, github mcp server, claude mcp add]
+concepts: [what-is-mcp, mcp-architecture, consuming-mcp-server, mcp-security, least-privilege]
+sources:
+  - title: "Playwright MCP README"
+    url: "https://github.com/microsoft/playwright-mcp"
+  - title: "GitHub MCP Server README"
+    url: "https://github.com/github/github-mcp-server"
+  - title: "Model Context Protocol"
+    url: "https://modelcontextprotocol.io"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 7
+status: published
+---
+
+A model on its own can only write text. The [Model Context Protocol](/learn/mcp/what-is-mcp) is the standard plug that lets it use tools: browsers, databases, GitHub, your calendar. You install a server once and every MCP-capable app (Claude Code, Cursor, VS Code, n8n, and others) can use it.
+
+The examples use Claude Code's CLI. Other hosts take the same servers through a JSON config, shown in step 4.
+
+## Add a browser with Playwright MCP
+
+```bash
+claude mcp add playwright npx @playwright/mcp@latest
+```
+
+Start a session and try it:
+
+```text
+Open https://news.ycombinator.com and list the top five story titles.
+```
+
+A browser window opens and the agent drives it. You need Node.js installed for `npx`.
+
+## Add GitHub
+
+Create a [personal access token](https://github.com/settings/personal-access-tokens) with only the repositories and permissions you want the agent to have. Then, with Docker running:
+
+```bash
+export GITHUB_PAT=your_token_here
+claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_PAT -- docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server
+```
+
+Now ask: "List my open pull requests and summarize what each one changes."
+
+<Warning>
+The token is the agent's power. Scope it to specific repositories and start read-only. A broad token plus an agent that reads untrusted issue text is how [indirect prompt injection](/learn/security/indirect-prompt-injection) becomes a real incident.
+</Warning>
+
+## Check what is connected
+
+```bash
+claude mcp list
+```
+
+Inside a session, `/mcp` shows each server's status and the tools it exposes. If a server shows as failed, run its command by hand in a terminal to see the actual error.
+
+## Use the same servers in other apps
+
+Most hosts read a JSON block shaped like this:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}
+```
+
+Where it goes differs per app (Cursor, VS Code, Claude Desktop, and so on); each server's README lists the exact location for every major host.
+
+## Add only what you need
+
+Every connected server adds tool descriptions to the model's context, and more tools means more chances to pick the wrong one. Three sharp servers beat fifteen vague ones. Remove what you are not using:
+
+```bash
+claude mcp remove playwright
+```
+
+### Where to find more servers
+
+- The [reference servers](https://github.com/modelcontextprotocol/servers) repository.
+- Vendor-official servers. Prefer a server published by the company that owns the API.
+- Read the code or the permissions before installing a community server. It runs on your machine with your credentials. See [MCP security](/learn/mcp/mcp-security).
+
+### What to do next
+
+Write your own: [Building an MCP Server](/learn/mcp/building-mcp-server).

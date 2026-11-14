@@ -3,6 +3,7 @@ import { OneLine } from "./one-line";
 import { MemoryCard } from "./memory-card";
 import { Compare } from "./compare";
 import { Quiz } from "./quiz";
+import { CodeBlock } from "./code-block";
 import { Note, Tip, Warning, CommonMistake } from "./callout";
 import { RagPipeline } from "@/components/visuals/rag-pipeline";
 import { AttentionVisualizer } from "@/components/visuals/attention-visualizer";
@@ -137,6 +138,7 @@ import { TransformersVsRnns } from "@/components/visuals/transformers-vs-rnns";
 
 // Components available inside every lesson's MDX.
 export const mdxComponents: MDXComponents = {
+  pre: CodeBlock,
   OneLine,
   MemoryCard,
   Compare,

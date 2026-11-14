@@ -33,7 +33,7 @@ export function PromptVersionTrace() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex flex-wrap gap-1.5">
           {versions.map((ver) => (
             <button
@@ -41,7 +41,7 @@ export function PromptVersionTrace() {
               type="button"
               onClick={() => setId(ver.id)}
               aria-pressed={ver.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: ver.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: ver.id === id ? "var(--accent)" : "var(--rule)",
@@ -52,13 +52,13 @@ export function PromptVersionTrace() {
           ))}
         </div>
         <div className="grid gap-2 sm:grid-cols-2" aria-live="polite">
-          <div className="rounded-[--radius-sm] p-3" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) p-3" style={{ background: "var(--paper)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
               Eval traces (gold set)
             </div>
             <p className="text-sm">{v.gold}</p>
           </div>
-          <div className="rounded-[--radius-sm] p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
               Prod traces (same shape)
             </div>

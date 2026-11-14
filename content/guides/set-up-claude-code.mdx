@@ -1,0 +1,102 @@
+---
+title: "Set up Claude Code as your terminal coding agent"
+summary: "Install Claude Code, teach it your project with a CLAUDE.md file, and run it interactively or as a scripted, headless agent."
+outcome: "A coding agent in your terminal that can read your repo, make changes, run commands, and be scripted for automation."
+level: beginner
+minutes: 20
+tools: [claude-code]
+tags: [claude code, coding agent, ai pair programming, CLAUDE.md, terminal ai]
+concepts: [what-is-agent, agent-loop, prompt-engineering-vs-context-engineering, human-in-the-loop]
+sources:
+  - title: "Claude Code README"
+    url: "https://github.com/anthropics/claude-code"
+  - title: "Claude Code documentation"
+    url: "https://code.claude.com/docs"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 4
+status: published
+---
+
+A coding agent is different from autocomplete. You describe an outcome, and it reads files, edits them, runs your tests, and reports back. Claude Code is one of the most widely used; the habits you build here carry over to any other coding agent.
+
+<Note title="What you need">
+A Claude subscription or an Anthropic API key, and a project folder (any language) under git.
+</Note>
+
+## Install it
+
+macOS, Linux, or WSL:
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+Windows PowerShell:
+
+```powershell
+irm https://claude.ai/install.ps1 | iex
+```
+
+Homebrew and npm also work: `brew install --cask claude-code` or `npm install -g @anthropic-ai/claude-code`.
+
+## Start it in a project
+
+```bash
+cd your-project
+claude
+```
+
+The first run opens a browser to sign in. Then ask a question that requires reading code, such as "Explain how requests flow through this app." Nothing is changed yet; this is the safest way to see what it understands.
+
+## Give it a memory of your project
+
+Inside the session, run:
+
+```text
+/init
+```
+
+This writes a `CLAUDE.md` file: how to build, test, and lint the project, plus conventions it noticed. The file is loaded at the start of every session, so edit it like onboarding notes for a new teammate. Short and specific beats long.
+
+## Ask for a real change
+
+```text
+Add input validation to the signup form and write tests for it. Run the tests.
+```
+
+By default Claude Code asks before editing files or running commands. Read what it proposes. Approve one step at a time until you trust it on this codebase.
+
+<Tip>
+The best prompts name the goal, the constraints, and how to verify. "Make the tests in tests/api pass without changing the public API" will beat "fix the bug" every time.
+</Tip>
+
+## Run it without the chat
+
+Print mode runs one prompt and exits, which makes the agent scriptable:
+
+```bash
+claude -p "Summarize what changed in the last 5 commits"
+```
+
+You can pipe into it too:
+
+```bash
+git diff main | claude -p "Review this diff for bugs. Be brief."
+```
+
+That one line is the seed of real automation: put it in a git hook, a cron job, or CI.
+
+## Add tools with MCP
+
+Claude Code can use any MCP server. For example, to give it a browser:
+
+```bash
+claude mcp add playwright npx @playwright/mcp@latest
+```
+
+The [MCP guide](/guides/connect-mcp-servers) covers this properly.
+
+### What to do next
+
+Schedule it: [run an AI agent every week with GitHub Actions](/guides/weekly-ai-agent-with-github-actions).

@@ -37,7 +37,7 @@ export function SlmVsLlm() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Pick the job. Size is a product choice, not a trophy.
         </p>
@@ -48,7 +48,7 @@ export function SlmVsLlm() {
               type="button"
               onClick={() => setId(ch.id)}
               aria-pressed={ch.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: ch.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: ch.id === id ? "var(--accent)" : "var(--rule)",
@@ -60,7 +60,7 @@ export function SlmVsLlm() {
         </div>
         <div className="grid gap-2 sm:grid-cols-2" aria-live="polite">
           <div
-            className="rounded-[--radius-sm] border p-3"
+            className="rounded-(--radius-sm) border p-3"
             style={{
               background: slm ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
               borderColor: slm ? "var(--accent)" : "var(--rule)",
@@ -72,7 +72,7 @@ export function SlmVsLlm() {
             <p className="text-sm">{slm ? j.winner : "Standby / router / on-device draft"}</p>
           </div>
           <div
-            className="rounded-[--radius-sm] border p-3"
+            className="rounded-(--radius-sm) border p-3"
             style={{
               background: !slm ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
               borderColor: !slm ? "var(--accent)" : "var(--rule)",
@@ -84,7 +84,7 @@ export function SlmVsLlm() {
             <p className="text-sm">{slm ? "Skip unless the SLM is unsure" : j.winner}</p>
           </div>
         </div>
-        <p className="mt-2 rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="mt-2 rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <strong style={{ color: "var(--accent)" }}>{j.winner}. </strong>
           {j.why}
         </p>

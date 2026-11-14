@@ -34,15 +34,15 @@ export function AnnVsExact() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
-        <div className="mb-3 inline-flex rounded-[--radius-sm] border p-0.5" role="group" aria-label="Search mode">
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
+        <div className="mb-3 inline-flex rounded-(--radius-sm) border p-0.5" role="group" aria-label="Search mode">
           {(["exact", "ann"] as const).map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => setMode(m)}
               aria-pressed={mode === m}
-              className="rounded-[--radius-sm] px-3 py-1 text-sm font-semibold"
+              className="rounded-(--radius-sm) px-3 py-1 text-sm font-semibold"
               style={{ background: mode === m ? "var(--accent)" : "transparent", color: mode === m ? "var(--accent-ink)" : "var(--ink-muted)" }}
             >
               {m === "exact" ? "Exact (brute force)" : "Approximate (ANN)"}
@@ -72,15 +72,15 @@ export function AnnVsExact() {
         </div>
 
         <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>Comparisons</div>
             <div className="text-lg font-bold" style={{ color: "var(--accent)" }}>{visited.length} / {dots.length}</div>
           </div>
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>Speed</div>
             <div className="text-lg font-bold">{mode === "exact" ? "Slow" : "Fast"}</div>
           </div>
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>Found true nearest?</div>
             <div className="text-lg font-bold" style={{ color: correct ? "oklch(0.55 0.15 150)" : "oklch(0.6 0.18 25)" }}>{correct ? "Yes" : "Missed"}</div>
           </div>

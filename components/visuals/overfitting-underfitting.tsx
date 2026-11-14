@@ -50,7 +50,7 @@ export function OverfittingUnderfitting() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Same task. Three models. Watch train vs validation error:
         </p>
@@ -61,7 +61,7 @@ export function OverfittingUnderfitting() {
               type="button"
               onClick={() => setId(fit.id)}
               aria-pressed={fit.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: fit.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: fit.id === id ? "var(--accent)" : "var(--rule)",
@@ -75,10 +75,10 @@ export function OverfittingUnderfitting() {
           <ErrorBar label="Train error (lower looks “smarter”)" value={f.train} />
           <ErrorBar label="Validation error (the honest one)" value={f.val} />
           <div className="grid gap-2 sm:grid-cols-2">
-            <div className="rounded-[--radius-sm] border p-3 text-sm" style={{ background: "var(--paper)" }}>
+            <div className="rounded-(--radius-sm) border p-3 text-sm" style={{ background: "var(--paper)" }}>
               {f.story}
             </div>
-            <div className="rounded-[--radius-sm] border p-3 text-sm" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+            <div className="rounded-(--radius-sm) border p-3 text-sm" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
               <span className="font-semibold" style={{ color: "var(--accent)" }}>
                 What to do:{" "}
               </span>

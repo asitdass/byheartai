@@ -37,24 +37,24 @@ export function LlmAsJudge() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div
           className="mb-4 flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-center sm:text-left"
           role="img"
           aria-label="Answer plus rubric go into a judge model, which returns a score and a short rationale."
         >
-          <div className="rounded-[--radius-sm] border px-3 py-2 text-xs" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border px-3 py-2 text-xs" style={{ background: "var(--paper)" }}>
             answer + rubric
             <div className="font-mono" style={{ color: "var(--ink-faint)" }}>(and the retrieved context)</div>
           </div>
           <Scale size={18} aria-hidden style={{ color: "var(--accent)" }} />
-          <div className="rounded-[--radius-sm] border px-3 py-2 text-xs font-semibold" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border px-3 py-2 text-xs font-semibold" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             judge model
           </div>
           <span className="text-xs" style={{ color: "var(--ink-faint)" }} aria-hidden>
             →
           </span>
-          <div className="rounded-[--radius-sm] border px-3 py-2 text-xs" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border px-3 py-2 text-xs" style={{ background: "var(--paper)" }}>
             score + why
           </div>
         </div>
@@ -65,7 +65,7 @@ export function LlmAsJudge() {
               type="button"
               onClick={() => setId(bias.id)}
               aria-pressed={bias.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: bias.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: bias.id === id ? "var(--accent)" : "var(--rule)",
@@ -75,7 +75,7 @@ export function LlmAsJudge() {
             </button>
           ))}
         </div>
-        <div className="rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <div className="rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <p className="font-mono text-xs" style={{ color: "var(--accent)" }}>{b.score}</p>
           <p className="mt-1">{b.note}</p>
         </div>

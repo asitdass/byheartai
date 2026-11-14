@@ -52,7 +52,7 @@ export function AutoencoderIdea() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           6 numbers in · squeeze · 6 numbers out. Loss is against the <em>clean</em> vector.
         </p>
@@ -63,7 +63,7 @@ export function AutoencoderIdea() {
               type="button"
               onClick={() => setJob(j.id)}
               aria-pressed={j.id === job}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: j.id === job ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: j.id === job ? "var(--accent)" : "var(--rule)",
@@ -80,7 +80,7 @@ export function AutoencoderIdea() {
               type="button"
               onClick={() => setWid(item.id)}
               aria-pressed={item.id === wid}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: item.id === wid ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: item.id === wid ? "var(--accent)" : "var(--rule)",
@@ -112,7 +112,7 @@ export function AutoencoderIdea() {
 
 function Bars({ title, vals, accent }: { title: string; vals: number[]; accent?: boolean }) {
   return (
-    <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)", borderColor: accent ? "var(--accent)" : "var(--rule)" }}>
+    <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)", borderColor: accent ? "var(--accent)" : "var(--rule)" }}>
       <div className="mb-2 text-[11px] font-bold uppercase tracking-wide" style={{ color: accent ? "var(--accent)" : "var(--ink-faint)" }}>
         {title}
       </div>
@@ -120,7 +120,7 @@ function Bars({ title, vals, accent }: { title: string; vals: number[]; accent?:
         {vals.map((v, i) => (
           <div
             key={i}
-            className="flex-1 rounded-t-[--radius-sm]"
+            className="flex-1 rounded-t-(--radius-sm)"
             style={{
               height: `${Math.max(6, Math.abs(v) * 100)}%`,
               background: accent ? "var(--accent)" : "color-mix(in oklab, var(--accent) 45%, var(--surface))",

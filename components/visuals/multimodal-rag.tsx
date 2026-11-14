@@ -32,7 +32,7 @@ export function MultimodalRag() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>Pick a query:</p>
         <div className="mb-3 flex flex-wrap gap-1.5">
           {queries.map((qq, idx) => (
@@ -41,7 +41,7 @@ export function MultimodalRag() {
               type="button"
               onClick={() => setI(idx)}
               aria-pressed={idx === i}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: idx === i ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: idx === i ? "var(--accent)" : "var(--rule)",
@@ -53,7 +53,7 @@ export function MultimodalRag() {
         </div>
         <ul className="space-y-2" aria-live="polite">
           {row.hits.map((h) => (
-            <li key={h.n} className="rounded-[--radius-sm] border px-3 py-2 text-sm" style={{ background: "var(--paper)" }}>
+            <li key={h.n} className="rounded-(--radius-sm) border px-3 py-2 text-sm" style={{ background: "var(--paper)" }}>
               <span className="font-mono text-xs font-semibold" style={{ color: "var(--accent)" }}>{h.kind}</span>
               <span className="ml-2 font-mono text-xs">{h.n}</span>
               <p className="mt-1 text-xs" style={{ color: "var(--ink-muted)" }}>{h.why}</p>

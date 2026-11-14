@@ -35,7 +35,7 @@ export function CrossValidation() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Which slice is held out this run?
         </p>
@@ -49,7 +49,7 @@ export function CrossValidation() {
                 setId("kfold");
               }}
               aria-pressed={fold === n && id === "kfold"}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: fold === n && id === "kfold" ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: fold === n && id === "kfold" ? "var(--accent)" : "var(--rule)",
@@ -59,7 +59,7 @@ export function CrossValidation() {
             </button>
           ))}
         </div>
-        <div className="mb-3 flex h-10 overflow-hidden rounded-[--radius-sm] border" role="img" aria-label={`Five equal slices. Fold ${fold} is the test set; the others train.`}>
+        <div className="mb-3 flex h-10 overflow-hidden rounded-(--radius-sm) border" role="img" aria-label={`Five equal slices. Fold ${fold} is the test set; the others train.`}>
           {folds.map((n) => (
             <div
               key={n}
@@ -81,7 +81,7 @@ export function CrossValidation() {
               type="button"
               onClick={() => setId(mode.id)}
               aria-pressed={mode.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: mode.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: mode.id === id ? "var(--accent)" : "var(--rule)",
@@ -91,7 +91,7 @@ export function CrossValidation() {
             </button>
           ))}
         </div>
-        <p className="rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           {m.note}
         </p>
       </div>

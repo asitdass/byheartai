@@ -43,7 +43,7 @@ export default function LearnHub() {
             <Link
               key={c.id}
               href={`/learn/${c.id}`}
-              className="rounded-[--radius] border p-5 no-underline transition-colors hover:border-[--accent]"
+              className="rounded-(--radius) border p-5 no-underline transition-colors hover:border-(--accent)"
               style={{ background: "var(--surface)", borderColor: "var(--rule)" }}
             >
               <div className="flex items-baseline justify-between gap-2">

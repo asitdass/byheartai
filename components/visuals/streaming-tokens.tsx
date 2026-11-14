@@ -74,7 +74,7 @@ export function StreamingTokens() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Token-by-token decode. Play, then Cancel mid-stream if you want.
         </p>
@@ -84,7 +84,7 @@ export function StreamingTokens() {
             onClick={start}
             disabled={running}
             aria-pressed={running}
-            className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs font-semibold"
+            className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs font-semibold"
             style={{
               background: running ? "var(--paper)" : "var(--accent)",
               color: running ? "var(--ink-muted)" : "var(--accent-ink)",
@@ -97,14 +97,14 @@ export function StreamingTokens() {
             type="button"
             onClick={cancel}
             disabled={!running}
-            className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+            className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
             style={{ background: "var(--paper)" }}
           >
             Cancel
           </button>
         </div>
         <div
-          className="min-h-16 rounded-[--radius-sm] border p-3 font-mono text-sm"
+          className="min-h-16 rounded-(--radius-sm) border p-3 font-mono text-sm"
           style={{ background: "var(--paper)" }}
           aria-live="polite"
         >
@@ -116,13 +116,13 @@ export function StreamingTokens() {
           )}
         </div>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
-          <div className="rounded-[--radius-sm] border p-3 text-xs" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3 text-xs" style={{ background: "var(--paper)" }}>
             <span className="font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
               TTFT
             </span>
             <div className="mt-1">Time to first token. UX lives or dies here.</div>
           </div>
-          <div className="rounded-[--radius-sm] border p-3 text-xs" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3 text-xs" style={{ background: "var(--paper)" }}>
             <span className="font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
               TPOT
             </span>

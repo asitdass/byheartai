@@ -26,7 +26,7 @@ function Callout({
   const tint = `oklch(0.62 0.14 ${hue})`;
   return (
     <div
-      className="my-6 rounded-[--radius] border-l-[3px] py-3 pl-4 pr-4"
+      className="my-6 rounded-(--radius) border-l-[3px] py-3 pl-4 pr-4"
       style={{
         borderLeftColor: tint,
         background: `color-mix(in oklab, ${tint} 8%, var(--paper))`,

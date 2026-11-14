@@ -56,7 +56,7 @@ export function DatasetsFeaturesLabels() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           A supervised dataset is a table. Click what to highlight:
         </p>
@@ -67,7 +67,7 @@ export function DatasetsFeaturesLabels() {
               type="button"
               onClick={() => setId(ch.id)}
               aria-pressed={ch.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: ch.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: ch.id === id ? "var(--accent)" : "var(--rule)",
@@ -125,7 +125,7 @@ export function DatasetsFeaturesLabels() {
             </tbody>
           </table>
         </div>
-        <p className="mt-3 rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="mt-3 rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           {id === "example" ? (
             <>
               <strong style={{ color: "var(--accent)" }}>Row h2 highlighted. </strong>

@@ -1,0 +1,117 @@
+---
+title: "Run an LLM on your own computer with Ollama"
+summary: "Install Ollama, download an open model, chat with it offline, and call it from your own code through a local API."
+outcome: "A private AI model running on your machine, with a local API at localhost:11434 that other tools in these guides can use."
+level: beginner
+minutes: 15
+tools: [ollama]
+tags: [ollama, local llm, run ai locally, offline ai, self-hosted llm]
+concepts: [what-is-llm, small-language-models, quantization, what-is-inference]
+sources:
+  - title: "Ollama README"
+    url: "https://github.com/ollama/ollama"
+  - title: "Ollama documentation"
+    url: "https://docs.ollama.com"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 1
+status: published
+---
+
+Running a model locally means your prompts never leave your machine, there is no per-token bill, and it works on a plane. Ollama is the simplest way to do it: one install, one command per model.
+
+<Note title="What you need">
+A laptop or desktop from the last few years. 8 GB of RAM runs small models; 16 GB or more (or any recent Apple Silicon Mac, or a PC with a GPU) is comfortable. Models are multi-gigabyte downloads.
+</Note>
+
+## Install Ollama
+
+On macOS or Linux:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+On Windows, in PowerShell:
+
+```powershell
+irm https://ollama.com/install.ps1 | iex
+```
+
+Check it worked:
+
+```bash
+ollama --version
+```
+
+## Run your first model
+
+```bash
+ollama run gemma4
+```
+
+The first run downloads the model, then drops you into a chat prompt. Ask it something. Type `/bye` to leave.
+
+`gemma4` is one option. The [model library](https://ollama.com/library) lists the rest, with sizes. A rule of thumb: the model file should be clearly smaller than your free RAM (or GPU memory). If a model is slow, pick a smaller one or a more heavily [quantized](/learn/fine-tuning/quantization) variant.
+
+## Manage what is installed
+
+```bash
+ollama list        # models on disk
+ollama ps          # models loaded in memory right now
+ollama pull gemma4 # download or update without chatting
+ollama rm gemma4   # free the disk space
+```
+
+## Call it from code
+
+While Ollama is running it serves a REST API on port 11434. This is what makes it useful for automation: any script or app can now use your local model.
+
+```bash
+curl http://localhost:11434/api/chat -d '{
+  "model": "gemma4",
+  "messages": [{ "role": "user", "content": "Why is the sky blue?" }],
+  "stream": false
+}'
+```
+
+From Python:
+
+```bash
+pip install ollama
+```
+
+```python
+import ollama
+
+reply = ollama.chat(
+    model="gemma4",
+    messages=[{"role": "user", "content": "Summarize RAG in two sentences."}],
+)
+print(reply["message"]["content"])
+```
+
+<Tip>
+Many tools that expect an OpenAI-style API can be pointed at Ollama instead by setting their base URL to `http://localhost:11434/v1`. That is how most of the other guides here connect to your local model.
+</Tip>
+
+## Connect it to an agent
+
+Recent Ollama versions can launch popular agents already wired to your local models:
+
+```bash
+ollama launch claude     # Claude Code, running on a local model
+ollama launch openclaw   # a personal assistant across your chat apps
+```
+
+Running `ollama` with no arguments shows the full menu of integrations.
+
+### If something goes wrong
+
+- **"connection refused" on port 11434**: the server is not running. Start the Ollama app, or run `ollama serve` in a terminal.
+- **Very slow answers**: the model is too large for your memory and is swapping. Try a smaller model.
+- **Out of disk**: `ollama list`, then `ollama rm` the ones you do not use.
+
+### What to do next
+
+Put a proper chat interface on top with [Open WebUI](/guides/private-chatgpt-with-open-webui), or let it answer questions about your own files with [AnythingLLM](/guides/chat-with-your-documents-anythingllm).

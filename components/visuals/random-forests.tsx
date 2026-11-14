@@ -30,7 +30,7 @@ export function RandomForests() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Why a crowd of trees beats the cleverest one:
         </p>
@@ -41,7 +41,7 @@ export function RandomForests() {
               type="button"
               onClick={() => setId(view.id)}
               aria-pressed={view.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: view.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: view.id === id ? "var(--accent)" : "var(--rule)",
@@ -55,7 +55,7 @@ export function RandomForests() {
           {["A", "B", "C"].map((name, i) => (
             <div
               key={name}
-              className="rounded-[--radius-sm] border p-3 text-center text-xs"
+              className="rounded-(--radius-sm) border p-3 text-center text-xs"
               style={{
                 background: "var(--paper)",
                 opacity: id === "one" && i > 0 ? 0.35 : 1,
@@ -69,7 +69,7 @@ export function RandomForests() {
             </div>
           ))}
         </div>
-        <div className="mt-3 rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <div className="mt-3 rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <p className="font-mono text-xs" style={{ color: "var(--accent)" }}>
             {v.vote}
           </p>

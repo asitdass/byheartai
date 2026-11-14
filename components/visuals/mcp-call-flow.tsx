@@ -33,7 +33,7 @@ export function McpCallFlow() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <ol className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {steps.map((s, i) => {
             const active = i === step;
@@ -41,7 +41,7 @@ export function McpCallFlow() {
             return (
               <li
                 key={s.title}
-                className="flex flex-col items-center rounded-[--radius-sm] border px-2 py-3 text-center"
+                className="flex flex-col items-center rounded-(--radius-sm) border px-2 py-3 text-center"
                 style={{
                   background: active ? "var(--accent)" : "var(--paper)",
                   borderColor: active || done ? "var(--accent)" : "var(--rule)",
@@ -57,7 +57,7 @@ export function McpCallFlow() {
           })}
         </ol>
 
-        <p className="rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <span className="font-semibold" style={{ color: "var(--accent)" }}>{current.title}:</span> {current.detail}
         </p>
 
@@ -66,7 +66,7 @@ export function McpCallFlow() {
             type="button"
             onClick={() => setStep((s) => Math.min(s + 1, steps.length - 1))}
             disabled={step >= steps.length - 1}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-4 py-2 text-sm font-semibold disabled:opacity-40"
             style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
           >
             <Play size={14} aria-hidden /> Next
@@ -74,7 +74,7 @@ export function McpCallFlow() {
           <button
             type="button"
             onClick={() => setStep(0)}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-3 py-2 text-sm hover:bg-[--surface]"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-3 py-2 text-sm hover:bg-(--surface)"
             style={{ color: "var(--ink-muted)" }}
           >
             <RotateCcw size={14} aria-hidden /> Reset

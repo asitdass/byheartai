@@ -65,7 +65,7 @@ export function ThemeControls() {
         onClick={toggleReading}
         aria-pressed={readingMode}
         title="Reading mode (hide sidebars)"
-        className="rounded-[--radius-sm] p-2 hover:bg-[--surface]"
+        className="rounded-(--radius-sm) p-2 hover:bg-(--surface)"
         style={{ color: readingMode ? "var(--accent)" : "var(--ink-muted)" }}
       >
         <BookOpen size={18} aria-hidden />
@@ -79,7 +79,7 @@ export function ThemeControls() {
           aria-expanded={open}
           aria-haspopup="menu"
           title="Appearance"
-          className="rounded-[--radius-sm] p-2 hover:bg-[--surface]"
+          className="rounded-(--radius-sm) p-2 hover:bg-(--surface)"
           style={{ color: "var(--ink-muted)" }}
         >
           {quickIsDark ? <Moon size={18} aria-hidden /> : <Sun size={18} aria-hidden />}
@@ -91,7 +91,7 @@ export function ThemeControls() {
             <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-hidden />
             <div
               role="menu"
-              className="absolute right-0 z-50 mt-2 w-56 rounded-[--radius] border p-3 shadow-lg"
+              className="absolute right-0 z-50 mt-2 w-56 rounded-(--radius) border p-3 shadow-lg"
               style={{ background: "var(--paper)", borderColor: "var(--rule)" }}
             >
               <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
@@ -104,7 +104,7 @@ export function ThemeControls() {
                     role="menuitemradio"
                     aria-checked={theme === t}
                     onClick={() => chooseTheme(t)}
-                    className="flex items-center justify-between rounded-[--radius-sm] px-3 py-1.5 text-sm capitalize hover:bg-[--surface]"
+                    className="flex items-center justify-between rounded-(--radius-sm) px-3 py-1.5 text-sm capitalize hover:bg-(--surface)"
                   >
                     {t}
                     {theme === t && <Check size={15} style={{ color: "var(--accent)" }} />}
@@ -122,7 +122,7 @@ export function ThemeControls() {
                     role="menuitemradio"
                     aria-checked={fontSize === f}
                     onClick={() => chooseFontSize(f)}
-                    className="rounded-[--radius-sm] px-2 py-1.5 text-sm capitalize hover:bg-[--surface]"
+                    className="rounded-(--radius-sm) px-2 py-1.5 text-sm capitalize hover:bg-(--surface)"
                     style={{
                       background: fontSize === f ? "color-mix(in oklab, var(--accent) 12%, var(--paper))" : "transparent",
                       color: fontSize === f ? "var(--accent)" : "var(--ink)",

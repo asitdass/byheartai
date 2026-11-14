@@ -1,0 +1,52 @@
+---
+title: "Personal agents top GitHub, and MCP goes stateless"
+date: 2026-11-14
+summary: "The first ByHeart AI radar: what the open-source star counts say about where AI is heading, the protocol changes worth knowing, and what to learn because of them."
+highlights: ["Personal agents", "Local-first AI", "MCP 2026-07-28", "A2A", "Agent memory"]
+---
+
+This is the first issue of the weekly radar. Each week it covers what moved in AI, with a source on every item and a pointer to the lesson or guide that explains it. Star counts below were read from the GitHub API on November 14, 2026.
+
+## Open source: the agent moved onto your computer
+
+The most-starred AI projects are no longer libraries for developers. They are assistants ordinary people install.
+
+- **[OpenClaw](https://github.com/openclaw/openclaw)** (about 394k stars) and **[Hermes Agent](https://github.com/NousResearch/hermes-agent)** (about 263k) are personal assistants that run on your own machine and answer in your chat apps. OpenClaw is now developed under an independent foundation, according to its README.
+- **[OpenCode](https://github.com/anomalyco/opencode)** (about 227k) leads the open-source coding agents, ahead of **[Claude Code](https://github.com/anthropics/claude-code)** (156k) and **[Codex CLI](https://github.com/openai/codex)** (135k) by stars. Stars measure attention, not usage.
+- **[n8n](https://github.com/n8n-io/n8n)** (about 210k) remains the default for no-code AI automation.
+
+**Do something with it:** [Set up a personal AI assistant](/guides/personal-ai-assistant-openclaw-hermes), with the safety brakes on.
+
+## Local-first is the default starting point
+
+**[Ollama](https://github.com/ollama/ollama)** (about 187k stars) has become the hub other tools plug into. Its README now documents `ollama launch` commands that start coding agents and assistants already connected to a local model. **[Open WebUI](https://github.com/open-webui/open-webui)** (about 159k) is the standard interface on top.
+
+**Do something with it:** [Run an LLM on your own computer](/guides/run-llms-locally-with-ollama), then [add a private ChatGPT](/guides/private-chatgpt-with-open-webui).
+
+## The new bottleneck: context, memory, and tokens
+
+A cluster of fast-growing projects all attack the same problem, which is that agents forget and that long sessions are expensive:
+
+- Memory layers: **[Mem0](https://github.com/mem0ai/mem0)** (69k), **[Cognee](https://github.com/topoteretes/cognee)** (33k).
+- Session memory for coding agents: **[claude-mem](https://github.com/thedotmack/claude-mem)** (117k).
+- Web and document ingestion for agents: **[Firecrawl](https://github.com/firecrawl/firecrawl)** (202k), **[MarkItDown](https://github.com/microsoft/markitdown)** (195k), **[Crawl4AI](https://github.com/unclecode/crawl4ai)** (87k).
+
+**Learn the idea:** [Context engineering](/learn/context-engineering) and [Memory](/learn/memory). **Build it:** [Give your AI long-term memory with Mem0](/guides/agent-memory-with-mem0).
+
+## Protocols: the plumbing is settling
+
+- **MCP.** The 2026-07-28 revision of the Model Context Protocol made the protocol stateless: the `initialize` handshake and protocol-level sessions are gone, and every request carries its own version and capabilities. Remote MCP servers can now run as ordinary HTTP services. It also deprecated Roots, Sampling, and Logging. Our [MCP track](/learn/mcp) already targets this revision. Source: [the official changelog](https://modelcontextprotocol.io/specification/2026-07-28/changelog).
+- **A2A.** The Agent2Agent protocol, originated by Google and donated to the Linux Foundation, covers the other half of the picture. MCP connects an agent to tools; A2A lets agents discover and delegate to each other. Source: [a2a-protocol.org](https://a2a-protocol.org).
+- **Agent Skills.** Packaged instructions that an agent loads only when a task needs them. The public [skills repository](https://github.com/anthropics/skills) is at about 194k stars, and tools such as Mem0 now ship skills alongside their SDKs.
+
+**Do something with it:** [Connect MCP servers to your AI agent](/guides/connect-mcp-servers).
+
+## One caution that has not changed
+
+Every category above gives a model more reach, and prompt injection is still unsolved. Before you connect an agent to your inbox or your browser, read [indirect prompt injection](/learn/security/indirect-prompt-injection) and [least privilege](/learn/security/least-privilege).
+
+## New on ByHeart AI this week
+
+- A [Guides](/guides) section with 11 hands-on setup guides.
+- An [open-source tools directory](/tools) with live GitHub stats.
+- This weekly radar.

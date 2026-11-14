@@ -67,7 +67,7 @@ export function GradientDescent() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Loss L(w) = (w − 2)². Click <span className="font-mono">Step</span> to descend.
         </p>
@@ -84,7 +84,7 @@ export function GradientDescent() {
                 reset();
               }}
               aria-pressed={x === lr}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 font-mono text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 font-mono text-xs"
               style={{
                 background: x === lr ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: x === lr ? "var(--accent)" : "var(--rule)",
@@ -96,7 +96,7 @@ export function GradientDescent() {
           <button
             type="button"
             onClick={step}
-            className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs font-semibold"
+            className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs font-semibold"
             style={{
               background: "var(--accent)",
               color: "var(--accent-ink)",
@@ -108,7 +108,7 @@ export function GradientDescent() {
           <button
             type="button"
             onClick={reset}
-            className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+            className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
             style={{ background: "var(--paper)" }}
           >
             Reset
@@ -135,20 +135,20 @@ export function GradientDescent() {
           </text>
         </svg>
         <div className="mt-2 grid gap-2 sm:grid-cols-3" aria-live="polite">
-          <div className="rounded-[--radius-sm] border p-3 font-mono text-xs" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3 font-mono text-xs" style={{ background: "var(--paper)" }}>
             w = {w.toFixed(3)}
           </div>
-          <div className="rounded-[--radius-sm] border p-3 font-mono text-xs" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3 font-mono text-xs" style={{ background: "var(--paper)" }}>
             L = {L.toFixed(3)}
           </div>
           <div
-            className="rounded-[--radius-sm] border p-3 font-mono text-xs"
+            className="rounded-(--radius-sm) border p-3 font-mono text-xs"
             style={{ background: "var(--paper)", borderColor: "var(--accent)" }}
           >
             g = {g.toFixed(3)}
           </div>
         </div>
-        <p className="mt-2 rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="mt-2 rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           Next update: w ← {w.toFixed(2)} − {lr} × {g.toFixed(2)} = {(w - lr * g).toFixed(2)}. {note}
         </p>
       </div>

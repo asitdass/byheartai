@@ -34,7 +34,7 @@ export function InferenceIdea() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 grid grid-cols-3 gap-2">
           {phases.map((ph) => {
             const active = ph.id === id;
@@ -44,7 +44,7 @@ export function InferenceIdea() {
                 type="button"
                 onClick={() => setId(ph.id)}
                 aria-pressed={active}
-                className="flex flex-col items-center rounded-[--radius-sm] border px-2 py-3 text-center"
+                className="flex flex-col items-center rounded-(--radius-sm) border px-2 py-3 text-center"
                 style={{
                   background: active ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                   borderColor: active ? "var(--accent)" : "var(--rule)",

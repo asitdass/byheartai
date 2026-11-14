@@ -45,7 +45,7 @@ export function TokenizationDemo() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <label className="mb-2 block text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Type anything — see how it splits into tokens:
         </label>
@@ -53,7 +53,7 @@ export function TokenizationDemo() {
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="w-full rounded-[--radius-sm] border px-3 py-2 text-base"
+          className="w-full rounded-(--radius-sm) border px-3 py-2 text-base"
           style={{ background: "var(--paper)", color: "var(--ink)" }}
           aria-label="Text to tokenize"
         />
@@ -65,7 +65,7 @@ export function TokenizationDemo() {
           {visible.map((tok, i) => (
             <span
               key={i}
-              className="rounded-[--radius-sm] px-2 py-1 font-mono text-sm"
+              className="rounded-(--radius-sm) px-2 py-1 font-mono text-sm"
               style={{ background: palette[i % palette.length], color: "oklch(0.25 0.03 260)" }}
             >
               {tok}

@@ -140,8 +140,58 @@ for (const id of byId.keys()) {
   if ((color.get(id) ?? WHITE) === WHITE) visit(id);
 }
 
+// ---- Guides, radar, tools ----
+const ROOT = process.cwd();
+const toolsFile = path.join(ROOT, "data", "tools.json");
+const toolList = fs.existsSync(toolsFile)
+  ? (JSON.parse(fs.readFileSync(toolsFile, "utf8")) as { id: string; repo: string; guide?: string }[])
+  : [];
+const toolIds = new Set(toolList.map((t) => t.id));
+if (toolIds.size !== toolList.length) errors.push("data/tools.json: duplicate tool ids");
+
+const GUIDE_REQUIRED = ["title", "summary", "outcome", "level", "minutes", "datePublished", "lastVerified", "status"];
+const guideDir = path.join(ROOT, "content", "guides");
+const guideSlugs = new Set<string>();
+for (const file of walk(guideDir)) {
+  const rel = path.relative(ROOT, file);
+  const { data, content } = matter(fs.readFileSync(file, "utf8"));
+  guideSlugs.add(path.basename(file, ".mdx"));
+  for (const field of GUIDE_REQUIRED) {
+    if (data[field] == null || String(data[field]).trim() === "") errors.push(`${rel}: missing required field "${field}"`);
+  }
+  if (data.level && !LEVELS.has(String(data.level))) errors.push(`${rel}: invalid level "${data.level}"`);
+  for (const t of asArray(data.tools)) if (!toolIds.has(t)) errors.push(`${rel}: unknown tool id "${t}" (see data/tools.json)`);
+  for (const c of asArray(data.concepts)) if (!byId.has(c)) warnings.push(`${rel}: concepts references "${c}" which has no lesson`);
+  if (!Array.isArray(data.sources) || data.sources.length === 0) errors.push(`${rel}: guides must list at least one source`);
+  if (String(data.summary ?? "").length > 165) warnings.push(`${rel}: summary is over 165 chars`);
+  // Internal links must resolve
+  for (const m of content.matchAll(/\]\((\/(?:learn|guides)\/[^)#\s]+)/g)) {
+    const parts = m[1].split("/").filter(Boolean);
+    const ok =
+      parts[0] === "guides"
+        ? parts.length === 1 || fs.existsSync(path.join(guideDir, `${parts[1]}.mdx`))
+        : parts.length === 2
+          ? fs.existsSync(path.join(CONTENT_DIR, parts[1]))
+          : seenCategorySlug.has(`${parts[1]}/${parts[2]}`);
+    if (!ok) errors.push(`${rel}: broken internal link ${m[1]}`);
+  }
+}
+for (const t of toolList) {
+  if (t.guide && !guideSlugs.has(t.guide)) errors.push(`data/tools.json: tool "${t.id}" points to missing guide "${t.guide}"`);
+  if (!/^[\w.-]+\/[\w.-]+$/.test(t.repo)) errors.push(`data/tools.json: tool "${t.id}" has invalid repo "${t.repo}"`);
+}
+const radarDir = path.join(ROOT, "content", "radar");
+for (const file of walk(radarDir)) {
+  const rel = path.relative(ROOT, file);
+  const { data, content } = matter(fs.readFileSync(file, "utf8"));
+  if (!/^\d{4}-\d{2}-\d{2}\.mdx$/.test(path.basename(file))) errors.push(`${rel}: radar files must be named YYYY-MM-DD.mdx`);
+  for (const field of ["title", "date", "summary"]) if (!data[field]) errors.push(`${rel}: missing required field "${field}"`);
+  if (!/\]\(https?:\/\//.test(content)) errors.push(`${rel}: radar issues must link to external sources`);
+}
+
 // Report
 console.log(`\nByHeart AI content validation`);
+console.log(`  Guides: ${guideSlugs.size} · Tools: ${toolList.length} · Radar issues: ${walk(radarDir).length}`);
 console.log(`  Concepts found: ${entries.length}`);
 console.log(`  Errors:   ${errors.length}`);
 console.log(`  Warnings: ${warnings.length}\n`);

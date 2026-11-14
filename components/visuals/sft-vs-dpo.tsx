@@ -24,7 +24,7 @@ export function SftVsDpo() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex gap-2">
           {modes.map((mode) => (
             <button
@@ -32,7 +32,7 @@ export function SftVsDpo() {
               type="button"
               onClick={() => setId(mode.id)}
               aria-pressed={mode.id === id}
-              className="rounded-[--radius-sm] border px-3 py-1.5 text-sm"
+              className="rounded-(--radius-sm) border px-3 py-1.5 text-sm"
               style={{
                 background: mode.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: mode.id === id ? "var(--accent)" : "var(--rule)",
@@ -42,7 +42,7 @@ export function SftVsDpo() {
             </button>
           ))}
         </div>
-        <pre className="overflow-x-auto rounded-[--radius-sm] p-3 font-mono text-xs" style={{ background: "var(--paper)" }} aria-live="polite">
+        <pre className="overflow-x-auto rounded-(--radius-sm) p-3 font-mono text-xs" style={{ background: "var(--paper)" }} aria-live="polite">
           {m.row}
         </pre>
         <p className="mt-3 text-sm">{m.desc}</p>

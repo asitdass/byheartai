@@ -1,0 +1,121 @@
+---
+title: "Set up a personal AI assistant with OpenClaw or Hermes Agent"
+summary: "Install an always-on personal agent on your own computer, connect it to a chat app, and give it its first recurring chore safely."
+outcome: "An assistant running on your machine that you can message from your phone, with a deliberately small set of permissions."
+level: intermediate
+minutes: 30
+tools: [openclaw, hermes-agent, ollama]
+tags: [openclaw, hermes agent, personal ai assistant, self-hosted ai agent, ai assistant telegram whatsapp]
+concepts: [what-is-agent, agent-memory, tool-abuse, least-privilege, indirect-prompt-injection, human-in-the-loop]
+sources:
+  - title: "OpenClaw README"
+    url: "https://github.com/openclaw/openclaw"
+  - title: "OpenClaw documentation"
+    url: "https://docs.openclaw.ai"
+  - title: "Hermes Agent README"
+    url: "https://github.com/NousResearch/hermes-agent"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 6
+status: published
+---
+
+Personal agents are among the most-starred AI projects on GitHub right now. The idea: an agent that runs on *your* computer, remembers you, and is reachable from the chat apps you already use, so "remind me", "summarize my inbox", and "book that" become messages you send.
+
+They are also the riskiest thing in these guides, because an assistant with access to your files and accounts is a tempting target. This guide sets one up with the brakes on.
+
+## Pick one
+
+| | OpenClaw | Hermes Agent |
+|---|---|---|
+| Built with | Node.js | Python |
+| Reach | 20+ chat channels, plus desktop and mobile apps | Terminal UI plus a messaging gateway (Telegram, Discord, Slack, WhatsApp, Signal, email) |
+| Known for | Breadth of channels and device integrations | Building up reusable skills and memory over time |
+| License | MIT | MIT |
+
+Both work with hosted models or local ones. You only need one; pick by the chat app you live in.
+
+## Install OpenClaw
+
+macOS, Linux, or WSL2:
+
+```bash
+curl -fsSL https://openclaw.ai/install.sh | bash
+```
+
+The installer starts an onboarding wizard that checks model access, creates a workspace, and configures the local **Gateway** (the control plane that channels and apps connect to). If you installed through npm instead, start it yourself:
+
+```bash
+openclaw onboard --install-daemon
+```
+
+Then confirm it is alive and open the control UI:
+
+```bash
+openclaw gateway status
+openclaw dashboard
+```
+
+Send a message in the dashboard before connecting any channel.
+
+## Or install Hermes Agent
+
+Linux, macOS, or WSL2:
+
+```bash
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+```
+
+Reload your shell, then run the setup wizard and start chatting:
+
+```bash
+hermes setup
+hermes
+```
+
+Useful commands afterwards:
+
+```bash
+hermes model     # choose provider and model
+hermes tools     # choose which tools are enabled
+hermes gateway   # start the messaging gateway
+hermes doctor    # diagnose problems
+```
+
+## Choose the model
+
+Hosted models are the most capable at multi-step tool use. For privacy, both assistants can use a local model through [Ollama](/guides/run-llms-locally-with-ollama); OpenClaw can even be started that way with `ollama launch openclaw`. Expect a local model to be slower and less reliable at complex chores.
+
+## Connect one chat channel
+
+Follow the channel instructions in the project's docs for the app you chose (Telegram is usually the quickest, since it only needs a bot token). Then:
+
+- Restrict who can talk to it. Allow **only your own account**. A bot that answers anyone is an open door to your machine.
+- Send it a harmless request and confirm the reply arrives.
+
+## Start with the brakes on
+
+<Warning>
+An assistant that can read your email, browse the web, and run commands can be steered by text hidden in any of those. This is [tool abuse](/learn/security/tool-abuse) plus [indirect prompt injection](/learn/security/indirect-prompt-injection), and no current model is immune.
+</Warning>
+
+A safe starting configuration:
+
+- **Separate accounts.** Give it its own email and its own browser profile, not yours.
+- **Read before write.** Enable reading and summarizing first. Add sending, deleting, and purchasing later, one at a time, with confirmation required.
+- **No secrets in reach.** Keep password managers, SSH keys, and payment details out of its workspace.
+- **Review third-party skills.** Community skills and plugins are code and instructions that run with the agent's permissions. Read them first.
+
+## Give it a first chore
+
+Pick something recurring, low-stakes, and easy to check:
+
+```text
+Every weekday at 8am, send me the three most important headlines about AI agents, each with a one-line summary and a link.
+```
+
+Run it for a week. When you trust it, widen its job one permission at a time.
+
+### What to do next
+
+Understand the machinery in the [Agents track](/learn/agents) and [Memory track](/learn/memory), then extend your assistant with [MCP servers](/guides/connect-mcp-servers).

@@ -35,7 +35,7 @@ export function RnnIdea() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           hₜ = tanh(Wₓ xₜ + Wₕ hₜ₋₁) · Wₕ = 0.5 · click a timestep
         </p>
@@ -46,7 +46,7 @@ export function RnnIdea() {
               type="button"
               onClick={() => setT(i)}
               aria-pressed={i === t}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: i === t ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: i === t ? "var(--accent)" : "var(--rule)",
@@ -61,7 +61,7 @@ export function RnnIdea() {
           {tokens.map((tok, i) => (
             <span key={tok.t} className="flex items-center gap-1.5">
               <span
-                className="rounded-[--radius-sm] border px-2 py-2 text-center"
+                className="rounded-(--radius-sm) border px-2 py-2 text-center"
                 style={{
                   background: i === t ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                   borderColor: i === t ? "var(--accent)" : "var(--rule)",
@@ -79,7 +79,7 @@ export function RnnIdea() {
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2" aria-live="polite">
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
               Hidden state now
             </div>
@@ -91,7 +91,7 @@ export function RnnIdea() {
               Must finish t={t} before t={t + 2} can start. No parallelism over time.
             </p>
           </div>
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
               Gradient from the last step back to here
             </div>

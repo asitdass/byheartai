@@ -52,7 +52,7 @@ export function ClusteringIdea() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Same unlabeled dots. You pick k; k-means assigns groups:
         </p>
@@ -63,7 +63,7 @@ export function ClusteringIdea() {
               type="button"
               onClick={() => setId(opt.id)}
               aria-pressed={opt.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: opt.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: opt.id === id ? "var(--accent)" : "var(--rule)",
@@ -74,7 +74,7 @@ export function ClusteringIdea() {
           ))}
         </div>
         <div
-          className="relative mb-3 h-44 rounded-[--radius-sm] border"
+          className="relative mb-3 h-44 rounded-(--radius-sm) border"
           style={{ background: "var(--paper)" }}
           role="img"
           aria-label={`Unlabeled points colored into ${k.label} groups.`}
@@ -92,7 +92,7 @@ export function ClusteringIdea() {
             />
           ))}
         </div>
-        <p className="rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           {k.note}
         </p>
       </div>

@@ -57,7 +57,7 @@ export function BackpropagationViz() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Tiny network: x —w₁→ h —w₂→ ŷ. Click the training step:
         </p>
@@ -68,7 +68,7 @@ export function BackpropagationViz() {
               type="button"
               onClick={() => setId(ch.id)}
               aria-pressed={ch.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: ch.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: ch.id === id ? "var(--accent)" : "var(--rule)",
@@ -83,7 +83,7 @@ export function BackpropagationViz() {
             <span key={node} className="flex items-center gap-2">
               {i > 0 && <span style={{ color: "var(--ink-faint)" }}>{idx >= 2 ? "←" : "→"}</span>}
               <span
-                className="rounded-[--radius-sm] border px-2 py-1 font-mono"
+                className="rounded-(--radius-sm) border px-2 py-1 font-mono"
                 style={{
                   background: "var(--paper)",
                   borderColor: i === 1 || i === 3 ? "var(--accent)" : "var(--rule)",
@@ -96,7 +96,7 @@ export function BackpropagationViz() {
         </div>
         <div className="space-y-2" aria-live="polite">
           <p className="text-sm font-semibold">{s.title}</p>
-          <p className="rounded-[--radius-sm] border p-3 text-sm" style={{ background: "var(--paper)" }}>
+          <p className="rounded-(--radius-sm) border p-3 text-sm" style={{ background: "var(--paper)" }}>
             {s.body}
           </p>
           <p className="font-mono text-xs" style={{ color: "var(--accent)" }}>

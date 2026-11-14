@@ -32,7 +32,7 @@ export function FineTuneDecision() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>What&apos;s the gap?</p>
         <div className="mb-3 flex flex-wrap gap-1.5">
           {cases.map((k) => (
@@ -41,7 +41,7 @@ export function FineTuneDecision() {
               type="button"
               onClick={() => setId(k.id)}
               aria-pressed={k.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: k.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: k.id === id ? "var(--accent)" : "var(--rule)",
@@ -51,7 +51,7 @@ export function FineTuneDecision() {
             </button>
           ))}
         </div>
-        <p className="rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <strong style={{ color: "var(--accent)" }}>Do this:</strong> {c.a}
         </p>
       </div>

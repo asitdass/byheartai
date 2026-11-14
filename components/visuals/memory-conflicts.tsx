@@ -33,7 +33,7 @@ export function MemoryConflicts() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex flex-wrap gap-2">
           {cases.map((k) => (
             <button
@@ -41,7 +41,7 @@ export function MemoryConflicts() {
               type="button"
               onClick={() => setId(k.id)}
               aria-pressed={k.id === id}
-              className="rounded-[--radius-sm] border px-3 py-1.5 text-sm"
+              className="rounded-(--radius-sm) border px-3 py-1.5 text-sm"
               style={{
                 background: k.id === id ? "color-mix(in oklab, oklch(0.6 0.18 25) 16%, var(--paper))" : "var(--paper)",
                 borderColor: k.id === id ? "oklch(0.6 0.18 25)" : "var(--rule)",
@@ -52,8 +52,8 @@ export function MemoryConflicts() {
           ))}
         </div>
         <div className="space-y-2 text-sm" aria-live="polite">
-          <p className="rounded-[--radius-sm] p-2 font-mono text-xs" style={{ background: "var(--paper)" }}>{c.a}</p>
-          <p className="rounded-[--radius-sm] p-2 font-mono text-xs" style={{ background: "var(--paper)" }}>{c.b}</p>
+          <p className="rounded-(--radius-sm) p-2 font-mono text-xs" style={{ background: "var(--paper)" }}>{c.a}</p>
+          <p className="rounded-(--radius-sm) p-2 font-mono text-xs" style={{ background: "var(--paper)" }}>{c.b}</p>
           <p><span className="font-semibold" style={{ color: "var(--accent)" }}>Do this: </span>{c.action}</p>
         </div>
       </div>

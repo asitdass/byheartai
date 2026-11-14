@@ -14,7 +14,7 @@ export function FunctionCallingFlow() {
   return (
     <figure className="my-8">
       <div
-        className="rounded-[--radius] border p-5"
+        className="rounded-(--radius) border p-5"
         style={{ background: "var(--surface)" }}
         role="img"
         aria-label="Function calling loop: the user asks a question; the model decides to call a tool and returns a structured request; your code runs the real function; the result is returned to the model; the model reads the result; the model replies in natural language."
@@ -23,7 +23,7 @@ export function FunctionCallingFlow() {
           {steps.map((s, i) => (
             <li
               key={s.label}
-              className="flex items-start gap-3 rounded-[--radius-sm] border p-3"
+              className="flex items-start gap-3 rounded-(--radius-sm) border p-3"
               style={{ background: "var(--paper)" }}
             >
               <s.icon size={18} style={{ color: "var(--accent)", flexShrink: 0, marginTop: 2 }} aria-hidden />

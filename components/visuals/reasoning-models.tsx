@@ -51,7 +51,7 @@ export function ReasoningModels() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Same API, very different bills. Click a turn type:
         </p>
@@ -62,7 +62,7 @@ export function ReasoningModels() {
               type="button"
               onClick={() => setId(ch.id)}
               aria-pressed={ch.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: ch.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: ch.id === id ? "var(--accent)" : "var(--rule)",
@@ -73,7 +73,7 @@ export function ReasoningModels() {
           ))}
         </div>
         <div className="space-y-3" aria-live="polite">
-          <p className="rounded-[--radius-sm] p-3 font-mono text-xs" style={{ background: "var(--paper)" }}>
+          <p className="rounded-(--radius-sm) p-3 font-mono text-xs" style={{ background: "var(--paper)" }}>
             {c.prompt}
           </p>
           <div className="h-3 overflow-hidden rounded-full" style={{ background: "var(--paper)" }}>
@@ -84,19 +84,19 @@ export function ReasoningModels() {
             </div>
           </div>
           <div className="grid gap-2 sm:grid-cols-3">
-            <div className="rounded-[--radius-sm] border p-3 text-xs" style={{ background: "var(--paper)" }}>
+            <div className="rounded-(--radius-sm) border p-3 text-xs" style={{ background: "var(--paper)" }}>
               <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
                 Prompt
               </div>
               ~24 tokens (short)
             </div>
-            <div className="rounded-[--radius-sm] border p-3 text-xs" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+            <div className="rounded-(--radius-sm) border p-3 text-xs" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
               <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
                 Hidden thinking
               </div>
               {c.think === 0 ? "none" : `${c.think.toLocaleString()} tokens`}
             </div>
-            <div className="rounded-[--radius-sm] border p-3 text-xs" style={{ background: "var(--paper)" }}>
+            <div className="rounded-(--radius-sm) border p-3 text-xs" style={{ background: "var(--paper)" }}>
               <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
                 Visible answer
               </div>

@@ -1,0 +1,83 @@
+---
+title: "Chat with your own documents using AnythingLLM"
+summary: "Set up AnythingLLM as a private document assistant: drop in PDFs and notes, then ask questions and get answers with citations."
+outcome: "A local app where each project has its own workspace of documents you can question, with nothing uploaded to a third party."
+level: beginner
+minutes: 20
+tools: [anything-llm, ollama]
+tags: [anythingllm, chat with pdf, local rag, private document ai, chat with documents]
+concepts: [what-is-rag, chunking, what-are-embeddings, rag-architecture]
+sources:
+  - title: "AnythingLLM README"
+    url: "https://github.com/Mintplex-Labs/anything-llm"
+  - title: "AnythingLLM Docker instructions"
+    url: "https://github.com/Mintplex-Labs/anything-llm/blob/master/docker/HOW_TO_USE_DOCKER.md"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 5
+status: published
+---
+
+"Ask questions about my own files" is the most common thing people want from AI, and the pattern behind it is [RAG](/learn/rag/what-is-rag): find the relevant passages, then let the model answer from them. AnythingLLM packages the whole pipeline (parsing, [chunking](/learn/rag/chunking), embeddings, vector store, chat) into one app.
+
+## Choose desktop or Docker
+
+- **Desktop app** (simplest, single user): download it from [anythingllm.com/download](https://anythingllm.com/download) for Mac, Windows, or Linux and open it. Skip to step 3.
+- **Docker** (multi-user, runs as a server): continue with step 2.
+
+## Run it with Docker
+
+```bash
+docker pull mintplexlabs/anythingllm
+```
+
+```bash
+export STORAGE_LOCATION=$HOME/anythingllm && \
+mkdir -p $STORAGE_LOCATION && \
+touch "$STORAGE_LOCATION/.env" && \
+docker run -d --rm -p 3001:3001 \
+--cap-add SYS_ADMIN \
+-v ${STORAGE_LOCATION}:/app/server/storage \
+-v ${STORAGE_LOCATION}/.env:/app/server/.env \
+-e STORAGE_DIR="/app/server/storage" \
+mintplexlabs/anythingllm
+```
+
+Open [http://localhost:3001](http://localhost:3001). Your documents and settings live in `~/anythingllm`, so they survive updates.
+
+## Choose the model
+
+The setup wizard asks which LLM to use. For a fully private setup choose **Ollama** and enter its address:
+
+- Desktop app: `http://localhost:11434`
+- Docker: `http://host.docker.internal:11434` (inside a container, `localhost` is the container itself; on Linux add `--add-host=host.docker.internal:host-gateway` to the run command)
+
+You can accept the defaults for embeddings and the vector database. Both run locally out of the box.
+
+## Create a workspace and add documents
+
+A workspace is a set of documents plus a chat. Make one per project, client, or subject so answers do not mix sources.
+
+1. Create a workspace.
+2. Click the upload icon and drop in PDFs, Word files, text, or paste a website URL.
+3. Select the files and **Move to Workspace**, then **Save and Embed**.
+
+Embedding takes a moment per document. It only happens once.
+
+## Ask questions
+
+Ask something only your documents could answer. Each reply shows **citations**: click one to see the exact passage it used. If the answer is wrong, the citation tells you whether retrieval found the wrong passage or the model misread the right one. Those need different fixes.
+
+<Tip>
+Workspace settings has two chat modes. **Query** answers only from your documents and says so when it finds nothing. **Chat** also uses the model's general knowledge. Use Query when being wrong is costly.
+</Tip>
+
+### If answers are poor
+
+- **"I could not find that"**: the passage was not retrieved. Ask with words closer to the document's own wording, or pin the key document in the workspace.
+- **Scanned PDFs**: these are images. Run OCR first or the text is empty.
+- **Vague answers**: a small local model may be the limit. Try a larger one.
+
+### What to do next
+
+Learn what is happening under the hood in the [RAG track](/learn/rag), or feed it cleaner source material with [Crawl4AI](/guides/web-scraping-for-ai-with-crawl4ai).

@@ -32,7 +32,7 @@ export function ModelRouting() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           What kind of turn is this?
         </p>
@@ -43,7 +43,7 @@ export function ModelRouting() {
               type="button"
               onClick={() => setId(k.id)}
               aria-pressed={k.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: k.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: k.id === id ? "var(--accent)" : "var(--rule)",
@@ -53,7 +53,7 @@ export function ModelRouting() {
             </button>
           ))}
         </div>
-        <p className="rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <strong style={{ color: "var(--accent)" }}>Route: </strong>
           {c.a}
         </p>

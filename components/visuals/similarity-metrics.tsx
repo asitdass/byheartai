@@ -34,9 +34,9 @@ export function SimilarityMetrics() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="grid gap-5 md:grid-cols-2">
-          <div className="rounded-[--radius-sm]" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm)" style={{ background: "var(--paper)" }}>
             <svg viewBox="0 0 100 90" className="h-full w-full" role="img" aria-label={`Two vectors with a ${angle} degree angle between them. Cosine similarity ${cosine.toFixed(2)}.`}>
               <line x1={ORIGIN.x} y1={ORIGIN.y} x2={aEnd.x} y2={aEnd.y} stroke="var(--accent)" strokeWidth={1.2} markerEnd="url(#arrowA)" />
               <line x1={ORIGIN.x} y1={ORIGIN.y} x2={bEnd.x} y2={bEnd.y} stroke="oklch(0.6 0.15 260)" strokeWidth={1.2} markerEnd="url(#arrowB)" />
@@ -74,7 +74,7 @@ export function SimilarityMetrics() {
               <Metric label="Dot product" value={dot.toFixed(2)} />
               <Metric label="Euclidean" value={euclid.toFixed(2)} />
             </div>
-            <p className="rounded-[--radius-sm] p-2 text-center text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+            <p className="rounded-(--radius-sm) p-2 text-center text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
               {verdict}
             </p>
           </div>
@@ -92,7 +92,7 @@ export function SimilarityMetrics() {
 
 function Metric({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)", outline: highlight ? "2px solid var(--accent)" : "none" }}>
+    <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)", outline: highlight ? "2px solid var(--accent)" : "none" }}>
       <div className="text-xs" style={{ color: "var(--ink-faint)" }}>{label}</div>
       <div className="text-lg font-bold" style={{ color: highlight ? "var(--accent)" : "var(--ink)" }}>{value}</div>
     </div>

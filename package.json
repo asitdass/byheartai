@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "validate:content": "tsx scripts/validate-content.ts"
+    "validate:content": "tsx scripts/validate-content.ts",
+    "refresh:tools": "tsx scripts/refresh-tools.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

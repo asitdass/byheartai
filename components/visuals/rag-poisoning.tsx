@@ -15,7 +15,7 @@ export function RagPoisoning() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-xs font-semibold" style={{ color: "var(--ink-muted)" }}>
           Index — click what retrieval might return first
         </p>
@@ -28,7 +28,7 @@ export function RagPoisoning() {
                 type="button"
                 onClick={() => setId(ch.id)}
                 aria-pressed={active}
-                className="flex w-full items-center justify-between rounded-[--radius-sm] border px-3 py-2 text-left text-sm"
+                className="flex w-full items-center justify-between rounded-(--radius-sm) border px-3 py-2 text-left text-sm"
                 style={{
                   background: active ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                   borderColor: ch.poisoned ? "oklch(0.6 0.18 25)" : active ? "var(--accent)" : "var(--rule)",

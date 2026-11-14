@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 export function MemoryCard({ children }: { children: ReactNode }) {
   return (
     <aside
-      className="my-10 rounded-[--radius] border p-6"
+      className="my-10 rounded-(--radius) border p-6"
       style={{
         background: `color-mix(in oklab, var(--heart) 6%, var(--surface))`,
         borderColor: `color-mix(in oklab, var(--heart) 30%, var(--rule))`,

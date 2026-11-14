@@ -16,7 +16,7 @@ const query = [
 
 function Row({ title, subtitle, steps }: { title: string; subtitle: string; steps: typeof ingestion }) {
   return (
-    <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+    <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
       <div className="mb-3">
         <span className="text-sm font-bold">{title}</span>
         <span className="ml-2 text-xs" style={{ color: "var(--ink-faint)" }}>{subtitle}</span>
@@ -24,7 +24,7 @@ function Row({ title, subtitle, steps }: { title: string; subtitle: string; step
       <div className="flex flex-wrap items-stretch gap-2">
         {steps.map((s, i) => (
           <div key={s.label} className="flex items-center gap-2">
-            <div className="flex w-32 flex-col items-center rounded-[--radius-sm] border px-2 py-3 text-center" style={{ background: "var(--paper)" }}>
+            <div className="flex w-32 flex-col items-center rounded-(--radius-sm) border px-2 py-3 text-center" style={{ background: "var(--paper)" }}>
               <s.icon size={18} style={{ color: "var(--accent)" }} aria-hidden />
               <span className="mt-1 text-sm font-semibold">{s.label}</span>
               <span className="text-xs" style={{ color: "var(--ink-faint)" }}>{s.note}</span>

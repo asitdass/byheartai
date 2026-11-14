@@ -27,7 +27,7 @@ export function AgentMemory() {
     <figure className="my-8">
       <div className="grid gap-3 md:grid-cols-3" role="img" aria-label="Agents use three kinds of memory: short-term working memory (the context window), long-term memory (facts stored outside the model and retrieved when relevant), and state (the structured progress of the task).">
         {kinds.map((k) => (
-          <div key={k.title} className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+          <div key={k.title} className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
             <div className="mb-2 flex items-center gap-2">
               <k.icon size={18} aria-hidden style={{ color: "var(--accent)" }} />
               <span className="text-sm font-bold">{k.title}</span>

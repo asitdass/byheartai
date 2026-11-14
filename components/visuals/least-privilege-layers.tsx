@@ -43,7 +43,7 @@ export function LeastPrivilegeLayers() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
           {layers.map((layer) => {
             const active = layer.id === id;
@@ -53,7 +53,7 @@ export function LeastPrivilegeLayers() {
                 type="button"
                 onClick={() => setId(layer.id)}
                 aria-pressed={active}
-                className="flex flex-col items-center rounded-[--radius-sm] border px-2 py-3 text-center"
+                className="flex flex-col items-center rounded-(--radius-sm) border px-2 py-3 text-center"
                 style={{
                   background: active ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                   borderColor: active ? "var(--accent)" : "var(--rule)",

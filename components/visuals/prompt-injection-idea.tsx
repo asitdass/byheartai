@@ -27,9 +27,9 @@ export function PromptInjectionIdea() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div
-          className="mb-3 overflow-hidden rounded-[--radius-sm] border"
+          className="mb-3 overflow-hidden rounded-(--radius-sm) border"
           role="img"
           aria-label="One context window containing developer instructions on top and untrusted user text below. Both become tokens."
         >
@@ -53,7 +53,7 @@ export function PromptInjectionIdea() {
               type="button"
               onClick={() => setId(view.id)}
               aria-pressed={view.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: view.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: view.id === id ? "var(--accent)" : "var(--rule)",

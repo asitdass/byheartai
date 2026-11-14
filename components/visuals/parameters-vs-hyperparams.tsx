@@ -37,7 +37,7 @@ export function ParametersVsHyperparams() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Two kinds of numbers around a model. Click one:
         </p>
@@ -48,7 +48,7 @@ export function ParametersVsHyperparams() {
               type="button"
               onClick={() => setId(ch.id)}
               aria-pressed={ch.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: ch.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: ch.id === id ? "var(--accent)" : "var(--rule)",
@@ -60,13 +60,13 @@ export function ParametersVsHyperparams() {
         </div>
         <div className="space-y-2" aria-live="polite">
           <div className="grid gap-2 sm:grid-cols-2">
-            <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+            <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
               <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
                 Who sets them
               </div>
               <p className="text-sm">{k.who}</p>
             </div>
-            <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+            <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
               <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
                 When they change
               </div>
@@ -77,7 +77,7 @@ export function ParametersVsHyperparams() {
             {k.examples.map((ex) => (
               <li
                 key={ex.name}
-                className="rounded-[--radius-sm] border p-3 text-sm"
+                className="rounded-(--radius-sm) border p-3 text-sm"
                 style={{ background: "var(--paper)", borderColor: id === "params" ? "var(--accent)" : "var(--rule)" }}
               >
                 <span className="font-mono text-xs font-semibold" style={{ color: "var(--accent)" }}>

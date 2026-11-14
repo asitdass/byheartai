@@ -34,7 +34,7 @@ export function LatencyThroughput() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Concurrent decode batch
         </p>
@@ -45,7 +45,7 @@ export function LatencyThroughput() {
               type="button"
               onClick={() => setN(x.n)}
               aria-pressed={x.n === n}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 font-mono text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 font-mono text-xs"
               style={{
                 background: x.n === n ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: x.n === n ? "var(--accent)" : "var(--rule)",

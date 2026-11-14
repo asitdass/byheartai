@@ -45,7 +45,7 @@ export function HallucinationSafety() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {failures.map((fail) => {
             const active = fail.id === id;
@@ -55,7 +55,7 @@ export function HallucinationSafety() {
                 type="button"
                 onClick={() => setId(fail.id)}
                 aria-pressed={active}
-                className="flex flex-col items-center rounded-[--radius-sm] border px-2 py-3 text-center"
+                className="flex flex-col items-center rounded-(--radius-sm) border px-2 py-3 text-center"
                 style={{
                   background: active ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                   borderColor: active ? "var(--accent)" : "var(--rule)",

@@ -26,7 +26,7 @@ export function JailbreakVsInjection() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex gap-2">
           {modes.map((mode) => (
             <button
@@ -34,7 +34,7 @@ export function JailbreakVsInjection() {
               type="button"
               onClick={() => setId(mode.id)}
               aria-pressed={mode.id === id}
-              className="flex-1 rounded-[--radius-sm] border px-3 py-2 text-sm"
+              className="flex-1 rounded-(--radius-sm) border px-3 py-2 text-sm"
               style={{
                 background: mode.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: mode.id === id ? "var(--accent)" : "var(--rule)",

@@ -12,14 +12,14 @@ export function McpAuthFlow() {
   return (
     <figure className="my-8">
       <div
-        className="rounded-[--radius] border p-5"
+        className="rounded-(--radius) border p-5"
         style={{ background: "var(--surface)" }}
         role="img"
         aria-label="Remote MCP authorization: the host asks to connect, the user signs in with OAuth 2.1, a token is issued bound to that specific server, and the server rejects any token that was not minted for it."
       >
         <ol className="grid gap-2 sm:grid-cols-2">
           {steps.map((s) => (
-            <li key={s.label} className="flex items-start gap-3 rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+            <li key={s.label} className="flex items-start gap-3 rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
               <s.icon size={18} aria-hidden style={{ color: "var(--accent)", flexShrink: 0, marginTop: 2 }} />
               <div>
                 <div className="text-sm font-semibold">{s.label}</div>

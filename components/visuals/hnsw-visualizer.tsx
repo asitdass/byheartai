@@ -35,7 +35,7 @@ export function HnswVisualizer() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="w-full" style={{ background: "var(--paper)", borderRadius: "var(--radius-sm)" }}>
           <svg viewBox="0 0 100 68" className="h-full w-full" role="img" aria-label={`HNSW search step ${step + 1} of ${steps.length}: ${current.note}`}>
             {layers.map((layer) => {
@@ -87,7 +87,7 @@ export function HnswVisualizer() {
           </svg>
         </div>
 
-        <p className="mt-3 rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="mt-3 rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <strong style={{ color: "var(--accent)" }}>Step {step + 1}/{steps.length}:</strong> {current.note}
         </p>
 
@@ -96,7 +96,7 @@ export function HnswVisualizer() {
             type="button"
             onClick={() => setStep((s) => Math.min(s + 1, steps.length - 1))}
             disabled={step >= steps.length - 1}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-4 py-2 text-sm font-semibold disabled:opacity-40"
             style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
           >
             <Play size={14} aria-hidden /> Next step
@@ -104,7 +104,7 @@ export function HnswVisualizer() {
           <button
             type="button"
             onClick={() => setStep(0)}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-3 py-2 text-sm hover:bg-[--surface]"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-3 py-2 text-sm hover:bg-(--surface)"
             style={{ color: "var(--ink-muted)" }}
           >
             <RotateCcw size={14} aria-hidden /> Reset

@@ -8,11 +8,11 @@ export function ContextualRetrieval() {
   return (
     <figure className="my-8">
       <div className="grid gap-4 md:grid-cols-2" role="img" aria-label="A raw chunk saying 'The refund window is 30 days' lacks context about which product. A contextualized chunk prepends 'From the Acme Pro billing policy:' so it becomes self-explanatory and easier to retrieve correctly.">
-        <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+        <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
           <div className="mb-2 flex items-center gap-2 text-sm font-bold" style={{ color: "oklch(0.6 0.18 25)" }}>
             <X size={16} aria-hidden /> Raw chunk
           </div>
-          <p className="rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }}>
+          <p className="rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }}>
             &quot;The refund window is 30 days.&quot;
           </p>
           <p className="mt-2 text-xs" style={{ color: "var(--ink-faint)" }}>
@@ -20,11 +20,11 @@ export function ContextualRetrieval() {
           </p>
         </div>
 
-        <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+        <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
           <div className="mb-2 flex items-center gap-2 text-sm font-bold" style={{ color: "oklch(0.55 0.15 150)" }}>
             <Check size={16} aria-hidden /> Contextualized chunk
           </div>
-          <p className="rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }}>
+          <p className="rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }}>
             <span style={{ color: "var(--accent)" }}>From the Acme Pro billing policy (Refunds):</span> &quot;The refund window is 30 days.&quot;
           </p>
           <p className="mt-2 text-xs" style={{ color: "var(--ink-faint)" }}>

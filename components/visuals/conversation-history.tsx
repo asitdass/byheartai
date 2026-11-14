@@ -23,11 +23,11 @@ export function ConversationHistory() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="grid gap-3 md:grid-cols-2">
           <div>
             <div className="mb-2 text-sm font-bold">Session log (stored)</div>
-            <ul className="min-h-32 space-y-1 rounded-[--radius-sm] border p-2 text-xs" style={{ background: "var(--paper)" }} role="list" aria-label="Full conversation stored for this session">
+            <ul className="min-h-32 space-y-1 rounded-(--radius-sm) border p-2 text-xs" style={{ background: "var(--paper)" }} role="list" aria-label="Full conversation stored for this session">
               {shown.length === 0 && <li style={{ color: "var(--ink-faint)" }}>empty</li>}
               {inLog.map((t) => (
                 <li key={t} style={{ color: "var(--ink-faint)" }}>{t}</li>
@@ -40,7 +40,7 @@ export function ConversationHistory() {
           </div>
           <div>
             <div className="mb-2 text-sm font-bold">Working memory (context window)</div>
-            <ul className="min-h-32 space-y-1 rounded-[--radius-sm] border p-2 text-xs" style={{ background: "var(--paper)", borderColor: "var(--accent)" }} role="list" aria-label="Only the last few turns fit in the model context">
+            <ul className="min-h-32 space-y-1 rounded-(--radius-sm) border p-2 text-xs" style={{ background: "var(--paper)", borderColor: "var(--accent)" }} role="list" aria-label="Only the last few turns fit in the model context">
               {inWindow.map((t) => (
                 <li key={t}>{t}</li>
               ))}
@@ -53,12 +53,12 @@ export function ConversationHistory() {
             type="button"
             onClick={() => setN((x) => Math.min(x + 1, turns.length))}
             disabled={n >= turns.length}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-4 py-2 text-sm font-semibold disabled:opacity-40"
             style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
           >
             <Plus size={14} aria-hidden /> Next turn
           </button>
-          <button type="button" onClick={() => setN(3)} className="flex items-center gap-1 rounded-[--radius-sm] px-3 py-2 text-sm" style={{ color: "var(--ink-muted)" }}>
+          <button type="button" onClick={() => setN(3)} className="flex items-center gap-1 rounded-(--radius-sm) px-3 py-2 text-sm" style={{ color: "var(--ink-muted)" }}>
             <RotateCcw size={14} aria-hidden /> Reset
           </button>
         </div>

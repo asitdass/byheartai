@@ -43,7 +43,7 @@ function Cell({
 }) {
   return (
     <div
-      className="rounded-[--radius-sm] border p-2 text-center"
+      className="rounded-(--radius-sm) border p-2 text-center"
       style={{
         background: accent ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
         borderColor: accent ? "var(--accent)" : "var(--rule)",
@@ -68,7 +68,7 @@ export function ClassificationMetrics() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           100 emails, 10 are spam. Move the decision threshold:
         </p>
@@ -79,7 +79,7 @@ export function ClassificationMetrics() {
               type="button"
               onClick={() => setId(th.id)}
               aria-pressed={th.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: th.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: th.id === id ? "var(--accent)" : "var(--rule)",
@@ -96,16 +96,16 @@ export function ClassificationMetrics() {
           <Cell label="Caught spam (TP)" value={t.tp} accent />
         </div>
         <div className="mb-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
-          <div className="rounded-[--radius-sm] border p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-2" style={{ background: "var(--paper)" }}>
             Acc <span className="font-mono font-semibold">{(acc * 100).toFixed(0)}%</span>
           </div>
-          <div className="rounded-[--radius-sm] border p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-2" style={{ background: "var(--paper)" }}>
             Prec <span className="font-mono font-semibold">{(prec * 100).toFixed(0)}%</span>
           </div>
-          <div className="rounded-[--radius-sm] border p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-2" style={{ background: "var(--paper)" }}>
             Rec <span className="font-mono font-semibold">{(rec * 100).toFixed(0)}%</span>
           </div>
-          <div className="rounded-[--radius-sm] border p-2" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border p-2" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             F1 <span className="font-mono font-semibold">{f1.toFixed(2)}</span>
           </div>
         </div>

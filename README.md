@@ -2,7 +2,7 @@
 
 > Learn AI. Know it by heart.
 
-A reading-first, visual, interactive knowledge layer for modern AI engineering. This repository currently contains the **Phase 1 MVP walking skeleton**: a runnable Next.js app that demonstrates the full reading experience end-to-end, plus the complete planning docs.
+A reading-first, visual, interactive knowledge layer for modern AI engineering. It combines a concept curriculum (`/learn`), hands-on setup guides for open-source AI tools (`/guides`), a tools directory with live GitHub stats (`/tools`), and a weekly briefing (`/whats-new`) that an automated job drafts every Monday.
 
 ## Documentation
 
@@ -53,6 +53,24 @@ lib/                 # content loader, knowledge-graph utils, MDX render, TOC, t
 scripts/             # content validation
 docs/                # the master plan and companions
 ```
+
+## Guides, tools, and the weekly radar
+
+- **Guides** (`content/guides/*.mdx`) are hands-on setup walkthroughs for open-source AI tools. Commands are copied from each project's README and dated with `lastVerified`.
+- **Tools** (`data/tools.json`) power `/tools`. Editorial fields are hand-written; stars, license, and activity come from `npm run refresh:tools`.
+- **Radar** (`content/radar/YYYY-MM-DD.mdx`) is the weekly "What's new" briefing at `/whats-new`.
+
+## Weekly automation
+
+`.github/workflows/weekly-content.yml` runs every Monday at 05:00 UTC (and on demand from the Actions tab). It refreshes tool stats, then runs Claude Code with the `/weekly-update` skill (`.claude/skills/weekly-update/SKILL.md`) to research the past week and update the radar, tools, guides, and lessons. The result arrives as a **pull request**; nothing is published until you merge it.
+
+One-time setup:
+
+1. Add a repository secret named `ANTHROPIC_API_KEY` (Claude Console key) or `CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token`, uses your Claude subscription).
+2. In **Settings → Actions → General → Workflow permissions**, enable **Allow GitHub Actions to create and approve pull requests**.
+3. Merge the workflow to `main` (schedules only run from the default branch), then trigger it once by hand to test.
+
+To run the same update locally, open Claude Code in this repo and type `/weekly-update`.
 
 ## Adding a lesson
 

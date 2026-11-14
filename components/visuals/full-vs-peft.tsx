@@ -5,7 +5,7 @@ export function FullVsPeft() {
   return (
     <figure className="my-8">
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+        <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
           <div className="mb-2 flex items-center gap-2 text-sm font-bold">
             <Layers size={15} aria-hidden style={{ color: "var(--accent)" }} /> Full fine-tune
           </div>
@@ -20,7 +20,7 @@ export function FullVsPeft() {
             <li>− Costly, easy to overwrite general skill</li>
           </ul>
         </div>
-        <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+        <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
           <div className="mb-2 flex items-center gap-2 text-sm font-bold">
             <Puzzle size={15} aria-hidden style={{ color: "var(--accent)" }} /> PEFT (adapter)
           </div>

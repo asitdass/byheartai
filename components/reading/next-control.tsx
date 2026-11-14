@@ -13,7 +13,7 @@ export function NextControl({ conceptId }: { conceptId: string }) {
   return (
     <Link
       href={conceptHref(next)}
-      className="group mt-12 flex items-center justify-between gap-4 rounded-[--radius] border p-5 no-underline transition-colors hover:border-[--accent]"
+      className="group mt-12 flex items-center justify-between gap-4 rounded-(--radius) border p-5 no-underline transition-colors hover:border-(--accent)"
       style={{ background: "var(--surface)", borderColor: "var(--rule)" }}
     >
       <span>

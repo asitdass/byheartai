@@ -45,12 +45,12 @@ export function ContextCompression() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex gap-2">
           {stages.map((st, i) => (
             <span
               key={st.title}
-              className="rounded-[--radius-sm] border px-2 py-1 text-xs font-semibold"
+              className="rounded-(--radius-sm) border px-2 py-1 text-xs font-semibold"
               style={{
                 background: i === step ? "var(--accent)" : "var(--paper)",
                 color: i === step ? "var(--accent-ink)" : "var(--ink-muted)",
@@ -66,7 +66,7 @@ export function ContextCompression() {
           {s.items.filter((it) => it.text).map((it) => (
             <li
               key={it.text}
-              className="rounded-[--radius-sm] px-3 py-2"
+              className="rounded-(--radius-sm) px-3 py-2"
               style={{
                 background: "var(--paper)",
                 opacity: it.keep ? 1 : 0.45,
@@ -85,7 +85,7 @@ export function ContextCompression() {
             type="button"
             onClick={() => setStep((n) => Math.min(n + 1, stages.length - 1))}
             disabled={step >= stages.length - 1}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-4 py-2 text-sm font-semibold disabled:opacity-40"
             style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
           >
             <Play size={14} aria-hidden /> Next
@@ -93,7 +93,7 @@ export function ContextCompression() {
           <button
             type="button"
             onClick={() => setStep(0)}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-3 py-2 text-sm"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-3 py-2 text-sm"
             style={{ color: "var(--ink-muted)" }}
           >
             <RotateCcw size={14} aria-hidden /> Reset

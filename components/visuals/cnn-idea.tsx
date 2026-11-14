@@ -60,7 +60,7 @@ export function CnnIdea() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           4×4 checkerboard · 2×2 filter · valid conv → 3×3 map
         </p>
@@ -71,7 +71,7 @@ export function CnnIdea() {
               type="button"
               onClick={() => setKid(k.id)}
               aria-pressed={k.id === kid}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: k.id === kid ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: k.id === kid ? "var(--accent)" : "var(--rule)",
@@ -88,7 +88,7 @@ export function CnnIdea() {
               type="button"
               onClick={() => setStage(s.id)}
               aria-pressed={s.id === stage}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: s.id === stage ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: s.id === stage ? "var(--accent)" : "var(--rule)",
@@ -111,7 +111,7 @@ export function CnnIdea() {
                   return (
                     <div
                       key={`${i}-${j}`}
-                      className="flex h-8 items-center justify-center rounded-[--radius-sm] font-mono text-xs"
+                      className="flex h-8 items-center justify-center rounded-(--radius-sm) font-mono text-xs"
                       style={{
                         background: inWin ? "color-mix(in oklab, var(--accent) 22%, var(--paper))" : "var(--paper)",
                         border: "1px solid var(--rule)",
@@ -135,7 +135,7 @@ export function CnnIdea() {
                   row.map((v, j) => (
                     <div
                       key={`p${i}-${j}`}
-                      className="flex h-8 w-12 items-center justify-center rounded-[--radius-sm] font-mono text-xs"
+                      className="flex h-8 w-12 items-center justify-center rounded-(--radius-sm) font-mono text-xs"
                       style={{ background: "var(--paper)", border: "1px solid var(--accent)" }}
                     >
                       {v}
@@ -149,7 +149,7 @@ export function CnnIdea() {
                   row.map((v, j) => (
                     <div
                       key={`f${i}-${j}`}
-                      className="flex h-8 w-10 items-center justify-center rounded-[--radius-sm] font-mono text-xs"
+                      className="flex h-8 w-10 items-center justify-center rounded-(--radius-sm) font-mono text-xs"
                       style={{
                         background: i === pi && j === pj && stage === "patch" ? "color-mix(in oklab, var(--accent) 22%, var(--paper))" : "var(--paper)",
                         border: "1px solid var(--rule)",
@@ -166,7 +166,7 @@ export function CnnIdea() {
               <div className="mt-2 flex items-center gap-2">
                 <button
                   type="button"
-                  className="rounded-[--radius-sm] border px-2 py-1 text-xs"
+                  className="rounded-(--radius-sm) border px-2 py-1 text-xs"
                   style={{ background: "var(--paper)" }}
                   onClick={() => setPos((p) => (p + 8) % 9)}
                 >
@@ -174,7 +174,7 @@ export function CnnIdea() {
                 </button>
                 <button
                   type="button"
-                  className="rounded-[--radius-sm] border px-2 py-1 text-xs"
+                  className="rounded-(--radius-sm) border px-2 py-1 text-xs"
                   style={{ background: "var(--paper)" }}
                   onClick={() => setPos((p) => (p + 1) % 9)}
                 >

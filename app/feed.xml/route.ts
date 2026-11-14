@@ -1,4 +1,5 @@
 import { getPublishedConcepts, conceptHref } from "@/lib/content";
+import { getPublishedGuides, getRadarIssues } from "@/lib/guides";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl, toIsoDate } from "@/lib/site";
 
 export const revalidate = 3600;
@@ -19,17 +20,28 @@ export function GET() {
     return db.localeCompare(da);
   });
 
-  const items = lessons
-    .map((c) => {
-      const url = absoluteUrl(conceptHref(c));
-      const updated = toIsoDate(c.lastReviewed ?? c.datePublished) ?? new Date().toISOString();
+  const entries = [
+    ...getRadarIssues().map((r) => ({ title: r.title, path: `/whats-new/${r.slug}`, date: r.date, summary: r.summary, category: "whats-new" })),
+    ...getPublishedGuides().map((g) => ({ title: g.title, path: `/guides/${g.slug}`, date: g.datePublished, summary: g.summary, category: "guides" })),
+    ...lessons.map((c) => ({
+      title: c.title,
+      path: conceptHref(c),
+      date: c.lastReviewed ?? c.datePublished ?? "",
+      summary: c.summary,
+      category: c.category,
+    })),
+  ].sort((a, b) => b.date.localeCompare(a.date));
+  const items = entries
+    .map((e) => {
+      const url = absoluteUrl(e.path);
+      const updated = toIsoDate(e.date || undefined) ?? new Date().toISOString();
       return `    <item>
-      <title>${xmlEscape(c.title)}</title>
+      <title>${xmlEscape(e.title)}</title>
       <link>${url}</link>
       <guid isPermaLink="true">${url}</guid>
       <pubDate>${new Date(updated).toUTCString()}</pubDate>
-      <description>${xmlEscape(c.summary)}</description>
-      <category>${xmlEscape(c.category)}</category>
+      <description>${xmlEscape(e.summary)}</description>
+      <category>${xmlEscape(e.category)}</category>
     </item>`;
     })
     .join("\n");

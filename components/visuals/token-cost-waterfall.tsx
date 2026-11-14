@@ -78,7 +78,7 @@ export function TokenCostWaterfall() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex flex-wrap gap-1.5">
           {calls.map((call) => (
             <button
@@ -86,7 +86,7 @@ export function TokenCostWaterfall() {
               type="button"
               onClick={() => setId(call.id)}
               aria-pressed={call.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: call.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: call.id === id ? "var(--accent)" : "var(--rule)",
@@ -97,10 +97,10 @@ export function TokenCostWaterfall() {
           ))}
         </div>
         <div className="mb-3 grid grid-cols-2 gap-2 font-mono text-[11px] sm:grid-cols-4">
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>in {c.inTok}</div>
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>cached {c.cached}</div>
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>reason {c.reason}</div>
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>out {c.outTok}</div>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>in {c.inTok}</div>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>cached {c.cached}</div>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>reason {c.reason}</div>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>out {c.outTok}</div>
         </div>
         <div className="space-y-2" aria-live="polite">
           <Mini label="TTFT (ms)" value={c.ttft} max={2200} unit="ms" />

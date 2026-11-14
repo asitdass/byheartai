@@ -18,7 +18,7 @@ export function KVCacheVisualizer() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-3 text-sm" style={{ color: "var(--ink-muted)" }}>
           Generate tokens one at a time. Cached tokens are reused; only the newest token is computed.
         </p>
@@ -29,7 +29,7 @@ export function KVCacheVisualizer() {
             const isNewest = i === generated - 1;
             if (!isGenerated) {
               return (
-                <span key={i} className="rounded-[--radius-sm] border border-dashed px-2 py-1" style={{ color: "var(--ink-faint)", opacity: 0.5 }}>
+                <span key={i} className="rounded-(--radius-sm) border border-dashed px-2 py-1" style={{ color: "var(--ink-faint)", opacity: 0.5 }}>
                   {tok}
                 </span>
               );
@@ -37,7 +37,7 @@ export function KVCacheVisualizer() {
             return (
               <span
                 key={i}
-                className="flex items-center gap-1 rounded-[--radius-sm] px-2 py-1"
+                className="flex items-center gap-1 rounded-(--radius-sm) px-2 py-1"
                 style={{
                   background: isNewest
                     ? "color-mix(in oklab, var(--accent) 20%, var(--paper))"
@@ -58,17 +58,17 @@ export function KVCacheVisualizer() {
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-2 text-center text-sm">
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>Without cache</div>
             <div className="text-lg font-bold">{withoutCache}</div>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>token-computations</div>
           </div>
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>With KV cache</div>
             <div className="text-lg font-bold" style={{ color: "var(--accent)" }}>{withCache}</div>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>token-computations</div>
           </div>
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>Saved</div>
             <div className="text-lg font-bold" style={{ color: "oklch(0.55 0.15 150)" }}>{saved}</div>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>re-computations</div>
@@ -80,7 +80,7 @@ export function KVCacheVisualizer() {
             type="button"
             onClick={() => setGenerated((g) => Math.min(g + 1, sequence.length))}
             disabled={generated >= sequence.length}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-4 py-2 text-sm font-semibold disabled:opacity-40"
             style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
           >
             <Play size={14} aria-hidden /> Generate next token
@@ -88,7 +88,7 @@ export function KVCacheVisualizer() {
           <button
             type="button"
             onClick={() => setGenerated(1)}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-3 py-2 text-sm hover:bg-[--surface]"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-3 py-2 text-sm hover:bg-(--surface)"
             style={{ color: "var(--ink-muted)" }}
           >
             <RotateCcw size={14} aria-hidden /> Reset

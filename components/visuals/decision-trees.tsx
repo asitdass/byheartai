@@ -45,7 +45,7 @@ export function DecisionTreesViz() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Same loan table. Grow the tree:
         </p>
@@ -56,7 +56,7 @@ export function DecisionTreesViz() {
               type="button"
               onClick={() => setId(depth.id)}
               aria-pressed={depth.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: depth.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: depth.id === id ? "var(--accent)" : "var(--rule)",
@@ -67,17 +67,17 @@ export function DecisionTreesViz() {
           ))}
         </div>
         <pre
-          className="mb-3 overflow-x-auto rounded-[--radius-sm] p-3 font-mono text-xs"
+          className="mb-3 overflow-x-auto rounded-(--radius-sm) p-3 font-mono text-xs"
           style={{ background: "var(--paper)" }}
           aria-live="polite"
         >
           {d.rules.join("\n")}
         </pre>
         <div className="mb-2 grid grid-cols-2 gap-2 text-sm">
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
             Leaves: <strong>{d.leaves}</strong>
           </div>
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             Overfit risk: <strong style={{ color: "var(--accent)" }}>{d.overfit}</strong>
           </div>
         </div>

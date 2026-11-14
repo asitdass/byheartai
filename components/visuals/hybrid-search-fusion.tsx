@@ -19,14 +19,14 @@ const inBoth = new Set(dense.filter((d) => sparse.includes(d)));
 
 function Column({ title, subtitle, docs }: { title: string; subtitle: string; docs: string[] }) {
   return (
-    <div className="flex-1 rounded-[--radius] border p-3" style={{ background: "var(--surface)" }}>
+    <div className="flex-1 rounded-(--radius) border p-3" style={{ background: "var(--surface)" }}>
       <div className="text-sm font-bold">{title}</div>
       <div className="mb-2 text-xs" style={{ color: "var(--ink-faint)" }}>{subtitle}</div>
       <ol className="space-y-1.5">
         {docs.map((doc, i) => (
           <li
             key={doc}
-            className="flex items-center gap-2 rounded-[--radius-sm] px-2 py-1.5 text-xs"
+            className="flex items-center gap-2 rounded-(--radius-sm) px-2 py-1.5 text-xs"
             style={{
               background: inBoth.has(doc) ? "color-mix(in oklab, var(--accent) 18%, var(--paper))" : "var(--paper)",
               border: inBoth.has(doc) ? "1px solid var(--accent)" : "1px solid transparent",

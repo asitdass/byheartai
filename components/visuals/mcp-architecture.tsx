@@ -31,9 +31,9 @@ export function McpArchitecture() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div
-          className="mb-4 rounded-[--radius-sm] border p-4"
+          className="mb-4 rounded-(--radius-sm) border p-4"
           style={{ background: "var(--paper)" }}
           role="img"
           aria-label="A host application contains several MCP clients. Each client connects to one MCP server — a local filesystem server over stdio, a GitHub server, and a remote Linear server over HTTP."
@@ -41,7 +41,7 @@ export function McpArchitecture() {
           <div className="text-center text-sm font-bold">Host (Cursor / Claude / your agent)</div>
           <div className="mt-2 grid grid-cols-3 gap-2">
             {["Client A", "Client B", "Client C"].map((c) => (
-              <div key={c} className="rounded-[--radius-sm] border px-2 py-1.5 text-center text-xs font-semibold" style={{ background: "var(--surface)", borderColor: "var(--accent)" }}>
+              <div key={c} className="rounded-(--radius-sm) border px-2 py-1.5 text-center text-xs font-semibold" style={{ background: "var(--surface)", borderColor: "var(--accent)" }}>
                 {c}
               </div>
             ))}
@@ -53,7 +53,7 @@ export function McpArchitecture() {
           </div>
           <div className="mt-1 grid grid-cols-3 gap-2">
             {["Filesystem server", "Git server", "Linear server"].map((s) => (
-              <div key={s} className="rounded-[--radius-sm] border px-2 py-1.5 text-center text-xs" style={{ background: "var(--surface)" }}>
+              <div key={s} className="rounded-(--radius-sm) border px-2 py-1.5 text-center text-xs" style={{ background: "var(--surface)" }}>
                 {s}
               </div>
             ))}
@@ -68,7 +68,7 @@ export function McpArchitecture() {
               type="button"
               onClick={() => setPicked(tr.id)}
               aria-pressed={picked === tr.id}
-              className="flex items-center gap-1.5 rounded-[--radius-sm] border px-3 py-1.5 text-sm"
+              className="flex items-center gap-1.5 rounded-(--radius-sm) border px-3 py-1.5 text-sm"
               style={{
                 background: picked === tr.id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: picked === tr.id ? "var(--accent)" : "var(--rule)",

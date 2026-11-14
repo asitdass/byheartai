@@ -5,7 +5,7 @@ export function UserVsAgentMemory() {
   return (
     <figure className="my-8">
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+        <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
           <div className="mb-2 flex items-center gap-2 text-sm font-bold">
             <User size={16} aria-hidden style={{ color: "var(--accent)" }} /> User memory
           </div>
@@ -19,7 +19,7 @@ export function UserVsAgentMemory() {
           </ul>
           <p className="mt-3 text-xs" style={{ color: "var(--ink-faint)" }}>Leakage here is a privacy incident.</p>
         </div>
-        <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+        <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
           <div className="mb-2 flex items-center gap-2 text-sm font-bold">
             <Bot size={16} aria-hidden style={{ color: "var(--accent)" }} /> Agent memory
           </div>

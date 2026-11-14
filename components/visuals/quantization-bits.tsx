@@ -15,7 +15,7 @@ export function QuantizationBits() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex gap-2">
           {bits.map((bit) => (
             <button
@@ -23,7 +23,7 @@ export function QuantizationBits() {
               type="button"
               onClick={() => setId(bit.id)}
               aria-pressed={bit.id === id}
-              className="rounded-[--radius-sm] border px-3 py-1.5 text-sm"
+              className="rounded-(--radius-sm) border px-3 py-1.5 text-sm"
               style={{
                 background: bit.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: bit.id === id ? "var(--accent)" : "var(--rule)",

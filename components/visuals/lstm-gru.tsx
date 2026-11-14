@@ -50,7 +50,7 @@ export function LstmGru() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Same story, two wiring diagrams. Gates are numbers in (0, 1).
         </p>
@@ -61,7 +61,7 @@ export function LstmGru() {
               type="button"
               onClick={() => setKind(k.id)}
               aria-pressed={k.id === kind}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: k.id === kind ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: k.id === kind ? "var(--accent)" : "var(--rule)",
@@ -78,7 +78,7 @@ export function LstmGru() {
               type="button"
               onClick={() => setSid(s.id)}
               aria-pressed={s.id === sid}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: s.id === sid ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: s.id === sid ? "var(--accent)" : "var(--rule)",
@@ -90,7 +90,7 @@ export function LstmGru() {
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2" aria-live="polite">
-          <div className="space-y-2 rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+          <div className="space-y-2 rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
             {kind === "lstm" ? (
               <>
                 <Gate name="forget f" v={scene.lstm.f} />
@@ -110,7 +110,7 @@ export function LstmGru() {
               </>
             )}
           </div>
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
               What the gates are doing
             </div>

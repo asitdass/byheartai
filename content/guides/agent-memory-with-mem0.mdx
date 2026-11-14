@@ -1,0 +1,105 @@
+---
+title: "Give your AI long-term memory with Mem0"
+summary: "Add a memory layer to a chatbot with Mem0 so it remembers facts about each user across sessions instead of starting from zero."
+outcome: "A Python chatbot that stores what it learns about a user and recalls the relevant memories in later conversations."
+level: intermediate
+minutes: 20
+tools: [mem0]
+tags: [mem0, ai memory, long-term memory llm, agent memory python, personalized chatbot]
+concepts: [long-term-memory, memory-types, agent-memory, user-vs-agent-memory, memory-conflicts]
+sources:
+  - title: "Mem0 README"
+    url: "https://github.com/mem0ai/mem0"
+  - title: "Mem0 documentation"
+    url: "https://docs.mem0.ai"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 11
+status: published
+---
+
+A model forgets everything when the conversation ends. Stuffing whole chat histories back into the prompt is slow and expensive. A memory layer does something smarter: it extracts durable facts ("prefers vegetarian food", "works in Berlin"), stores them, and retrieves only the relevant ones later. That is [long-term memory](/learn/memory/long-term-memory), and Mem0 is a popular open-source implementation.
+
+## Install
+
+```bash
+pip install mem0ai openai
+```
+
+By default Mem0 uses OpenAI for extracting and embedding memories, so set a key:
+
+```bash
+export OPENAI_API_KEY=sk-...
+```
+
+It can be configured for other providers and local models; see the docs once the basics work.
+
+## Store and search a memory
+
+```python
+from mem0 import Memory
+
+memory = Memory()
+
+memory.add(
+    [{"role": "user", "content": "I'm vegetarian and I'm allergic to nuts."}],
+    user_id="alice",
+)
+
+hits = memory.search(query="What can I cook for dinner?", filters={"user_id": "alice"}, top_k=3)
+for entry in hits["results"]:
+    print("-", entry["memory"])
+```
+
+Notice what came back: not the original sentence, but extracted facts. Notice also that the search was about dinner and the memory was about diet. Retrieval is by meaning, using [embeddings](/learn/embeddings/what-are-embeddings).
+
+## Wire it into a chatbot
+
+The loop is always the same: **search** memories, **answer** with them in the prompt, **add** the new exchange.
+
+```python
+from openai import OpenAI
+from mem0 import Memory
+
+client = OpenAI()
+memory = Memory()
+
+def chat(message: str, user_id: str = "default_user") -> str:
+    found = memory.search(query=message, filters={"user_id": user_id}, top_k=3)
+    memories = "\n".join(f"- {m['memory']}" for m in found["results"])
+
+    messages = [
+        {"role": "system", "content": f"You are a helpful assistant.\nWhat you know about the user:\n{memories}"},
+        {"role": "user", "content": message},
+    ]
+    reply = client.chat.completions.create(model="your-model-name", messages=messages)
+    answer = reply.choices[0].message.content
+
+    messages.append({"role": "assistant", "content": answer})
+    memory.add(messages, user_id=user_id)
+    return answer
+
+while True:
+    text = input("You: ").strip()
+    if text.lower() == "exit":
+        break
+    print("AI:", chat(text, user_id="alice"))
+```
+
+Tell it something about yourself, exit, run it again, and ask a question that depends on it.
+
+## Keep users separate
+
+`user_id` is the wall between people. Every `add` and every `search` must carry the right one, or one user's facts leak into another's answers. In a real app, take it from your authenticated session, never from text the user typed.
+
+## Decide what should be remembered
+
+Memory that stores everything becomes noise, and memory about people is personal data.
+
+- Tell users what is remembered and give them a way to see and delete it.
+- Do not store secrets, health details, or payment data unless you truly need them.
+- Expect contradictions ("moved to Paris") and test how updates behave. See [memory conflicts](/learn/memory/memory-conflicts).
+
+### What to do next
+
+Mem0 also ships a self-hosted server with a dashboard (`docker compose up` in the repo's `server` folder) and a hosted platform. For the concepts, read the [Memory track](/learn/memory).

@@ -48,7 +48,7 @@ export default function RoadmapsPage() {
                     {available && c ? (
                       <Link
                         href={conceptHref(c)}
-                        className="flex items-center gap-3 rounded-[--radius-sm] px-3 py-2 no-underline hover:bg-[--surface]"
+                        className="flex items-center gap-3 rounded-(--radius-sm) px-3 py-2 no-underline hover:bg-(--surface)"
                       >
                         <CheckCircle2 size={16} style={{ color: "var(--accent)" }} aria-hidden />
                         <span style={{ color: "var(--ink)" }}>

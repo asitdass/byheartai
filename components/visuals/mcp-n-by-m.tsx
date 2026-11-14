@@ -8,7 +8,7 @@ export function McpNByM() {
   return (
     <figure className="my-8">
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+        <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
           <div className="mb-2 flex items-center gap-2 text-sm font-bold">
             <X size={15} aria-hidden style={{ color: "oklch(0.55 0.18 25)" }} /> Without MCP
           </div>
@@ -16,7 +16,7 @@ export function McpNByM() {
             Every app needs a custom connector to every system — 4 apps × 4 systems = 16 one-off integrations.
           </p>
           <div
-            className="overflow-hidden rounded-[--radius-sm] border"
+            className="overflow-hidden rounded-(--radius-sm) border"
             role="img"
             aria-label="A grid of custom one-off integrations: each AI app is wired separately to GitHub, Slack, Postgres, and Drive."
           >
@@ -43,7 +43,7 @@ export function McpNByM() {
           </div>
         </div>
 
-        <div className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+        <div className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
           <div className="mb-2 flex items-center gap-2 text-sm font-bold">
             <Check size={15} aria-hidden style={{ color: "oklch(0.55 0.15 150)" }} /> With MCP
           </div>
@@ -52,7 +52,7 @@ export function McpNByM() {
           </p>
           <div className="space-y-2" role="img" aria-label="Each system has one MCP server. All four AI apps plug into those same servers.">
             {systems.map((s) => (
-              <div key={s} className="flex items-center gap-2 rounded-[--radius-sm] border px-3 py-2 text-xs" style={{ background: "var(--paper)" }}>
+              <div key={s} className="flex items-center gap-2 rounded-(--radius-sm) border px-3 py-2 text-xs" style={{ background: "var(--paper)" }}>
                 <span className="font-semibold">{s}</span>
                 <span className="font-mono" style={{ color: "var(--accent)" }}>MCP server</span>
                 <span className="ml-auto" style={{ color: "var(--ink-faint)" }}>← any host</span>

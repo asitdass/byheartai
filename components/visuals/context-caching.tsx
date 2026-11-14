@@ -13,13 +13,13 @@ export function ContextCaching() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => setStable(false)}
             aria-pressed={!stable}
-            className="rounded-[--radius-sm] border px-3 py-1.5 text-sm"
+            className="rounded-(--radius-sm) border px-3 py-1.5 text-sm"
             style={{
               background: !stable ? "color-mix(in oklab, oklch(0.6 0.18 25) 16%, var(--paper))" : "var(--paper)",
               borderColor: !stable ? "oklch(0.6 0.18 25)" : "var(--rule)",
@@ -31,7 +31,7 @@ export function ContextCaching() {
             type="button"
             onClick={() => setStable(true)}
             aria-pressed={stable}
-            className="rounded-[--radius-sm] border px-3 py-1.5 text-sm"
+            className="rounded-(--radius-sm) border px-3 py-1.5 text-sm"
             style={{
               background: stable ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
               borderColor: stable ? "var(--accent)" : "var(--rule)",
@@ -48,7 +48,7 @@ export function ContextCaching() {
             return (
               <li
                 key={`${block}-${i}`}
-                className="flex items-center justify-between rounded-[--radius-sm] border px-3 py-2 text-sm"
+                className="flex items-center justify-between rounded-(--radius-sm) border px-3 py-2 text-sm"
                 style={{
                   background: cached ? "color-mix(in oklab, var(--accent) 14%, var(--paper))" : "var(--paper)",
                   borderColor: cached ? "var(--accent)" : "var(--rule)",

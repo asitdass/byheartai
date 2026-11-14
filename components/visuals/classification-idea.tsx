@@ -56,7 +56,7 @@ export function ClassificationIdea() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Labeled points + a boundary. Click the problem type:
         </p>
@@ -67,7 +67,7 @@ export function ClassificationIdea() {
               type="button"
               onClick={() => setId(mode.id)}
               aria-pressed={mode.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: mode.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: mode.id === id ? "var(--accent)" : "var(--rule)",
@@ -78,7 +78,7 @@ export function ClassificationIdea() {
           ))}
         </div>
         <div
-          className="relative mb-3 h-44 overflow-hidden rounded-[--radius-sm] border"
+          className="relative mb-3 h-44 overflow-hidden rounded-(--radius-sm) border"
           style={{ background: "var(--paper)" }}
           role="img"
           aria-label={m.boundary}
@@ -107,7 +107,7 @@ export function ClassificationIdea() {
             {m.title}
           </span>
         </div>
-        <p className="rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <strong style={{ color: "var(--accent)" }}>{m.boundary}</strong> {m.note}
         </p>
       </div>

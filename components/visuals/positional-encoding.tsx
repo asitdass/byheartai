@@ -30,20 +30,20 @@ export function PositionalEncoding() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-3 text-sm" style={{ color: "var(--ink-muted)" }}>
           Same three words — reorder them and watch the meaning change. Position is information.
         </p>
 
         <div className="flex flex-wrap items-center gap-2">
           {words.map((w, i) => (
-            <div key={`${w}-${i}`} className="flex items-center overflow-hidden rounded-[--radius-sm] border" style={{ background: "var(--paper)" }}>
+            <div key={`${w}-${i}`} className="flex items-center overflow-hidden rounded-(--radius-sm) border" style={{ background: "var(--paper)" }}>
               <button
                 type="button"
                 onClick={() => move(i, -1)}
                 disabled={i === 0}
                 aria-label={`Move ${w} left`}
-                className="px-1.5 py-2 disabled:opacity-30 hover:bg-[--surface]"
+                className="px-1.5 py-2 disabled:opacity-30 hover:bg-(--surface)"
               >
                 <ArrowLeft size={14} aria-hidden />
               </button>
@@ -56,7 +56,7 @@ export function PositionalEncoding() {
                 onClick={() => move(i, 1)}
                 disabled={i === words.length - 1}
                 aria-label={`Move ${w} right`}
-                className="px-1.5 py-2 disabled:opacity-30 hover:bg-[--surface]"
+                className="px-1.5 py-2 disabled:opacity-30 hover:bg-(--surface)"
               >
                 <ArrowRight size={14} aria-hidden />
               </button>
@@ -65,14 +65,14 @@ export function PositionalEncoding() {
           <button
             type="button"
             onClick={() => setWords(initial)}
-            className="ml-1 flex items-center gap-1 rounded-[--radius-sm] px-2 py-2 text-sm hover:bg-[--surface]"
+            className="ml-1 flex items-center gap-1 rounded-(--radius-sm) px-2 py-2 text-sm hover:bg-(--surface)"
             style={{ color: "var(--ink-muted)" }}
           >
             <RotateCcw size={14} aria-hidden /> Reset
           </button>
         </div>
 
-        <p className="mt-4 rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)", color: "var(--ink)" }} aria-live="polite">
+        <p className="mt-4 rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)", color: "var(--ink)" }} aria-live="polite">
           {meaning}
         </p>
       </div>

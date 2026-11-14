@@ -36,7 +36,7 @@ export function SupervisedUnsupervisedRl() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           What is the teaching signal? Click one:
         </p>
@@ -47,7 +47,7 @@ export function SupervisedUnsupervisedRl() {
               type="button"
               onClick={() => setId(mode.id)}
               aria-pressed={mode.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: mode.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: mode.id === id ? "var(--accent)" : "var(--rule)",
@@ -58,20 +58,20 @@ export function SupervisedUnsupervisedRl() {
           ))}
         </div>
         <div className="space-y-2 text-sm" aria-live="polite">
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
               Teaching signal
             </div>
             <p>{m.signal}</p>
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
-            <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+            <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
               <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
                 Setup
               </div>
               <p>{m.setup}</p>
             </div>
-            <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+            <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
               <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
                 What it learns
               </div>

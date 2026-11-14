@@ -25,7 +25,7 @@ export function RerankingVisualizer() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-3 text-sm" style={{ color: "var(--ink-muted)" }}>
           Query: <span className="font-mono">&quot;how do I reset my password?&quot;</span> — first by vector similarity, then reranked by a cross-encoder.
         </p>
@@ -38,7 +38,7 @@ export function RerankingVisualizer() {
             return (
               <li
                 key={doc.id}
-                className="flex items-center gap-3 rounded-[--radius-sm] px-3 py-2 text-sm transition-all"
+                className="flex items-center gap-3 rounded-(--radius-sm) px-3 py-2 text-sm transition-all"
                 style={{
                   background: isTop ? "color-mix(in oklab, var(--accent) 18%, var(--paper))" : "var(--paper)",
                   border: isTop ? "1px solid var(--accent)" : "1px solid transparent",
@@ -65,7 +65,7 @@ export function RerankingVisualizer() {
             type="button"
             onClick={() => setReranked(true)}
             disabled={reranked}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-4 py-2 text-sm font-semibold disabled:opacity-40"
             style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
           >
             <Wand2 size={14} aria-hidden /> Rerank with cross-encoder
@@ -73,7 +73,7 @@ export function RerankingVisualizer() {
           <button
             type="button"
             onClick={() => setReranked(false)}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-3 py-2 text-sm hover:bg-[--surface]"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-3 py-2 text-sm hover:bg-(--surface)"
             style={{ color: "var(--ink-muted)" }}
           >
             <RotateCcw size={14} aria-hidden /> Reset

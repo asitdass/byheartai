@@ -41,7 +41,7 @@ export function TemperatureSampling() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
           Prompt: <span className="font-mono">&quot;The weather today is ___&quot;</span>
         </p>
@@ -68,7 +68,7 @@ export function TemperatureSampling() {
           {candidates.map((c, i) => (
             <div key={c.word} className="flex items-center gap-2">
               <span className="w-16 text-right font-mono text-sm" style={{ color: "var(--ink-muted)" }}>{c.word}</span>
-              <div className="h-6 flex-1 overflow-hidden rounded-[--radius-sm]" style={{ background: "var(--paper)" }}>
+              <div className="h-6 flex-1 overflow-hidden rounded-(--radius-sm)" style={{ background: "var(--paper)" }}>
                 <div
                   className="flex h-full items-center justify-end pr-2 text-xs font-semibold transition-all duration-200"
                   style={{
@@ -84,7 +84,7 @@ export function TemperatureSampling() {
           ))}
         </div>
 
-        <p className="mt-4 rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="mt-4 rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           {mood}
         </p>
       </div>

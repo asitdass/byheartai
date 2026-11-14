@@ -1,0 +1,106 @@
+---
+title: "Build a browser agent with Browser Use"
+summary: "Use the Browser Use Python library to have an AI agent open a browser, navigate a site, and complete a task from a one-line description."
+outcome: "A Python script where an agent drives a real browser to finish a web task and returns the result."
+level: intermediate
+minutes: 20
+tools: [browser-use]
+tags: [browser use, browser agent, ai web automation, python ai agent, computer use]
+concepts: [what-is-agent, agent-loop, indirect-prompt-injection, human-in-the-loop, least-privilege]
+sources:
+  - title: "Browser Use README"
+    url: "https://github.com/browser-use/browser-use"
+  - title: "Browser Use 1.0 migration notes"
+    url: "https://github.com/browser-use/browser-use/blob/main/MIGRATING.md"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 9
+status: published
+---
+
+Plenty of the work people repeat every week happens in websites that have no API: portals, dashboards, booking forms. A browser agent handles those the way you do, by looking at the page and clicking. Browser Use is the most popular open-source library for it.
+
+<Note title="Version note">
+This guide follows Browser Use **1.0**, which changed the API from the 0.x series. The project asks you to pin an exact version, because releases move fast. Check the README for the current number.
+</Note>
+
+## Create a project
+
+You need Python 3.11 or newer. With [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv init --python 3.12 my-agent && cd my-agent
+uv add 'browser-use==1.0.4'
+```
+
+Or with pip:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install 'browser-use==1.0.4'
+```
+
+## Run the hosted quick start
+
+The default setup uses Browser Use's own cloud browser and model with one API key from [cloud.browser-use.com](https://cloud.browser-use.com/new-api-key):
+
+```bash
+export BROWSER_USE_API_KEY=bu_...
+```
+
+```python
+from browser_use import Agent
+
+result = Agent('Find the number of stars of the browser-use repo').run_sync()
+print(result.final_result())
+```
+
+Save it as `main.py` and run `uv run main.py` (or `python main.py`).
+
+## Run it on a local browser with your own model
+
+To keep the browser on your machine and choose the model yourself:
+
+```python
+from browser_use import Agent, Browser, ChatOpenAI
+
+agent = Agent(
+    'Find the number of stars of the browser-use repo',
+    llm=ChatOpenAI('your-model-name'),   # reads OPENAI_API_KEY
+    browser=Browser('chromium'),         # a fresh local Chromium with a temporary profile
+)
+print(agent.run_sync().final_result())
+```
+
+`ChatOpenAI(model, base_url=...)` works with any OpenAI-compatible server, which includes a local [Ollama](/guides/run-llms-locally-with-ollama) at `http://localhost:11434/v1`. Browser tasks are demanding, so expect small local models to struggle.
+
+## Write tasks that succeed
+
+The task string is the whole brief. Good ones are specific about the start, the goal, and the stopping point:
+
+```python
+task = """
+Go to https://news.ycombinator.com.
+Open the top story's comments page.
+Return the story title and the three most upvoted top-level comments as a list.
+Do not log in or post anything.
+"""
+```
+
+Vague tasks ("research laptops") wander. Bounded tasks finish.
+
+## Keep it safe
+
+A browser agent reads whatever is on the page, and pages can contain text written to hijack it. Treat it accordingly:
+
+- Use the default **temporary profile**, not your real browser profile with saved logins.
+- Never put passwords or card numbers in the task string.
+- Keep a person in the loop for anything that submits, buys, sends, or deletes.
+
+<Warning>
+[Prompt injection](/learn/security/indirect-prompt-injection) through web content is an unsolved problem for every browser agent. Design the task so the worst case is a wasted run, not a sent email.
+</Warning>
+
+### What to do next
+
+If you only need page *content* rather than clicks, a crawler is faster and cheaper: see [Crawl4AI](/guides/web-scraping-for-ai-with-crawl4ai). To expose a browser to an existing agent instead of writing Python, use [Playwright MCP](/guides/connect-mcp-servers).

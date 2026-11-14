@@ -17,7 +17,7 @@ export function RagPipeline() {
   return (
     <figure className="my-8">
       <div
-        className="flex flex-wrap items-stretch gap-2 rounded-[--radius] border p-4"
+        className="flex flex-wrap items-stretch gap-2 rounded-(--radius) border p-4"
         style={{ background: "var(--surface)" }}
         role="img"
         aria-label="RAG pipeline: a document is chunked, embedded into vectors, retrieved by similarity, reranked, and finally used as context to generate an answer."
@@ -25,7 +25,7 @@ export function RagPipeline() {
         {steps.map((s, i) => (
           <div key={s.label} className="flex flex-1 items-stretch gap-2" style={{ minWidth: "8.5rem" }}>
             <div
-              className="flex flex-1 flex-col items-center gap-1 rounded-[--radius-sm] border px-2 py-3 text-center"
+              className="flex flex-1 flex-col items-center gap-1 rounded-(--radius-sm) border px-2 py-3 text-center"
               style={{ background: "var(--paper)" }}
             >
               <s.icon size={22} style={{ color: "var(--accent)" }} aria-hidden />

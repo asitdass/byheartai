@@ -43,7 +43,7 @@ export function MemoryTypes() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-4 grid grid-cols-3 gap-2">
           {kinds.map((kind) => {
             const active = kind.id === id;
@@ -53,7 +53,7 @@ export function MemoryTypes() {
                 type="button"
                 onClick={() => setId(kind.id)}
                 aria-pressed={active}
-                className="flex flex-col items-center rounded-[--radius-sm] border px-2 py-3 text-center"
+                className="flex flex-col items-center rounded-(--radius-sm) border px-2 py-3 text-center"
                 style={{
                   background: active ? "var(--accent)" : "var(--paper)",
                   borderColor: active ? "var(--accent)" : "var(--rule)",
@@ -68,7 +68,7 @@ export function MemoryTypes() {
         </div>
         <div className="space-y-2 text-sm" aria-live="polite">
           <p>{k.desc}</p>
-          <p className="font-mono text-xs rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>{k.example}</p>
+          <p className="font-mono text-xs rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>{k.example}</p>
           <p className="text-xs" style={{ color: "var(--ink-muted)" }}><strong>Store:</strong> {k.store}</p>
           <p className="text-xs" style={{ color: "var(--ink-muted)" }}><strong>Forget:</strong> {k.forget}</p>
         </div>

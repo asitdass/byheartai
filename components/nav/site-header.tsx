@@ -12,22 +12,24 @@ export function SiteHeader() {
         borderColor: "var(--rule)",
       }}
     >
-      <div className="mx-auto flex h-14 max-w-[80rem] items-center gap-4 px-4">
+      <div className="mx-auto flex min-h-14 max-w-[80rem] flex-wrap items-center gap-x-4 px-4">
         <Link href="/" className="flex items-center gap-2 font-[family-name:var(--font-display)] text-lg font-bold no-underline" style={{ color: "var(--ink)" }}>
           <Heart size={18} fill="var(--heart)" stroke="var(--heart)" aria-hidden />
-          ByHeart<span style={{ color: "var(--accent)" }}>AI</span>
+          ByHeart<span className="grad-text">AI</span>
         </Link>
 
-        <nav className="ml-2 hidden items-center gap-1 text-sm sm:flex" aria-label="Primary">
+        <nav className="order-last -mx-1 flex w-full items-center gap-0.5 overflow-x-auto pb-2 text-sm md:order-none md:mx-0 md:ml-2 md:w-auto md:pb-0" aria-label="Primary">
           {[
             { href: "/learn", label: "Learn" },
+            { href: "/guides", label: "Guides" },
+            { href: "/tools", label: "Tools" },
+            { href: "/whats-new", label: "What's new" },
             { href: "/roadmaps", label: "Roadmaps" },
-            { href: "/glossary", label: "Glossary" },
           ].map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className="rounded-[--radius-sm] px-3 py-1.5 no-underline hover:bg-[--surface]"
+              className="shrink-0 whitespace-nowrap rounded-(--radius-sm) px-2.5 py-1.5 no-underline hover:bg-(--surface)"
               style={{ color: "var(--ink-muted)" }}
             >
               {l.label}
@@ -35,11 +37,11 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           <SearchForm size="header" />
           <Link
             href="/search"
-            className="rounded-[--radius-sm] p-2 no-underline hover:bg-[--surface] md:hidden"
+            className="rounded-(--radius-sm) p-2 no-underline hover:bg-(--surface) lg:hidden"
             style={{ color: "var(--ink-muted)" }}
             aria-label="Search lessons"
           >

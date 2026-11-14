@@ -31,7 +31,7 @@ export function AttentionVisualizer() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-3 text-sm" style={{ color: "var(--ink-muted)" }}>
           Click any word to see what it pays attention to. Darker = stronger attention.
         </p>
@@ -50,7 +50,7 @@ export function AttentionVisualizer() {
                 type="button"
                 onClick={() => setQuery(j)}
                 aria-pressed={isQuery}
-                className="rounded-[--radius-sm] px-2 py-1 transition-colors"
+                className="rounded-(--radius-sm) px-2 py-1 transition-colors"
                 style={{
                   background: isQuery
                     ? "var(--accent)"

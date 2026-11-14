@@ -55,7 +55,7 @@ export function SystemDesignLoop() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
           {stages.map((st) => {
             const active = st.id === id;
@@ -65,7 +65,7 @@ export function SystemDesignLoop() {
                 type="button"
                 onClick={() => setId(st.id)}
                 aria-pressed={active}
-                className="flex flex-col items-center rounded-[--radius-sm] border px-1.5 py-2 text-center"
+                className="flex flex-col items-center rounded-(--radius-sm) border px-1.5 py-2 text-center"
                 style={{
                   background: active ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                   borderColor: active ? "var(--accent)" : "var(--rule)",

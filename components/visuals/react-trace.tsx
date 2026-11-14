@@ -31,7 +31,7 @@ export function ReactTrace() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-3 text-sm" style={{ color: "var(--ink-muted)" }}>
           Question: <span className="font-mono">&quot;What is the population of the capital of France?&quot;</span>
         </p>
@@ -42,7 +42,7 @@ export function ReactTrace() {
             return (
               <div
                 key={i}
-                className="flex items-start gap-2 rounded-[--radius-sm] px-2 py-1.5"
+                className="flex items-start gap-2 rounded-(--radius-sm) px-2 py-1.5"
                 style={{ background: line.kind === "Answer" ? "color-mix(in oklab, oklch(0.6 0.15 150) 14%, var(--paper))" : "var(--paper)" }}
               >
                 <s.icon size={15} aria-hidden style={{ color: s.color, marginTop: 2, flexShrink: 0 }} />
@@ -59,7 +59,7 @@ export function ReactTrace() {
             type="button"
             onClick={() => setShown((s) => Math.min(s + 1, trace.length))}
             disabled={shown >= trace.length}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-4 py-2 text-sm font-semibold disabled:opacity-40"
             style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
           >
             <Play size={14} aria-hidden /> Next
@@ -67,7 +67,7 @@ export function ReactTrace() {
           <button
             type="button"
             onClick={() => setShown(1)}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-3 py-2 text-sm hover:bg-[--surface]"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-3 py-2 text-sm hover:bg-(--surface)"
             style={{ color: "var(--ink-muted)" }}
           >
             <RotateCcw size={14} aria-hidden /> Reset

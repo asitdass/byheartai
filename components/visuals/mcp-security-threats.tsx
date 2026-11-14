@@ -41,7 +41,7 @@ export function McpSecurityThreats() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {threats.map((th) => {
             const active = th.id === id;
@@ -51,7 +51,7 @@ export function McpSecurityThreats() {
                 type="button"
                 onClick={() => setId(th.id)}
                 aria-pressed={active}
-                className="flex flex-col items-center rounded-[--radius-sm] border px-2 py-3 text-center"
+                className="flex flex-col items-center rounded-(--radius-sm) border px-2 py-3 text-center"
                 style={{
                   background: active ? "color-mix(in oklab, oklch(0.6 0.18 25) 18%, var(--paper))" : "var(--paper)",
                   borderColor: active ? "oklch(0.6 0.18 25)" : "var(--rule)",

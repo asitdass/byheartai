@@ -33,7 +33,7 @@ export function ContextStrategies() {
     <figure className="my-8">
       <div className="grid gap-3 sm:grid-cols-2" role="img" aria-label="Four strategies: write information outside the window, select only what this step needs, compress old content, and isolate sub-tasks in their own windows.">
         {moves.map((m) => (
-          <div key={m.title} className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+          <div key={m.title} className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
             <div className="mb-2 flex items-center gap-2">
               <m.icon size={18} aria-hidden style={{ color: "var(--accent)" }} />
               <span className="text-sm font-bold">{m.title}</span>

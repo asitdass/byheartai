@@ -36,13 +36,13 @@ export function HumanEvalRubric() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-3 text-sm" style={{ color: "var(--ink-muted)" }}>
           A support answer. Score each axis — thumbs hide which part failed.
         </p>
         <div className="space-y-3">
           {dimensions.map((d) => (
-            <div key={d.id} className="rounded-[--radius-sm] p-3" style={{ background: "var(--paper)" }}>
+            <div key={d.id} className="rounded-(--radius-sm) p-3" style={{ background: "var(--paper)" }}>
               <div className="mb-1 flex items-center justify-between gap-2">
                 <span className="text-sm font-semibold">{d.label}</span>
                 <span className="font-mono text-xs" style={{ color: "var(--accent)" }}>
@@ -56,7 +56,7 @@ export function HumanEvalRubric() {
                     type="button"
                     onClick={() => setScores((s) => ({ ...s, [d.id]: n }))}
                     aria-pressed={scores[d.id] === n}
-                    className="h-8 flex-1 rounded-[--radius-sm] border text-xs font-semibold"
+                    className="h-8 flex-1 rounded-(--radius-sm) border text-xs font-semibold"
                     style={{
                       background: scores[d.id] === n ? "var(--accent)" : "var(--surface)",
                       color: scores[d.id] === n ? "var(--accent-ink)" : "var(--ink-muted)",
@@ -73,7 +73,7 @@ export function HumanEvalRubric() {
             </div>
           ))}
         </div>
-        <p className="mt-3 rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="mt-3 rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           Rubric average <strong>{avg}</strong> vs a thumb {thumbs}. Same answer; only the rubric tells you to fix grounding, not tone.
         </p>
       </div>

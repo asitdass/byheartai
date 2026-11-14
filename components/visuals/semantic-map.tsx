@@ -41,7 +41,7 @@ export function SemanticMap() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-3 text-sm" style={{ color: "var(--ink-muted)" }}>
           Click any word — its 3 nearest neighbors (closest in meaning) light up.
         </p>

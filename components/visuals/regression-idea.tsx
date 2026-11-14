@@ -39,7 +39,7 @@ export function RegressionIdea() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Three points: (1, 2), (2, 3), (3, 5). Click what to inspect:
         </p>
@@ -50,7 +50,7 @@ export function RegressionIdea() {
               type="button"
               onClick={() => setId(view.id)}
               aria-pressed={view.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: view.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: view.id === id ? "var(--accent)" : "var(--rule)",
@@ -61,7 +61,7 @@ export function RegressionIdea() {
           ))}
         </div>
         <div
-          className="relative mb-3 h-40 rounded-[--radius-sm] border"
+          className="relative mb-3 h-40 rounded-(--radius-sm) border"
           style={{ background: "var(--paper)" }}
           role="img"
           aria-label="Scatter of three points with a fitted line. Predictions sit on the line; actuals are the dots."
@@ -99,7 +99,7 @@ export function RegressionIdea() {
             y
           </span>
         </div>
-        <div className="rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <div className="rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <p className="font-mono text-xs" style={{ color: "var(--accent)" }}>
             {v.formula}
           </p>

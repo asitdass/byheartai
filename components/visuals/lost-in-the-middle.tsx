@@ -15,7 +15,7 @@ export function LostInTheMiddle() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-3 text-sm" style={{ color: "var(--ink-muted)" }}>
           Same fact: <span className="font-mono">&quot;The refund cap is $120.&quot;</span> Click where you place it:
         </p>
@@ -26,7 +26,7 @@ export function LostInTheMiddle() {
               type="button"
               onClick={() => setId(pos.id)}
               aria-pressed={pos.id === id}
-              className="rounded-[--radius-sm] border px-3 py-1.5 text-sm"
+              className="rounded-(--radius-sm) border px-3 py-1.5 text-sm"
               style={{
                 background: pos.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: pos.id === id ? "var(--accent)" : "var(--rule)",
@@ -37,7 +37,7 @@ export function LostInTheMiddle() {
           ))}
         </div>
 
-        <div className="mb-2 flex h-10 overflow-hidden rounded-[--radius-sm] border text-[11px] font-semibold" role="img" aria-label={`The fact sits at the ${p.label.toLowerCase()}.`}>
+        <div className="mb-2 flex h-10 overflow-hidden rounded-(--radius-sm) border text-[11px] font-semibold" role="img" aria-label={`The fact sits at the ${p.label.toLowerCase()}.`}>
           {(["start", "middle", "end"] as const).map((slot) => (
             <div
               key={slot}

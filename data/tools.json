@@ -1,0 +1,873 @@
+[
+  {
+    "id": "ollama",
+    "name": "Ollama",
+    "repo": "ollama/ollama",
+    "category": "local-models",
+    "tagline": "Download and run open models on your own machine with one command.",
+    "useFor": [
+      "Private local chat",
+      "Local API for apps and agents",
+      "Offline coding assistants"
+    ],
+    "install": "curl -fsSL https://ollama.com/install.sh | sh",
+    "guide": "run-llms-locally-with-ollama",
+    "stars": 186903,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "open-webui",
+    "name": "Open WebUI",
+    "repo": "open-webui/open-webui",
+    "category": "local-models",
+    "tagline": "A self-hosted ChatGPT-style interface for local and API models.",
+    "useFor": [
+      "Private chat UI for a team or family",
+      "Chat with files",
+      "Front-end for Ollama"
+    ],
+    "install": "pip install open-webui",
+    "guide": "private-chatgpt-with-open-webui",
+    "stars": 158593,
+    "license": "See repo",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "llama-cpp",
+    "name": "llama.cpp",
+    "repo": "ggml-org/llama.cpp",
+    "category": "local-models",
+    "tagline": "The C/C++ inference engine most local AI apps are built on.",
+    "useFor": [
+      "Run GGUF models on CPU or GPU",
+      "Embed inference in your own app",
+      "OpenAI-compatible local server"
+    ],
+    "stars": 134890,
+    "license": "MIT",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "localai",
+    "name": "LocalAI",
+    "repo": "mudler/LocalAI",
+    "category": "local-models",
+    "tagline": "A drop-in, self-hosted replacement for hosted AI APIs.",
+    "useFor": [
+      "Text, image, and voice from one local API",
+      "Swap a cloud API for a local one"
+    ],
+    "stars": 50359,
+    "license": "MIT",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "vllm",
+    "name": "vLLM",
+    "repo": "vllm-project/vllm",
+    "category": "local-models",
+    "tagline": "High-throughput model serving for GPUs.",
+    "useFor": [
+      "Serve open models to many users",
+      "Production inference with batching"
+    ],
+    "stars": 96881,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "unsloth",
+    "name": "Unsloth",
+    "repo": "unslothai/unsloth",
+    "category": "local-models",
+    "tagline": "Fine-tune and run open models with far less memory.",
+    "useFor": [
+      "Fine-tune on one GPU",
+      "Export to GGUF for Ollama"
+    ],
+    "stars": 79462,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "lobehub",
+    "name": "LobeHub",
+    "repo": "lobehub/lobehub",
+    "category": "local-models",
+    "tagline": "A polished self-hostable chat workspace with agents and plugins.",
+    "useFor": [
+      "Team chat with multiple models",
+      "Agent marketplace"
+    ],
+    "stars": 85410,
+    "license": "See repo",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "openclaw",
+    "name": "OpenClaw",
+    "repo": "openclaw/openclaw",
+    "category": "personal-agents",
+    "tagline": "A personal AI assistant that runs on your computer and lives in your chat apps.",
+    "useFor": [
+      "Message your assistant on WhatsApp or Telegram",
+      "Scheduled chores and reminders",
+      "Local files and device actions"
+    ],
+    "install": "curl -fsSL https://openclaw.ai/install.sh | bash",
+    "guide": "personal-ai-assistant-openclaw-hermes",
+    "stars": 394403,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "hermes-agent",
+    "name": "Hermes Agent",
+    "repo": "NousResearch/hermes-agent",
+    "category": "personal-agents",
+    "tagline": "A personal agent that builds up skills and memory the longer you use it.",
+    "useFor": [
+      "Always-on assistant over chat apps",
+      "Reusable skills learned from past tasks"
+    ],
+    "install": "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash",
+    "guide": "personal-ai-assistant-openclaw-hermes",
+    "stars": 263234,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "nanobot",
+    "name": "nanobot",
+    "repo": "HKUDS/nanobot",
+    "category": "personal-agents",
+    "tagline": "A small, readable personal agent you can understand end to end.",
+    "useFor": [
+      "Learn how personal agents work",
+      "Lightweight self-hosted assistant"
+    ],
+    "stars": 50067,
+    "license": "MIT",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "goose",
+    "name": "goose",
+    "repo": "aaif-goose/goose",
+    "category": "personal-agents",
+    "tagline": "An extensible on-machine agent that installs, runs, edits, and tests.",
+    "useFor": [
+      "Automate dev and desktop chores",
+      "Use any model with MCP extensions"
+    ],
+    "stars": 56568,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "khoj",
+    "name": "Khoj",
+    "repo": "khoj-ai/khoj",
+    "category": "personal-agents",
+    "tagline": "A self-hostable AI second brain over your notes and the web.",
+    "useFor": [
+      "Search and chat with personal notes",
+      "Scheduled research digests"
+    ],
+    "stars": 38124,
+    "license": "AGPL-3.0",
+    "lastPush": "2026-08-02",
+    "archived": false
+  },
+  {
+    "id": "claude-code",
+    "name": "Claude Code",
+    "repo": "anthropics/claude-code",
+    "category": "coding-agents",
+    "tagline": "An agentic coding tool that works in your terminal and understands your codebase.",
+    "useFor": [
+      "Build features from a description",
+      "Refactors, tests, and git workflows",
+      "Scheduled automation in CI"
+    ],
+    "install": "curl -fsSL https://claude.ai/install.sh | bash",
+    "guide": "set-up-claude-code",
+    "stars": 155578,
+    "license": "See repo",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "codex",
+    "name": "Codex CLI",
+    "repo": "openai/codex",
+    "category": "coding-agents",
+    "tagline": "OpenAI's lightweight coding agent for the terminal.",
+    "useFor": [
+      "Terminal pair programming",
+      "Scripted code changes"
+    ],
+    "stars": 135201,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "opencode",
+    "name": "OpenCode",
+    "repo": "anomalyco/opencode",
+    "category": "coding-agents",
+    "tagline": "An open-source coding agent that works with any model provider.",
+    "useFor": [
+      "Provider-agnostic coding agent",
+      "Local models for coding"
+    ],
+    "install": "curl -fsSL https://opencode.ai/v2/install | bash",
+    "stars": 226692,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "gemini-cli",
+    "name": "Gemini CLI",
+    "repo": "google-gemini/gemini-cli",
+    "category": "coding-agents",
+    "tagline": "Google's open-source terminal agent for Gemini models.",
+    "useFor": [
+      "Terminal agent on Gemini",
+      "Large-context codebase questions"
+    ],
+    "stars": 108821,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "cline",
+    "name": "Cline",
+    "repo": "cline/cline",
+    "category": "coding-agents",
+    "tagline": "An autonomous coding agent for your IDE, CLI, or as an SDK.",
+    "useFor": [
+      "Agentic edits inside VS Code",
+      "Plan-then-act workflows"
+    ],
+    "stars": 71599,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "continue",
+    "name": "Continue",
+    "repo": "continuedev/continue",
+    "category": "coding-agents",
+    "tagline": "An open-source coding agent you configure to your team's rules.",
+    "useFor": [
+      "Custom assistants in the IDE",
+      "Bring-your-own-model completion"
+    ],
+    "stars": 36476,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "openhands",
+    "name": "OpenHands",
+    "repo": "OpenHands/OpenHands",
+    "category": "coding-agents",
+    "tagline": "An open platform for software-development agents in sandboxes.",
+    "useFor": [
+      "Hand a whole issue to an agent",
+      "Self-hosted cloud coding agents"
+    ],
+    "stars": 93436,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "aider",
+    "name": "aider",
+    "repo": "Aider-AI/aider",
+    "category": "coding-agents",
+    "tagline": "AI pair programming in your terminal, built around git.",
+    "useFor": [
+      "Small, reviewable AI commits",
+      "Works with local models"
+    ],
+    "stars": 50111,
+    "license": "Apache-2.0",
+    "lastPush": "2026-05-22",
+    "archived": false
+  },
+  {
+    "id": "n8n",
+    "name": "n8n",
+    "repo": "n8n-io/n8n",
+    "category": "automation",
+    "tagline": "Visual workflow automation with built-in AI agent nodes and 1,500+ integrations.",
+    "useFor": [
+      "Email, CRM, and spreadsheet automations",
+      "AI agents triggered by webhooks or schedules",
+      "Self-hosted alternative to Zapier"
+    ],
+    "install": "curl -fsSL https://get.n8n.io | sh",
+    "guide": "automate-workflows-with-n8n",
+    "stars": 210420,
+    "license": "See repo",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "dify",
+    "name": "Dify",
+    "repo": "langgenius/dify",
+    "category": "automation",
+    "tagline": "A visual platform for building agentic workflows and RAG apps.",
+    "useFor": [
+      "Internal AI apps without much code",
+      "RAG chatbots with a UI"
+    ],
+    "stars": 161125,
+    "license": "See repo",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "langflow",
+    "name": "Langflow",
+    "repo": "langflow-ai/langflow",
+    "category": "automation",
+    "tagline": "Drag-and-drop builder for agents and AI workflows.",
+    "useFor": [
+      "Prototype agent flows visually",
+      "Export flows as APIs"
+    ],
+    "stars": 156615,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "activepieces",
+    "name": "Activepieces",
+    "repo": "activepieces/activepieces",
+    "category": "automation",
+    "tagline": "Open-source AI automation with hundreds of MCP-ready integrations.",
+    "useFor": [
+      "Business automations",
+      "Expose integrations to agents via MCP"
+    ],
+    "stars": 25514,
+    "license": "See repo",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "langgraph",
+    "name": "LangGraph",
+    "repo": "langchain-ai/langgraph",
+    "category": "agent-frameworks",
+    "tagline": "Build stateful, resumable agents as graphs.",
+    "useFor": [
+      "Long-running agents with checkpoints",
+      "Human-in-the-loop flows"
+    ],
+    "stars": 44927,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "crewai",
+    "name": "CrewAI",
+    "repo": "crewAIInc/crewAI",
+    "category": "agent-frameworks",
+    "tagline": "Orchestrate teams of role-based agents.",
+    "useFor": [
+      "Multi-agent research and writing",
+      "Role-based task pipelines"
+    ],
+    "stars": 60869,
+    "license": "MIT",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "autogen",
+    "name": "AutoGen",
+    "repo": "microsoft/autogen",
+    "category": "agent-frameworks",
+    "tagline": "Microsoft's framework for multi-agent applications.",
+    "useFor": [
+      "Conversational multi-agent systems",
+      "Research prototypes"
+    ],
+    "stars": 61808,
+    "license": "CC-BY-4.0",
+    "lastPush": "2026-11-12",
+    "archived": false
+  },
+  {
+    "id": "openai-agents-python",
+    "name": "OpenAI Agents SDK",
+    "repo": "openai/openai-agents-python",
+    "category": "agent-frameworks",
+    "tagline": "A small framework for multi-agent workflows with handoffs.",
+    "useFor": [
+      "Agents with tools and handoffs",
+      "Tracing built in"
+    ],
+    "stars": 30660,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "adk-python",
+    "name": "Agent Development Kit",
+    "repo": "google/adk-python",
+    "category": "agent-frameworks",
+    "tagline": "Google's code-first toolkit for building and evaluating agents.",
+    "useFor": [
+      "Agents on Gemini",
+      "Built-in evaluation"
+    ],
+    "stars": 22209,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "pydantic-ai",
+    "name": "Pydantic AI",
+    "repo": "pydantic/pydantic-ai",
+    "category": "agent-frameworks",
+    "tagline": "Typed, Pythonic agents with validated outputs.",
+    "useFor": [
+      "Structured-output agents",
+      "Type-safe tool calls"
+    ],
+    "stars": 21199,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "dspy",
+    "name": "DSPy",
+    "repo": "stanfordnlp/dspy",
+    "category": "agent-frameworks",
+    "tagline": "Program language models instead of hand-writing prompts.",
+    "useFor": [
+      "Optimize prompts automatically",
+      "Modular LLM pipelines"
+    ],
+    "stars": 39037,
+    "license": "MIT",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "servers",
+    "name": "MCP reference servers",
+    "repo": "modelcontextprotocol/servers",
+    "category": "mcp-skills",
+    "tagline": "Reference Model Context Protocol servers to learn from and reuse.",
+    "useFor": [
+      "Give agents file, git, and fetch tools",
+      "Templates for your own server"
+    ],
+    "guide": "connect-mcp-servers",
+    "stars": 91976,
+    "license": "See repo",
+    "lastPush": "2026-11-12",
+    "archived": false
+  },
+  {
+    "id": "github-mcp-server",
+    "name": "GitHub MCP Server",
+    "repo": "github/github-mcp-server",
+    "category": "mcp-skills",
+    "tagline": "GitHub's official MCP server for repos, issues, and pull requests.",
+    "useFor": [
+      "Let agents triage issues",
+      "PR review and repo search from chat"
+    ],
+    "guide": "connect-mcp-servers",
+    "stars": 34448,
+    "license": "MIT",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "playwright-mcp",
+    "name": "Playwright MCP",
+    "repo": "microsoft/playwright-mcp",
+    "category": "mcp-skills",
+    "tagline": "Give any agent a real browser through MCP.",
+    "useFor": [
+      "Agents that click through web apps",
+      "End-to-end test generation"
+    ],
+    "install": "claude mcp add playwright npx @playwright/mcp@latest",
+    "guide": "connect-mcp-servers",
+    "stars": 39612,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "context7",
+    "name": "Context7",
+    "repo": "upstash/context7",
+    "category": "mcp-skills",
+    "tagline": "Feeds agents up-to-date library documentation.",
+    "useFor": [
+      "Stop outdated API answers",
+      "Version-accurate code generation"
+    ],
+    "stars": 64769,
+    "license": "MIT",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "skills",
+    "name": "Agent Skills",
+    "repo": "anthropics/skills",
+    "category": "mcp-skills",
+    "tagline": "The public repository of Agent Skills: packaged instructions agents load on demand.",
+    "useFor": [
+      "Teach an agent a repeatable workflow",
+      "Share team playbooks"
+    ],
+    "stars": 194165,
+    "license": "See repo",
+    "lastPush": "2026-11-06",
+    "archived": false
+  },
+  {
+    "id": "firecrawl",
+    "name": "Firecrawl",
+    "repo": "firecrawl/firecrawl",
+    "category": "web-data",
+    "tagline": "Turn websites into clean, LLM-ready data.",
+    "useFor": [
+      "Crawl a site into Markdown",
+      "Web search and extraction for agents"
+    ],
+    "stars": 201590,
+    "license": "AGPL-3.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "crawl4ai",
+    "name": "Crawl4AI",
+    "repo": "unclecode/crawl4ai",
+    "category": "web-data",
+    "tagline": "An open-source crawler that outputs Markdown built for LLMs.",
+    "useFor": [
+      "Scrape pages for RAG",
+      "Structured extraction"
+    ],
+    "install": "pip install -U crawl4ai",
+    "guide": "web-scraping-for-ai-with-crawl4ai",
+    "stars": 87327,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "browser-use",
+    "name": "Browser Use",
+    "repo": "browser-use/browser-use",
+    "category": "web-data",
+    "tagline": "A Python library that lets an AI agent drive a browser.",
+    "useFor": [
+      "Fill forms and click through sites",
+      "Automate repetitive web tasks"
+    ],
+    "guide": "browser-agents-with-browser-use",
+    "stars": 120962,
+    "license": "MIT",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "skyvern",
+    "name": "Skyvern",
+    "repo": "Skyvern-AI/skyvern",
+    "category": "web-data",
+    "tagline": "Automate browser-based workflows with vision and LLMs.",
+    "useFor": [
+      "Portal and form automation",
+      "Workflows on sites without APIs"
+    ],
+    "stars": 23412,
+    "license": "AGPL-3.0",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "markitdown",
+    "name": "MarkItDown",
+    "repo": "microsoft/markitdown",
+    "category": "web-data",
+    "tagline": "Convert PDFs, Office files, and more to Markdown for LLMs.",
+    "useFor": [
+      "Prepare documents for RAG",
+      "Feed files to a chat model"
+    ],
+    "install": "pip install 'markitdown[all]'",
+    "stars": 195257,
+    "license": "MIT",
+    "lastPush": "2026-11-07",
+    "archived": false
+  },
+  {
+    "id": "docling",
+    "name": "Docling",
+    "repo": "docling-project/docling",
+    "category": "web-data",
+    "tagline": "Parse complex documents, tables, and layouts for gen AI.",
+    "useFor": [
+      "High-fidelity PDF parsing",
+      "Table extraction"
+    ],
+    "stars": 70559,
+    "license": "MIT",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "anything-llm",
+    "name": "AnythingLLM",
+    "repo": "Mintplex-Labs/anything-llm",
+    "category": "rag-memory",
+    "tagline": "An all-in-one local app to chat with your documents.",
+    "useFor": [
+      "Private document Q&A",
+      "Workspaces per project or client"
+    ],
+    "install": "docker pull mintplexlabs/anythingllm",
+    "guide": "chat-with-your-documents-anythingllm",
+    "stars": 68251,
+    "license": "MIT",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "ragflow",
+    "name": "RAGFlow",
+    "repo": "infiniflow/ragflow",
+    "category": "rag-memory",
+    "tagline": "A RAG engine with deep document understanding.",
+    "useFor": [
+      "Production RAG over messy documents",
+      "Citations with source highlighting"
+    ],
+    "stars": 94131,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "llama-index",
+    "name": "LlamaIndex",
+    "repo": "run-llama/llama_index",
+    "category": "rag-memory",
+    "tagline": "A framework for document processing and retrieval.",
+    "useFor": [
+      "Custom RAG pipelines",
+      "Document agents"
+    ],
+    "stars": 52894,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "mem0",
+    "name": "Mem0",
+    "repo": "mem0ai/mem0",
+    "category": "rag-memory",
+    "tagline": "A drop-in memory layer so agents remember users across sessions.",
+    "useFor": [
+      "Personalized assistants",
+      "Long-term agent memory"
+    ],
+    "install": "pip install mem0ai",
+    "guide": "agent-memory-with-mem0",
+    "stars": 68928,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-06",
+    "archived": false
+  },
+  {
+    "id": "cognee",
+    "name": "Cognee",
+    "repo": "topoteretes/cognee",
+    "category": "rag-memory",
+    "tagline": "Graph-based long-term memory for agents.",
+    "useFor": [
+      "Knowledge-graph memory",
+      "Connected recall across documents"
+    ],
+    "stars": 33299,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "claude-mem",
+    "name": "claude-mem",
+    "repo": "thedotmack/claude-mem",
+    "category": "rag-memory",
+    "tagline": "Captures and compresses coding-agent sessions for later recall.",
+    "useFor": [
+      "Persistent context across coding sessions"
+    ],
+    "stars": 116869,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "qdrant",
+    "name": "Qdrant",
+    "repo": "qdrant/qdrant",
+    "category": "rag-memory",
+    "tagline": "A high-performance vector database and search engine.",
+    "useFor": [
+      "Semantic search at scale",
+      "Vector store for RAG"
+    ],
+    "stars": 35543,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "chroma",
+    "name": "Chroma",
+    "repo": "chroma-core/chroma",
+    "category": "rag-memory",
+    "tagline": "A simple, developer-friendly search database for AI.",
+    "useFor": [
+      "Local vector store for prototypes",
+      "Embedded retrieval"
+    ],
+    "stars": 29682,
+    "license": "Apache-2.0",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "langfuse",
+    "name": "Langfuse",
+    "repo": "langfuse/langfuse",
+    "category": "llmops",
+    "tagline": "Open-source tracing, evals, and prompt management.",
+    "useFor": [
+      "See every agent step and its cost",
+      "Track prompt versions"
+    ],
+    "stars": 37403,
+    "license": "See repo",
+    "lastPush": "2026-11-13",
+    "archived": false
+  },
+  {
+    "id": "promptfoo",
+    "name": "promptfoo",
+    "repo": "promptfoo/promptfoo",
+    "category": "llmops",
+    "tagline": "Test and red-team prompts, agents, and RAG.",
+    "useFor": [
+      "Regression tests for prompts",
+      "Security scans for AI apps"
+    ],
+    "stars": 27150,
+    "license": "MIT",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "litellm",
+    "name": "LiteLLM",
+    "repo": "BerriAI/litellm",
+    "category": "llmops",
+    "tagline": "One gateway and one API format for 100+ model providers.",
+    "useFor": [
+      "Switch providers without code changes",
+      "Budgets and rate limits per team"
+    ],
+    "install": "uv tool install 'litellm[proxy]'",
+    "stars": 63222,
+    "license": "See repo",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "comfyui",
+    "name": "ComfyUI",
+    "repo": "Comfy-Org/ComfyUI",
+    "category": "media",
+    "tagline": "A node-based interface for image and video generation models.",
+    "useFor": [
+      "Custom image pipelines",
+      "Local video generation"
+    ],
+    "stars": 146702,
+    "license": "GPL-3.0",
+    "lastPush": "2026-11-14",
+    "archived": false
+  },
+  {
+    "id": "whisper",
+    "name": "Whisper",
+    "repo": "openai/whisper",
+    "category": "media",
+    "tagline": "General-purpose open speech recognition.",
+    "useFor": [
+      "Transcribe meetings and podcasts",
+      "Subtitles"
+    ],
+    "stars": 112662,
+    "license": "MIT",
+    "lastPush": "2026-08-31",
+    "archived": false
+  },
+  {
+    "id": "faster-whisper",
+    "name": "faster-whisper",
+    "repo": "SYSTRAN/faster-whisper",
+    "category": "media",
+    "tagline": "A much faster Whisper implementation.",
+    "useFor": [
+      "Bulk transcription",
+      "Near real-time speech-to-text"
+    ],
+    "stars": 26728,
+    "license": "MIT",
+    "lastPush": "2026-11-12",
+    "archived": false
+  }
+]

@@ -36,7 +36,7 @@ export function NearestNeighborSearch() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm" style={{ color: "var(--ink-muted)" }}>Click the grid to move your query. The {k} nearest points light up.</p>
           <label className="flex items-center gap-2 text-sm font-semibold">

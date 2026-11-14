@@ -10,7 +10,7 @@ export function MultiHeadAttention() {
   return (
     <figure className="my-8">
       <div
-        className="rounded-[--radius] border p-5"
+        className="rounded-(--radius) border p-5"
         style={{ background: "var(--surface)" }}
         role="img"
         aria-label="Multi-head attention runs several attention heads in parallel. Each head learns to focus on a different kind of relationship (for example subject-verb links, pronoun references, nearby phrasing, or long-range topic links). Their outputs are concatenated and combined into one richer representation."
@@ -22,7 +22,7 @@ export function MultiHeadAttention() {
 
         <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
           {heads.map((h) => (
-            <div key={h.name} className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+            <div key={h.name} className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
               <div className="text-sm font-semibold" style={{ color: "var(--accent)" }}>{h.name}</div>
               <div className="mt-1 text-xs" style={{ color: "var(--ink-faint)" }}>{h.focus}</div>
             </div>
@@ -30,7 +30,7 @@ export function MultiHeadAttention() {
         </div>
 
         <div className="my-2 text-center" aria-hidden style={{ color: "var(--ink-faint)" }}>↓ concatenate + combine ↓</div>
-        <div className="mx-auto max-w-sm rounded-[--radius-sm] border px-3 py-2 text-center text-sm font-semibold" style={{ background: "var(--paper)" }}>
+        <div className="mx-auto max-w-sm rounded-(--radius-sm) border px-3 py-2 text-center text-sm font-semibold" style={{ background: "var(--paper)" }}>
           One richer representation out
         </div>
       </div>

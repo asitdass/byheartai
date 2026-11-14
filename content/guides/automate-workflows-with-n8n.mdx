@@ -1,0 +1,89 @@
+---
+title: "Automate your work with n8n and an AI agent"
+summary: "Self-host n8n, build a workflow with an AI Agent node, and have it summarize and act on incoming information on a schedule."
+outcome: "A running n8n instance with an AI agent workflow you can trigger by chat, webhook, or schedule, connected to the apps you already use."
+level: beginner
+minutes: 30
+tools: [n8n, ollama]
+tags: [n8n, ai automation, workflow automation, ai agent no code, self-hosted zapier]
+concepts: [what-is-agent, function-calling, agent-loop, human-in-the-loop]
+sources:
+  - title: "n8n README"
+    url: "https://github.com/n8n-io/n8n"
+  - title: "n8n advanced AI documentation"
+    url: "https://docs.n8n.io/advanced-ai/"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 3
+status: published
+---
+
+n8n is a visual workflow builder: boxes for triggers and actions, lines between them. What makes it matter for AI is the **AI Agent** node, which lets a model decide which of your connected apps to use. This is the fastest route from "AI can chat" to "AI does a chore for me every morning."
+
+## Start n8n
+
+You need Docker. Then either use the install script:
+
+```bash
+curl -fsSL https://get.n8n.io | sh
+```
+
+or run the container yourself:
+
+```bash
+docker volume create n8n_data
+docker run -it --rm --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n
+```
+
+Open [http://localhost:5678](http://localhost:5678) and create the owner account. Your workflows are saved in the `n8n_data` volume.
+
+## Create a chat-triggered agent
+
+1. Click **Create workflow**.
+2. Add a first node and search for **Chat Trigger**. This gives you a test chat window inside n8n.
+3. Add an **AI Agent** node after it.
+
+The agent node has three sockets underneath: **Chat Model**, **Memory**, and **Tool**. An agent is just those three things in a [loop](/learn/agents/agent-loop).
+
+## Give it a model
+
+Click the **Chat Model** socket and choose a provider:
+
+- **Hosted**: pick Anthropic, OpenAI, or Google and paste an API key into a new credential.
+- **Local**: pick **Ollama Chat Model**. Because n8n is in Docker, set the base URL to `http://host.docker.internal:11434`, not `localhost`.
+
+<Tip>
+Agents need a model that is good at tool calling. Small local models often chat well but pick tools badly. If your agent ignores its tools, try a larger model before debugging anything else.
+</Tip>
+
+## Give it tools
+
+Click the **Tool** socket and add what the agent may use. Good first tools:
+
+- **HTTP Request** to fetch a web page or call an API.
+- **Gmail**, **Google Sheets**, **Slack**, **Notion**: each needs a credential, which n8n walks you through.
+- **MCP Client** to plug in any [MCP server](/learn/mcp/what-is-mcp).
+
+Write a clear description for each tool. The model chooses tools by reading those descriptions.
+
+## Test it
+
+Open the chat panel and ask for something that needs a tool, for example "Fetch https://example.com and summarize it in three bullets." Watch the nodes light up, then click the agent node to read each step it took.
+
+## Make it run by itself
+
+Swap the Chat Trigger for a real trigger:
+
+- **Schedule Trigger**: every weekday at 8:00.
+- **Webhook**: when another app sends data.
+- **Gmail Trigger**: when a new email arrives.
+
+A useful first automation: Schedule Trigger → RSS Read (your favorite feeds) → AI Agent ("pick the five items most relevant to X and summarize each") → Send Email. Toggle the workflow to **Active** and it runs without you.
+
+<Warning>
+Anything the agent reads (emails, web pages) can contain instructions aimed at it. Start with read-only tools, and put an approval step before anything that sends, deletes, or pays. See [indirect prompt injection](/learn/security/indirect-prompt-injection).
+</Warning>
+
+### What to do next
+
+Browse the [workflow templates](https://n8n.io/workflows) for ideas, then give your agent a browser with [Browser Use](/guides/browser-agents-with-browser-use).

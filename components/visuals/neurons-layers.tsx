@@ -58,7 +58,7 @@ export function NeuronsLayersActivations() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Tiny MLP · x = [1.0, 0.5] · pick the activation
         </p>
@@ -69,7 +69,7 @@ export function NeuronsLayersActivations() {
               type="button"
               onClick={() => setId(act.id)}
               aria-pressed={act.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: act.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: act.id === id ? "var(--accent)" : "var(--rule)",
@@ -85,7 +85,7 @@ export function NeuronsLayersActivations() {
         </p>
 
         <div className="grid gap-2 sm:grid-cols-3" aria-live="polite">
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
               Affine z = Wx + b
             </div>
@@ -95,7 +95,7 @@ export function NeuronsLayersActivations() {
               z₂ = {fmt(z1[1])}
             </p>
           </div>
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
               After activation
             </div>
@@ -105,7 +105,7 @@ export function NeuronsLayersActivations() {
               h₂ = {fmt(h[1])}
             </p>
           </div>
-          <div className="rounded-[--radius-sm] border p-3" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3" style={{ background: "var(--paper)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
               Output layer
             </div>

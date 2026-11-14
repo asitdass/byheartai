@@ -10,8 +10,8 @@ const workers = [
 export function MultiAgent() {
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }} role="img" aria-label="A supervisor agent receives the goal and delegates sub-tasks to specialized agents — a researcher, a coder, and a writer — then combines their results into the final answer.">
-        <div className="mx-auto mb-2 flex w-56 flex-col items-center rounded-[--radius-sm] border-2 px-3 py-3 text-center" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }} role="img" aria-label="A supervisor agent receives the goal and delegates sub-tasks to specialized agents — a researcher, a coder, and a writer — then combines their results into the final answer.">
+        <div className="mx-auto mb-2 flex w-56 flex-col items-center rounded-(--radius-sm) border-2 px-3 py-3 text-center" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
           <UserCog size={20} aria-hidden style={{ color: "var(--accent)" }} />
           <span className="mt-1 text-sm font-bold">Supervisor / Orchestrator</span>
           <span className="text-xs" style={{ color: "var(--ink-faint)" }}>plans &amp; delegates sub-tasks</span>
@@ -19,7 +19,7 @@ export function MultiAgent() {
         <div className="text-center text-xs" style={{ color: "var(--ink-faint)" }} aria-hidden>↓ delegates to ↓</div>
         <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
           {workers.map((w) => (
-            <div key={w.name} className="flex flex-col items-center rounded-[--radius-sm] border px-3 py-3 text-center" style={{ background: "var(--paper)" }}>
+            <div key={w.name} className="flex flex-col items-center rounded-(--radius-sm) border px-3 py-3 text-center" style={{ background: "var(--paper)" }}>
               <w.icon size={18} aria-hidden style={{ color: "var(--accent)" }} />
               <span className="mt-1 text-sm font-semibold">{w.name}</span>
               <span className="text-xs" style={{ color: "var(--ink-faint)" }}>{w.job}</span>

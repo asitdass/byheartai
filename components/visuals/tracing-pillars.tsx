@@ -37,7 +37,7 @@ export function TracingPillars() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 grid grid-cols-3 gap-2">
           {pillars.map((pillar) => {
             const active = pillar.id === id;
@@ -47,7 +47,7 @@ export function TracingPillars() {
                 type="button"
                 onClick={() => setId(pillar.id)}
                 aria-pressed={active}
-                className="flex flex-col items-center rounded-[--radius-sm] border px-2 py-3 text-center"
+                className="flex flex-col items-center rounded-(--radius-sm) border px-2 py-3 text-center"
                 style={{
                   background: active ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                   borderColor: active ? "var(--accent)" : "var(--rule)",
@@ -61,7 +61,7 @@ export function TracingPillars() {
         </div>
         <div className="space-y-2 text-sm" aria-live="polite">
           <p><span className="font-semibold">Answers: </span>{p.answers}</p>
-          <pre className="overflow-x-auto rounded-[--radius-sm] p-3 font-mono text-[11px]" style={{ background: "var(--paper)" }}>
+          <pre className="overflow-x-auto rounded-(--radius-sm) p-3 font-mono text-[11px]" style={{ background: "var(--paper)" }}>
             {p.example}
           </pre>
           <p>{p.note}</p>

@@ -15,8 +15,8 @@ export function LoraQlora() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
-        <div className="mb-4 rounded-[--radius-sm] border p-3 text-sm" style={{ background: "var(--paper)" }} role="img" aria-label="Frozen base weight matrix plus two small LoRA matrices whose product is added back.">
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
+        <div className="mb-4 rounded-(--radius-sm) border p-3 text-sm" style={{ background: "var(--paper)" }} role="img" aria-label="Frozen base weight matrix plus two small LoRA matrices whose product is added back.">
           <div className="font-mono text-xs" style={{ color: "var(--ink-faint)" }}>W (frozen) + A × B</div>
           <div className="mt-2 flex items-center justify-center gap-2 text-xs">
             <span className="rounded border px-2 py-6" style={{ borderColor: "var(--rule)" }}>base W<br />locked</span>
@@ -41,7 +41,7 @@ export function LoraQlora() {
               type="button"
               onClick={() => setI(idx)}
               aria-pressed={idx === i}
-              className="rounded-[--radius-sm] border px-3 py-1.5 text-sm"
+              className="rounded-(--radius-sm) border px-3 py-1.5 text-sm"
               style={{
                 background: idx === i ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: idx === i ? "var(--accent)" : "var(--rule)",

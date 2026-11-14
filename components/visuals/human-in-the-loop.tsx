@@ -11,12 +11,12 @@ const steps = [
 export function HumanInTheLoop() {
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }} role="img" aria-label="Human-in-the-loop: the agent proposes a risky action, pauses for approval, a human approves or edits or rejects it, and only then does the agent continue.">
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }} role="img" aria-label="Human-in-the-loop: the agent proposes a risky action, pauses for approval, a human approves or edits or rejects it, and only then does the agent continue.">
         <ol className="flex flex-col gap-2">
           {steps.map((s, i) => {
             const isGate = i === 1;
             return (
-              <li key={s.label} className="flex items-center gap-3 rounded-[--radius-sm] border px-3 py-2" style={{ background: "var(--paper)", borderColor: isGate ? "color-mix(in oklab, oklch(0.6 0.18 25) 45%, var(--rule))" : "var(--rule)" }}>
+              <li key={s.label} className="flex items-center gap-3 rounded-(--radius-sm) border px-3 py-2" style={{ background: "var(--paper)", borderColor: isGate ? "color-mix(in oklab, oklch(0.6 0.18 25) 45%, var(--rule))" : "var(--rule)" }}>
                 <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold" style={{ background: isGate ? "oklch(0.6 0.18 25)" : "var(--accent)", color: "var(--accent-ink)" }}>{i + 1}</span>
                 <s.icon size={18} aria-hidden style={{ color: isGate ? "oklch(0.6 0.18 25)" : "var(--accent)" }} />
                 <div>

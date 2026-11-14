@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getPublishedConcepts, conceptHref } from "@/lib/content";
 import { categories } from "@/data/categories";
 import { SITE_URL } from "@/lib/site";
+import { getPublishedGuides, getRadarIssues } from "@/lib/guides";
 
 function toLastmod(value?: string): Date {
   if (!value) return new Date("2026-09-04T00:00:00.000Z");
@@ -23,7 +24,7 @@ function latestContentDate(): Date {
 export default function sitemap(): MetadataRoute.Sitemap {
   const contentDate = latestContentDate();
 
-  const staticRoutes = ["", "/learn", "/roadmaps", "/glossary", "/search"].map((path) => ({
+  const staticRoutes = ["", "/learn", "/guides", "/tools", "/whats-new", "/roadmaps", "/glossary", "/search"].map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: contentDate,
     changeFrequency: "weekly" as const,
@@ -44,5 +45,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  return [...staticRoutes, ...categoryRoutes, ...lessonRoutes];
+  const guideRoutes = getPublishedGuides().map((g) => ({
+    url: `${SITE_URL}/guides/${g.slug}`,
+    lastModified: toLastmod(g.lastVerified),
+    changeFrequency: "monthly" as const,
+    priority: 0.9,
+  }));
+  const radarRoutes = getRadarIssues().map((r) => ({
+    url: `${SITE_URL}/whats-new/${r.slug}`,
+    lastModified: toLastmod(r.date),
+    changeFrequency: "yearly" as const,
+    priority: 0.6,
+  }));
+  return [...staticRoutes, ...categoryRoutes, ...guideRoutes, ...radarRoutes, ...lessonRoutes];
 }

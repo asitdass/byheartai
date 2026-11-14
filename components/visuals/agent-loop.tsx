@@ -33,14 +33,14 @@ export function AgentLoop() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="grid grid-cols-4 gap-2">
           {stages.map((s) => {
             const active = s.key === activeStage;
             return (
               <div
                 key={s.key}
-                className="flex flex-col items-center rounded-[--radius-sm] border px-2 py-3 text-center transition-all"
+                className="flex flex-col items-center rounded-(--radius-sm) border px-2 py-3 text-center transition-all"
                 style={{
                   background: active ? "var(--accent)" : "var(--paper)",
                   borderColor: active ? "var(--accent)" : "var(--rule)",
@@ -56,7 +56,7 @@ export function AgentLoop() {
           ↻ repeats until the goal is achieved
         </div>
 
-        <div className="rounded-[--radius-sm] p-3 text-sm" style={{ background: current.done ? "color-mix(in oklab, oklch(0.6 0.15 150) 15%, var(--paper))" : "var(--paper)" }} aria-live="polite">
+        <div className="rounded-(--radius-sm) p-3 text-sm" style={{ background: current.done ? "color-mix(in oklab, oklch(0.6 0.15 150) 15%, var(--paper))" : "var(--paper)" }} aria-live="polite">
           <span className="font-semibold" style={{ color: "var(--accent)" }}>{current.stage}:</span> {current.text}
         </div>
 
@@ -65,7 +65,7 @@ export function AgentLoop() {
             type="button"
             onClick={() => setStep((s) => Math.min(s + 1, steps.length - 1))}
             disabled={step >= steps.length - 1}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-4 py-2 text-sm font-semibold disabled:opacity-40"
             style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
           >
             <Play size={14} aria-hidden /> Next step
@@ -73,7 +73,7 @@ export function AgentLoop() {
           <button
             type="button"
             onClick={() => setStep(0)}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-3 py-2 text-sm hover:bg-[--surface]"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-3 py-2 text-sm hover:bg-(--surface)"
             style={{ color: "var(--ink-muted)" }}
           >
             <RotateCcw size={14} aria-hidden /> Reset

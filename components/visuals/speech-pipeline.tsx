@@ -26,7 +26,7 @@ export function SpeechPipeline() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex flex-wrap gap-2">
           {paths.map((path) => (
             <button
@@ -34,7 +34,7 @@ export function SpeechPipeline() {
               type="button"
               onClick={() => setId(path.id)}
               aria-pressed={path.id === id}
-              className="rounded-[--radius-sm] border px-3 py-1.5 text-sm"
+              className="rounded-(--radius-sm) border px-3 py-1.5 text-sm"
               style={{
                 background: path.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: path.id === id ? "var(--accent)" : "var(--rule)",
@@ -47,7 +47,7 @@ export function SpeechPipeline() {
         <div className="flex flex-wrap items-center gap-1.5" role="img" aria-label={p.flow.join(" then ")}>
           {p.flow.map((step, i) => (
             <span key={step} className="flex items-center gap-1.5">
-              <span className="rounded-[--radius-sm] px-2 py-1 text-xs font-semibold" style={{ background: "var(--paper)" }}>{step}</span>
+              <span className="rounded-(--radius-sm) px-2 py-1 text-xs font-semibold" style={{ background: "var(--paper)" }}>{step}</span>
               {i < p.flow.length - 1 && <span aria-hidden style={{ color: "var(--ink-faint)" }}>→</span>}
             </span>
           ))}

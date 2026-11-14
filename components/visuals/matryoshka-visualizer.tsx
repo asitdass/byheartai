@@ -21,7 +21,7 @@ export function MatryoshkaVisualizer() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-3 text-sm" style={{ color: "var(--ink-muted)" }}>
           Keep only the first <strong style={{ color: "var(--accent)" }}>{keep}</strong> of {FULL} dimensions — the vector still works.
         </p>
@@ -57,12 +57,12 @@ export function MatryoshkaVisualizer() {
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-2 text-center text-sm">
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>Storage / speed</div>
             <div className="text-lg font-bold" style={{ color: "var(--accent)" }}>{sizePct}%</div>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>of full size</div>
           </div>
-          <div className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>Quality retained</div>
             <div className="text-lg font-bold" style={{ color: "oklch(0.55 0.15 150)" }}>≈ {quality}%</div>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>of full accuracy</div>

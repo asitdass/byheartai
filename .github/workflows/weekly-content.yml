@@ -1,0 +1,72 @@
+name: Weekly content update
+
+# Researches the last 7 days of AI and opens a pull request with a new radar issue,
+# refreshed tool stats, re-verified guides, and updated lessons.
+# Nothing is published until a person merges the pull request.
+#
+# One-time setup (see README "Weekly automation"):
+#   1. Add a repository secret: ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN.
+#   2. Settings -> Actions -> General -> Workflow permissions:
+#      enable "Allow GitHub Actions to create and approve pull requests".
+
+on:
+  schedule:
+    - cron: "0 5 * * 1" # Mondays 05:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: weekly-content
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Refresh GitHub stats for the tools directory
+        run: npm run refresh:tools
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Research and write this week's update
+        uses: anthropics/claude-code-action@v1
+        with:
+          # Set whichever secret you have; the unused one stays empty.
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: "/weekly-update"
+          claude_args: |
+            --max-turns 150
+            --allowedTools "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Bash(npm run validate:content),Bash(npm run refresh:tools),Bash(date:*),Bash(ls:*),Bash(git log:*)"
+
+      - name: Gate on content validation and types
+        run: |
+          npm run validate:content
+          npm run typecheck
+
+      - name: Open the pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: weekly-content-update
+          delete-branch: true
+          title: "Weekly content update"
+          commit-message: "Weekly content update"
+          body-path: weekly-summary.md
+          # Only content may be committed, whatever else was touched during the run.
+          add-paths: |
+            content/**
+            data/tools.json
+            data/glossary.ts

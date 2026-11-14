@@ -27,7 +27,7 @@ export function ChunkingVisualizer() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="flex items-center justify-between text-sm font-semibold">
@@ -47,7 +47,7 @@ export function ChunkingVisualizer() {
           {chunks.map((chunk, ci) => {
             const prevEnd = ci > 0 ? chunks[ci - 1].start + size : 0;
             return (
-              <div key={ci} className="rounded-[--radius-sm] border p-2" style={{ background: "var(--paper)" }}>
+              <div key={ci} className="rounded-(--radius-sm) border p-2" style={{ background: "var(--paper)" }}>
                 <div className="mb-1 text-xs font-semibold" style={{ color: "var(--ink-faint)" }}>Chunk {ci + 1}</div>
                 <div className="flex flex-wrap gap-1 text-sm">
                   {chunk.words.map((w, wi) => {

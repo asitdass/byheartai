@@ -37,7 +37,7 @@ export function QuizRunner({ quiz }: { quiz: Quiz }) {
         const correct = isRevealed && arraysEqual(sel, q.correct);
 
         return (
-          <fieldset key={q.id} className="rounded-[--radius] border p-5">
+          <fieldset key={q.id} className="rounded-(--radius) border p-5">
             <legend className="px-1 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
               Question {i + 1} of {quiz.questions.length}
             </legend>
@@ -56,7 +56,7 @@ export function QuizRunner({ quiz }: { quiz: Quiz }) {
                 return (
                   <label
                     key={opt.id}
-                    className="flex cursor-pointer items-center gap-3 rounded-[--radius-sm] border p-3 text-[0.95em] transition-colors"
+                    className="flex cursor-pointer items-center gap-3 rounded-(--radius-sm) border p-3 text-[0.95em] transition-colors"
                     style={{
                       borderColor: ring,
                       background: chosen ? "color-mix(in oklab, var(--accent) 6%, var(--paper))" : "transparent",
@@ -68,7 +68,7 @@ export function QuizRunner({ quiz }: { quiz: Quiz }) {
                       checked={chosen}
                       disabled={isRevealed}
                       onChange={() => toggle(q.id, opt.id, multiple)}
-                      className="accent-[--accent]"
+                      className="accent-(--accent)"
                     />
                     <span className="flex-1">{opt.text}</span>
                     {isRevealed && isCorrectOpt && (
@@ -87,14 +87,14 @@ export function QuizRunner({ quiz }: { quiz: Quiz }) {
                 type="button"
                 disabled={sel.length === 0}
                 onClick={() => setRevealed((p) => ({ ...p, [q.id]: true }))}
-                className="mt-4 rounded-[--radius-sm] px-4 py-2 text-sm font-semibold disabled:opacity-40"
+                className="mt-4 rounded-(--radius-sm) px-4 py-2 text-sm font-semibold disabled:opacity-40"
                 style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
               >
                 Check answer
               </button>
             ) : (
               <div
-                className="mt-4 rounded-[--radius-sm] p-3 text-[0.95em]"
+                className="mt-4 rounded-(--radius-sm) p-3 text-[0.95em]"
                 style={{ background: "var(--surface)" }}
               >
                 <p className="mb-1 font-semibold" style={{ color: correct ? "oklch(0.55 0.15 150)" : "oklch(0.58 0.18 20)" }}>

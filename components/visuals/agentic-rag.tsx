@@ -12,11 +12,11 @@ const steps = [
 export function AgenticRag() {
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }} role="img" aria-label="Agentic RAG adds decision loops: retrieve, grade whether the chunks are relevant, and if not rewrite the query and re-retrieve; then generate and check whether the answer is grounded, looping back if it is not — before returning the final answer.">
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }} role="img" aria-label="Agentic RAG adds decision loops: retrieve, grade whether the chunks are relevant, and if not rewrite the query and re-retrieve; then generate and check whether the answer is grounded, looping back if it is not — before returning the final answer.">
         <ol className="flex flex-col gap-2">
           {steps.map((s, i) => (
             <li key={s.label} className="flex items-center gap-3">
-              <div className="flex flex-1 items-center gap-3 rounded-[--radius-sm] border px-3 py-2" style={{ background: "var(--paper)", borderColor: s.loop ? "color-mix(in oklab, var(--accent) 40%, var(--rule))" : "var(--rule)" }}>
+              <div className="flex flex-1 items-center gap-3 rounded-(--radius-sm) border px-3 py-2" style={{ background: "var(--paper)", borderColor: s.loop ? "color-mix(in oklab, var(--accent) 40%, var(--rule))" : "var(--rule)" }}>
                 <span className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold" style={{ background: "var(--accent)", color: "var(--accent-ink)" }}>{i + 1}</span>
                 <s.icon size={18} style={{ color: "var(--accent)" }} aria-hidden />
                 <div>

@@ -63,7 +63,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
             <li key={c.id}>
               <Link
                 href={conceptHref(c)}
-                className="block rounded-[--radius] border p-4 no-underline transition-colors hover:border-[--accent]"
+                className="block rounded-(--radius) border p-4 no-underline transition-colors hover:border-(--accent)"
                 style={{ background: "var(--surface)", borderColor: "var(--rule)" }}
               >
                 <div className="flex items-baseline justify-between gap-3">

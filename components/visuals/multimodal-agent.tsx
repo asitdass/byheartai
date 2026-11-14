@@ -12,11 +12,11 @@ const steps = [
 export function MultimodalAgent() {
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }} role="img" aria-label="A multimodal agent sees and hears, reasons with the same observe-reason-act loop, uses tools, then speaks or shows a result.">
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }} role="img" aria-label="A multimodal agent sees and hears, reasons with the same observe-reason-act loop, uses tools, then speaks or shows a result.">
         <ol className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-center">
           {steps.map((s, i) => (
             <li key={s.label} className="flex items-center gap-2">
-              <div className="flex w-36 flex-col items-center rounded-[--radius-sm] border px-2 py-3 text-center" style={{ background: "var(--paper)" }}>
+              <div className="flex w-36 flex-col items-center rounded-(--radius-sm) border px-2 py-3 text-center" style={{ background: "var(--paper)" }}>
                 <s.icon size={18} aria-hidden style={{ color: "var(--accent)" }} />
                 <span className="mt-1 text-sm font-semibold">{s.label}</span>
                 <span className="text-[11px]" style={{ color: "var(--ink-faint)" }}>{s.note}</span>

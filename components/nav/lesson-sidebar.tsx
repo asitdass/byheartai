@@ -20,7 +20,7 @@ export function LessonSidebar({ category, activeSlug }: { category: string; acti
               <Link
                 href={conceptHref(c)}
                 aria-current={active ? "page" : undefined}
-                className="block rounded-[--radius-sm] px-3 py-1.5 no-underline"
+                className="block rounded-(--radius-sm) px-3 py-1.5 no-underline"
                 style={{
                   background: active ? "color-mix(in oklab, var(--accent) 12%, var(--paper))" : "transparent",
                   color: active ? "var(--accent)" : "var(--ink-muted)",

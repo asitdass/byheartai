@@ -3,7 +3,7 @@ export const SITE_URL = "https://byheartai.com";
 export const SITE_NAME = "ByHeart AI";
 export const SITE_TAGLINE = "Learn AI. Know it by heart.";
 export const SITE_DESCRIPTION =
-  "A free, prerequisite-driven AI curriculum: RAG, agents, MCP, transformers, evaluation, and production system design — with interactive visuals and one idea to remember per lesson.";
+  "Learn how modern AI works, then set it up yourself: a free curriculum on RAG, agents, and MCP, hands-on guides for open-source AI tools, and a weekly briefing on what changed.";
 
 export function absoluteUrl(path = "/"): string {
   if (!path || path === "/") return SITE_URL;

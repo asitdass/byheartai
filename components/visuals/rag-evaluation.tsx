@@ -11,14 +11,14 @@ const generation = [
 
 function Group({ icon: Icon, title, items }: { icon: typeof Search; title: string; items: { name: string; q: string }[] }) {
   return (
-    <div className="flex-1 rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+    <div className="flex-1 rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
       <div className="mb-3 flex items-center gap-2">
         <Icon size={18} style={{ color: "var(--accent)" }} aria-hidden />
         <span className="text-sm font-bold">{title}</span>
       </div>
       <ul className="space-y-2">
         {items.map((it) => (
-          <li key={it.name} className="rounded-[--radius-sm] p-2" style={{ background: "var(--paper)" }}>
+          <li key={it.name} className="rounded-(--radius-sm) p-2" style={{ background: "var(--paper)" }}>
             <div className="text-sm font-semibold" style={{ color: "var(--accent)" }}>{it.name}</div>
             <div className="text-xs" style={{ color: "var(--ink-faint)" }}>{it.q}</div>
           </li>

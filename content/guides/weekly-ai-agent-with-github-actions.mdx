@@ -1,0 +1,106 @@
+---
+title: "Run an AI agent every week with GitHub Actions"
+summary: "Schedule Claude Code in GitHub Actions so an agent wakes up on a cron, does a job in your repository, and opens a pull request for you to review."
+outcome: "A workflow file that runs an AI agent on a schedule and delivers its work as a pull request, with no server to maintain."
+level: intermediate
+minutes: 25
+tools: [claude-code]
+tags: [scheduled ai agent, github actions ai, claude code action, cron ai automation, automated pull requests]
+concepts: [what-is-agent, human-in-the-loop, least-privilege, agent-traces]
+sources:
+  - title: "Claude Code GitHub Actions documentation"
+    url: "https://code.claude.com/docs/en/github-actions"
+  - title: "claude-code-action repository"
+    url: "https://github.com/anthropics/claude-code-action"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 8
+status: published
+---
+
+The most useful agents are the ones you do not have to remember to run. GitHub Actions gives you a free scheduler, a clean machine, and a review step (the pull request) in one place. This site uses exactly this pattern to draft its weekly updates.
+
+## Add your credential as a secret
+
+In your repository go to **Settings → Secrets and variables → Actions → New repository secret** and add one of:
+
+- `ANTHROPIC_API_KEY`: an API key from the Claude Console.
+- `CLAUDE_CODE_OAUTH_TOKEN`: a token for your Claude subscription, generated locally with `claude setup-token`.
+
+Never paste a key into the workflow file itself.
+
+While you are in Settings, open **Actions → General → Workflow permissions** and tick **Allow GitHub Actions to create and approve pull requests**. Without it the last step of the workflow cannot open a PR.
+
+<Tip>
+If you already use Claude Code locally, running `/install-github-app` inside it sets up the GitHub App and the secret for you.
+</Tip>
+
+## Write the workflow
+
+Create `.github/workflows/weekly-agent.yml`:
+
+```yaml
+name: Weekly agent
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+  workflow_dispatch:       # lets you run it by hand
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Read CHANGELOG.md and the commits from the last 7 days.
+            Add a "This week" section to CHANGELOG.md summarizing user-facing changes.
+            Only edit CHANGELOG.md.
+          claude_args: |
+            --max-turns 30
+            --allowedTools "Read,Edit,Glob,Grep,Bash(git log:*)"
+
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: weekly-agent
+          title: "Weekly agent update"
+          commit-message: "Weekly agent update"
+```
+
+Using a subscription token instead? Replace the `anthropic_api_key` line with `claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}`.
+
+## Understand the three safety rails
+
+- **`--allowedTools`** is the agent's whole toolbox. With a plain-text prompt it has no shell or network access until you grant it. List the minimum.
+- **`--max-turns` and `timeout-minutes`** cap cost if the agent gets stuck.
+- **The pull request** is the human in the loop. The agent only edits files; a separate, boring step opens the PR. Nothing reaches your main branch until you merge it.
+
+## Test it by hand
+
+Push the file to your default branch, open the **Actions** tab, pick the workflow, and click **Run workflow**. Read the run log to see every step the agent took, then review the pull request it opened.
+
+## Know the scheduler's quirks
+
+- Cron times are **UTC**.
+- Scheduled workflows run only from the **default branch**.
+- On public repositories GitHub disables schedules after 60 days without repository activity.
+- Scheduled runs can start late when GitHub is busy. Do not depend on the exact minute.
+
+### Ideas for what to schedule
+
+- A weekly dependency and changelog summary.
+- Triage: label and summarize new issues every morning.
+- Docs drift: compare the README's commands against the code and propose fixes.
+- A content refresh, like this site's weekly radar.
+
+### What to do next
+
+Give the scheduled agent more reach with [MCP servers](/guides/connect-mcp-servers), and read [least privilege](/learn/security/least-privilege) before you do.

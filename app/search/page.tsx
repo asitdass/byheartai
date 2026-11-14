@@ -4,7 +4,7 @@ import { SearchForm } from "@/components/nav/search-form";
 import { conceptHref, getPublishedConcepts } from "@/lib/content";
 import { getCategory } from "@/data/categories";
 import { pageMetadata } from "@/lib/seo";
-import { searchConcepts } from "@/lib/search";
+import { searchConcepts, searchExtras } from "@/lib/search";
 
 interface Props {
   searchParams: Promise<{ q?: string }>;
@@ -33,13 +33,14 @@ export default async function SearchPage({ searchParams }: Props) {
   const { q } = await searchParams;
   const query = (q ?? "").trim();
   const results = query.length >= 2 ? searchConcepts(query) : [];
+  const extras = query.length >= 2 ? searchExtras(query) : [];
   const total = getPublishedConcepts().length;
 
   return (
     <div className="mx-auto max-w-[46rem] px-4 py-10">
       <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold">Search</h1>
       <p className="mt-3 text-lg" style={{ color: "var(--ink-muted)" }}>
-        {total} published lessons. Search by concept, synonym, or category.
+        {total} lessons, plus setup guides and open-source tools. Search by concept, tool, or task.
       </p>
       <SearchForm defaultValue={query} size="page" />
 
@@ -52,22 +53,35 @@ export default async function SearchPage({ searchParams }: Props) {
       {query.length >= 2 && (
         <section className="mt-8" aria-live="polite">
           <h2 className="text-sm font-semibold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
-            {results.length} result{results.length === 1 ? "" : "s"}
+            {results.length + extras.length} result{results.length + extras.length === 1 ? "" : "s"}
           </h2>
-          {results.length === 0 ? (
+          {results.length + extras.length === 0 ? (
             <p className="mt-4" style={{ color: "var(--ink-muted)" }}>
               Nothing matched. Try “RAG”, “attention”, or browse the{" "}
               <Link href="/learn">full curriculum</Link>.
             </p>
           ) : (
             <ul className="mt-4 space-y-2">
+              {extras.map((x) => (
+                <li key={x.href}>
+                  <Link href={x.href} className="card block p-4">
+                    <span className="eyebrow grad-text">{x.kind}</span>
+                    <span className="mt-1 block font-semibold" style={{ color: "var(--ink)" }}>
+                      {x.title}
+                    </span>
+                    <span className="mt-1 block text-sm" style={{ color: "var(--ink-muted)" }}>
+                      {x.summary}
+                    </span>
+                  </Link>
+                </li>
+              ))}
               {results.map((c) => {
                 const cat = getCategory(c.category);
                 return (
                   <li key={c.id}>
                     <Link
                       href={conceptHref(c)}
-                      className="block rounded-[--radius] border p-4 no-underline transition-colors hover:border-[--accent]"
+                      className="block rounded-(--radius) border p-4 no-underline transition-colors hover:border-(--accent)"
                       style={{ background: "var(--surface)", borderColor: "var(--rule)" }}
                     >
                       <span className="text-xs uppercase tracking-wide" style={{ color: "var(--accent)" }}>

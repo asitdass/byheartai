@@ -41,7 +41,7 @@ export function ContextWindowVisualizer() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-2 flex items-center justify-between text-sm">
           <span className="font-semibold" style={{ color: "var(--ink-muted)" }}>Context window</span>
           <span className="font-mono" style={{ color: usedTokens >= WINDOW ? "var(--accent)" : "var(--ink-faint)" }}>
@@ -58,7 +58,7 @@ export function ContextWindowVisualizer() {
             return (
               <div
                 key={i}
-                className="flex items-center justify-between rounded-[--radius-sm] px-3 py-2 text-sm transition-opacity"
+                className="flex items-center justify-between rounded-(--radius-sm) px-3 py-2 text-sm transition-opacity"
                 style={{
                   background: "var(--paper)",
                   opacity: dropped ? 0.4 : 1,
@@ -78,7 +78,7 @@ export function ContextWindowVisualizer() {
         </div>
 
         {nameDropped && count >= pool.length && (
-          <p className="mt-3 rounded-[--radius-sm] p-3 text-sm" style={{ background: "color-mix(in oklab, var(--accent) 12%, var(--paper))" }} aria-live="polite">
+          <p className="mt-3 rounded-(--radius-sm) p-3 text-sm" style={{ background: "color-mix(in oklab, var(--accent) 12%, var(--paper))" }} aria-live="polite">
             The AI can no longer &quot;see&quot; the first message — so it has <strong>forgotten Ada&apos;s name</strong>. That&apos;s a context-window limit in action.
           </p>
         )}
@@ -88,7 +88,7 @@ export function ContextWindowVisualizer() {
             type="button"
             onClick={() => setCount((c) => Math.min(c + 1, pool.length))}
             disabled={count >= pool.length}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-4 py-2 text-sm font-semibold disabled:opacity-40"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-4 py-2 text-sm font-semibold disabled:opacity-40"
             style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
           >
             <Plus size={14} aria-hidden /> Add message
@@ -96,7 +96,7 @@ export function ContextWindowVisualizer() {
           <button
             type="button"
             onClick={() => setCount(3)}
-            className="flex items-center gap-1 rounded-[--radius-sm] px-3 py-2 text-sm hover:bg-[--surface]"
+            className="flex items-center gap-1 rounded-(--radius-sm) px-3 py-2 text-sm hover:bg-(--surface)"
             style={{ color: "var(--ink-muted)" }}
           >
             <RotateCcw size={14} aria-hidden /> Reset

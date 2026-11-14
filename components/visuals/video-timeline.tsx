@@ -17,7 +17,7 @@ export function VideoTimeline() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-3 text-sm" style={{ color: "var(--ink-muted)" }}>
           A 30s clip is not 900 frames in the model. You <strong>sample</strong> and retrieve.
         </p>
@@ -38,7 +38,7 @@ export function VideoTimeline() {
             />
           ))}
         </div>
-        <p className="rounded-[--radius-sm] p-3 font-mono text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="rounded-(--radius-sm) p-3 font-mono text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           {c.t} · {c.kind} · {c.label}
         </p>
         <p className="mt-2 text-xs" style={{ color: "var(--ink-faint)" }}>

@@ -29,7 +29,7 @@ export function MetadataFiltering() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex flex-wrap gap-4 text-sm">
           <label className="flex items-center gap-2">
             <input type="checkbox" checked={onlyDocs} onChange={(e) => setOnlyDocs(e.target.checked)} style={{ accentColor: "var(--accent)" }} />

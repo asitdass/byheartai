@@ -1,0 +1,100 @@
+---
+title: "Turn any website into LLM-ready Markdown with Crawl4AI"
+summary: "Install Crawl4AI and scrape web pages into clean Markdown you can feed to a model, a RAG pipeline, or an agent."
+outcome: "A Python script that fetches any page, including JavaScript-heavy ones, and returns clean Markdown ready for an LLM."
+level: beginner
+minutes: 15
+tools: [crawl4ai]
+tags: [crawl4ai, web scraping for ai, llm markdown, rag data ingestion, web crawler python]
+concepts: [what-is-rag, chunking, context-window, rag-poisoning]
+sources:
+  - title: "Crawl4AI README"
+    url: "https://github.com/unclecode/crawl4ai"
+  - title: "Crawl4AI documentation"
+    url: "https://docs.crawl4ai.com"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 10
+status: published
+---
+
+Models are only as good as what you put in their [context window](/learn/llms/context-window). Raw HTML wastes that space on menus, scripts, and cookie banners. Crawl4AI loads a page in a real browser and hands back the content as Markdown, which is the format models read best.
+
+## Install
+
+```bash
+pip install -U crawl4ai
+crawl4ai-setup
+```
+
+The second command downloads the browser Crawl4AI drives. You run it once. If anything looks off:
+
+```bash
+crawl4ai-doctor
+```
+
+## Scrape one page
+
+```python
+import asyncio
+from crawl4ai import AsyncWebCrawler
+
+async def main():
+    async with AsyncWebCrawler() as crawler:
+        result = await crawler.arun(url="https://news.ycombinator.com")
+        print(result.markdown)
+
+asyncio.run(main())
+```
+
+Run it and you get the page as Markdown: headings, links, and text, without the page chrome.
+
+## Scrape several pages
+
+Reuse one crawler for a batch. It keeps the browser open, which is much faster than starting it per page:
+
+```python
+import asyncio
+from crawl4ai import AsyncWebCrawler
+
+URLS = [
+    "https://docs.python.org/3/tutorial/introduction.html",
+    "https://docs.python.org/3/tutorial/controlflow.html",
+]
+
+async def main():
+    async with AsyncWebCrawler() as crawler:
+        for url in URLS:
+            result = await crawler.arun(url=url)
+            name = url.rstrip("/").split("/")[-1].replace(".html", "") + ".md"
+            with open(name, "w") as f:
+                f.write(result.markdown)
+            print("saved", name)
+
+asyncio.run(main())
+```
+
+## Hand the result to a model
+
+The Markdown is now ordinary text. Summarize it with a local model:
+
+```python
+import ollama
+
+summary = ollama.chat(
+    model="gemma4",
+    messages=[{"role": "user", "content": f"Summarize the key points:\n\n{result.markdown}"}],
+)
+print(summary["message"]["content"])
+```
+
+Or drop the saved `.md` files into an [AnythingLLM workspace](/guides/chat-with-your-documents-anythingllm) and ask questions across all of them.
+
+## Be a good citizen
+
+- Check the site's terms and `robots.txt` before crawling, and do not hammer a server: add a pause between requests on large jobs.
+- Scraped text is **untrusted input**. A page can contain instructions aimed at your model. If the output feeds an agent with tools, read about [RAG poisoning](/learn/security/rag-poisoning) first.
+
+### What to do next
+
+Crawl4AI also runs as a Docker server with an HTTP API and has structured extraction options; the [project docs](https://docs.crawl4ai.com) cover both. For pages that need clicking and logging in, use a [browser agent](/guides/browser-agents-with-browser-use).

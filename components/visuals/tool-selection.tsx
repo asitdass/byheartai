@@ -27,7 +27,7 @@ export function ToolSelection() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>Pick a question:</p>
         <div className="mb-4 flex flex-wrap gap-1.5">
           {queries.map((qq, i) => (
@@ -36,7 +36,7 @@ export function ToolSelection() {
               type="button"
               onClick={() => setSelected(i)}
               aria-pressed={i === selected}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: i === selected ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: i === selected ? "var(--accent)" : "var(--rule)",
@@ -54,7 +54,7 @@ export function ToolSelection() {
             return (
               <div
                 key={t.id}
-                className="flex flex-col items-center rounded-[--radius-sm] border p-3 text-center transition-all"
+                className="flex flex-col items-center rounded-(--radius-sm) border p-3 text-center transition-all"
                 style={{
                   background: chosen ? "var(--accent)" : "var(--paper)",
                   borderColor: chosen ? "var(--accent)" : "var(--rule)",
@@ -68,7 +68,7 @@ export function ToolSelection() {
           })}
         </div>
 
-        <p className="mt-3 rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <p className="mt-3 rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <strong style={{ color: "var(--accent)" }}>Chosen:</strong> {active.why}
         </p>
       </div>

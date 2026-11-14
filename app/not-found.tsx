@@ -18,7 +18,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/learn"
-        className="mt-6 inline-block rounded-[--radius-sm] px-5 py-2.5 font-semibold no-underline"
+        className="mt-6 inline-block rounded-(--radius-sm) px-5 py-2.5 font-semibold no-underline"
         style={{ background: "var(--accent)", color: "var(--accent-ink)" }}
       >
         Browse the curriculum

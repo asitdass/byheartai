@@ -62,7 +62,7 @@ export function QualityLatencyCost() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex flex-wrap gap-1.5">
           {presets.map((pre) => (
             <button
@@ -70,7 +70,7 @@ export function QualityLatencyCost() {
               type="button"
               onClick={() => setId(pre.id)}
               aria-pressed={pre.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: pre.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: pre.id === id ? "var(--accent)" : "var(--rule)",

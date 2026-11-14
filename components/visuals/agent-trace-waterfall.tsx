@@ -57,7 +57,7 @@ export function AgentTraceWaterfall() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-xs font-semibold" style={{ color: "var(--ink-muted)" }}>
           trace_id=7f3a · click a span
         </p>
@@ -73,9 +73,9 @@ export function AgentTraceWaterfall() {
                 className="flex w-full items-center gap-2 text-left"
               >
                 <span className="w-28 shrink-0 truncate font-mono text-[11px]">{span.name}</span>
-                <span className="relative h-6 flex-1 rounded-[--radius-sm]" style={{ background: "var(--paper)" }}>
+                <span className="relative h-6 flex-1 rounded-(--radius-sm)" style={{ background: "var(--paper)" }}>
                   <span
-                    className="absolute top-0.5 h-5 rounded-[--radius-sm]"
+                    className="absolute top-0.5 h-5 rounded-(--radius-sm)"
                     style={{
                       left: `${span.left}%`,
                       width: `${span.width}%`,
@@ -90,7 +90,7 @@ export function AgentTraceWaterfall() {
             );
           })}
         </div>
-        <div className="mt-3 rounded-[--radius-sm] p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
+        <div className="mt-3 rounded-(--radius-sm) p-3 text-sm" style={{ background: "var(--paper)" }} aria-live="polite">
           <p className="font-mono text-[11px]" style={{ color: "var(--accent)" }}>{s.attr}</p>
           <p className="mt-1">{s.why}</p>
         </div>

@@ -40,7 +40,7 @@ export function GradientBoosting() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
           Boosting is a relay. Click the round:
         </p>
@@ -51,7 +51,7 @@ export function GradientBoosting() {
               type="button"
               onClick={() => setId(round.id)}
               aria-pressed={round.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-left text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-left text-xs"
               style={{
                 background: round.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: round.id === id ? "var(--accent)" : "var(--rule)",
@@ -62,13 +62,13 @@ export function GradientBoosting() {
           ))}
         </div>
         <div className="grid gap-2 sm:grid-cols-2" aria-live="polite">
-          <div className="rounded-[--radius-sm] border p-3 text-sm" style={{ background: "var(--paper)" }}>
+          <div className="rounded-(--radius-sm) border p-3 text-sm" style={{ background: "var(--paper)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
               Ensemble so far
             </div>
             <p>{r.pred}</p>
           </div>
-          <div className="rounded-[--radius-sm] border p-3 text-sm" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
+          <div className="rounded-(--radius-sm) border p-3 text-sm" style={{ background: "var(--paper)", borderColor: "var(--accent)" }}>
             <div className="mb-1 text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>
               Residuals left
             </div>

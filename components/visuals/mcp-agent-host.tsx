@@ -31,7 +31,7 @@ export function McpAgentHost() {
         aria-label="MCP shows up in three places: IDEs like Cursor, agent apps like Claude, and product surfaces like Slack or Figma. Each can be a host that consumes servers, and products can also publish a server for others to call."
       >
         {hosts.map((h) => (
-          <div key={h.title} className="rounded-[--radius] border p-4" style={{ background: "var(--surface)" }}>
+          <div key={h.title} className="rounded-(--radius) border p-4" style={{ background: "var(--surface)" }}>
             <div className="mb-2 flex items-center gap-2">
               <h.icon size={18} aria-hidden style={{ color: "var(--accent)" }} />
               <span className="text-sm font-bold">{h.title}</span>

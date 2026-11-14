@@ -40,7 +40,7 @@ export function ContextPacking() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-2 flex items-center justify-between text-sm">
           <span className="font-semibold">Token budget this call</span>
           <span className="font-mono" style={{ color: total > WINDOW ? "oklch(0.55 0.18 25)" : "var(--ink-faint)" }}>
@@ -67,7 +67,7 @@ export function ContextPacking() {
             const isDropped = dropped.has(l.id);
             return (
               <li key={l.id}>
-                <label className="flex cursor-pointer items-start gap-2 rounded-[--radius-sm] border px-3 py-2 text-sm" style={{ background: "var(--paper)", borderColor: isDropped ? "oklch(0.6 0.18 25)" : "var(--rule)" }}>
+                <label className="flex cursor-pointer items-start gap-2 rounded-(--radius-sm) border px-3 py-2 text-sm" style={{ background: "var(--paper)", borderColor: isDropped ? "oklch(0.6 0.18 25)" : "var(--rule)" }}>
                   <input
                     type="checkbox"
                     checked={checked}

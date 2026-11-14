@@ -1,6 +1,8 @@
 import "server-only";
 import type { Concept } from "@/lib/types";
 import { getPublishedConcepts } from "@/lib/content";
+import { getPublishedGuides } from "@/lib/guides";
+import { tools } from "@/data/tools";
 
 export function normalizeQuery(q: string): string {
   return q.trim().replace(/\s+/g, " ").slice(0, 200);
@@ -34,4 +36,30 @@ export function searchConcepts(raw: string): Concept[] {
     .sort((a, b) => b.score - a.score || a.c.title.localeCompare(b.c.title))
     .slice(0, 40)
     .map((x) => x.c);
+}
+
+export interface ExtraResult {
+  kind: "Guide" | "Tool";
+  title: string;
+  summary: string;
+  href: string;
+}
+
+/** Guides and tools matching a query (simple token match; lessons are ranked separately). */
+export function searchExtras(raw: string): ExtraResult[] {
+  const q = normalizeQuery(raw).toLowerCase();
+  if (q.length < 2) return [];
+  const tokens = q.split(" ").filter((t) => t.length > 1);
+  const hit = (text: string) => {
+    const hay = text.toLowerCase();
+    return hay.includes(q) || (tokens.length > 0 && tokens.every((t) => hay.includes(t)));
+  };
+  const guides: ExtraResult[] = getPublishedGuides()
+    .filter((g) => hit([g.title, g.summary, ...g.tags, ...g.tools].join(" ")))
+    .map((g) => ({ kind: "Guide", title: g.title, summary: g.summary, href: `/guides/${g.slug}` }));
+  const toolHits: ExtraResult[] = tools
+    .filter((t) => hit([t.name, t.repo, t.tagline, ...t.useFor].join(" ")))
+    .slice(0, 8)
+    .map((t) => ({ kind: "Tool", title: t.name, summary: t.tagline, href: `/tools#${t.id}` }));
+  return [...guides, ...toolHits];
 }

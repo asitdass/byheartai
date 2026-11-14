@@ -1,0 +1,75 @@
+---
+title: "Build a private ChatGPT with Open WebUI"
+summary: "Put a polished, self-hosted chat interface on top of your local models with one Docker command, then share it with your household or team."
+outcome: "A ChatGPT-style web app at localhost:3000 that talks to your local Ollama models, with accounts, chat history, and file uploads."
+level: beginner
+minutes: 15
+tools: [open-webui, ollama]
+tags: [open webui, private chatgpt, self-hosted chatgpt, ollama ui, local ai chat]
+concepts: [what-is-llm, context-window, what-is-rag]
+sources:
+  - title: "Open WebUI README"
+    url: "https://github.com/open-webui/open-webui"
+  - title: "Open WebUI documentation"
+    url: "https://docs.openwebui.com"
+datePublished: 2026-11-14
+lastVerified: 2026-11-14
+order: 2
+status: published
+---
+
+Ollama gives you a model in a terminal. Open WebUI gives you the part people actually want to use: a browser chat app with history, multiple models, file uploads, and user accounts, all running on your own hardware.
+
+<Note title="Before you start">
+You need [Ollama running with at least one model](/guides/run-llms-locally-with-ollama) and [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine on Linux) installed.
+</Note>
+
+## Start Open WebUI
+
+```bash
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
+
+What the flags do:
+
+- `-p 3000:8080` serves the app on port 3000 of your machine.
+- `--add-host=host.docker.internal:host-gateway` lets the container reach Ollama on your host.
+- `-v open-webui:/app/backend/data` keeps your chats and settings when the container is updated.
+- `--restart always` brings it back after a reboot.
+
+No Docker? It also installs as a Python package: `pip install open-webui`, then `open-webui serve`.
+
+## Create the admin account
+
+Open [http://localhost:3000](http://localhost:3000). The first account you create becomes the administrator. It is stored locally in the Docker volume, not on anyone's cloud.
+
+## Pick a model and chat
+
+Your Ollama models appear in the model picker at the top of the chat. Choose one and send a message.
+
+If the list is empty, Open WebUI cannot see Ollama. Go to **Admin Panel → Settings → Connections** and set the Ollama URL to `http://host.docker.internal:11434`.
+
+## Chat with a file
+
+Click the **+** next to the message box and upload a PDF or text file, then ask a question about it. Open WebUI splits the file, embeds it, and retrieves the relevant passages for the model. That is [RAG](/learn/rag/what-is-rag) working, with zero code.
+
+## Share it on your network
+
+Other devices on your Wi-Fi can open `http://YOUR-COMPUTER-IP:3000`. New sign-ups wait for admin approval by default, so you decide who gets in.
+
+<Warning>
+Do not expose port 3000 directly to the internet. If you need remote access, put it behind a VPN such as Tailscale or WireGuard, or a reverse proxy with HTTPS and authentication.
+</Warning>
+
+### Keep it updated
+
+```bash
+docker pull ghcr.io/open-webui/open-webui:main
+docker rm -f open-webui
+```
+
+Then run the `docker run` command from the first step again. Your data lives in the `open-webui` volume and survives.
+
+### What to do next
+
+Add hosted models alongside local ones under **Connections** (any OpenAI-compatible API works), or wire your local model into real automations with [n8n](/guides/automate-workflows-with-n8n).

@@ -42,7 +42,7 @@ export function ContinuousBatching() {
 
   return (
     <figure className="my-8">
-      <div className="rounded-[--radius] border p-5" style={{ background: "var(--surface)" }}>
+      <div className="rounded-(--radius) border p-5" style={{ background: "var(--surface)" }}>
         <div className="mb-3 flex flex-wrap gap-1.5">
           {modes.map((mode) => (
             <button
@@ -50,7 +50,7 @@ export function ContinuousBatching() {
               type="button"
               onClick={() => setId(mode.id)}
               aria-pressed={mode.id === id}
-              className="rounded-[--radius-sm] border px-2.5 py-1.5 text-xs"
+              className="rounded-(--radius-sm) border px-2.5 py-1.5 text-xs"
               style={{
                 background: mode.id === id ? "color-mix(in oklab, var(--accent) 16%, var(--paper))" : "var(--paper)",
                 borderColor: mode.id === id ? "var(--accent)" : "var(--rule)",

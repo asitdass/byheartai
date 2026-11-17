@@ -5,6 +5,8 @@ import { conceptHref, getPublishedConcepts } from "@/lib/content";
 import { getCategory } from "@/data/categories";
 import { pageMetadata } from "@/lib/seo";
 import { searchConcepts, searchExtras } from "@/lib/search";
+import { MatomoSearch } from "@/components/analytics/matomo";
+import { getMatomoConfig } from "@/lib/matomo-config";
 
 interface Props {
   searchParams: Promise<{ q?: string | string[] }>;
@@ -39,6 +41,8 @@ export default async function SearchPage({ searchParams }: Props) {
   const results = query.length >= 2 ? searchConcepts(query) : [];
   const extras = query.length >= 2 ? searchExtras(query) : [];
   const total = getPublishedConcepts().length;
+  const resultsCount = results.length + extras.length;
+  const matomo = getMatomoConfig();
 
   return (
     <div className="mx-auto max-w-[46rem] px-4 py-10">
@@ -47,6 +51,7 @@ export default async function SearchPage({ searchParams }: Props) {
         {total} lessons, plus setup guides and open-source tools. Search by concept, tool, or task.
       </p>
       <SearchForm defaultValue={query} size="page" />
+      {matomo && <MatomoSearch config={matomo} query={query} resultsCount={resultsCount} />}
 
       {query.length > 0 && query.length < 2 && (
         <p className="mt-8" style={{ color: "var(--ink-faint)" }}>
@@ -57,9 +62,9 @@ export default async function SearchPage({ searchParams }: Props) {
       {query.length >= 2 && (
         <section className="mt-8" aria-live="polite">
           <h2 className="text-sm font-semibold uppercase tracking-wide" style={{ color: "var(--ink-faint)" }}>
-            {results.length + extras.length} result{results.length + extras.length === 1 ? "" : "s"}
+            {resultsCount} result{resultsCount === 1 ? "" : "s"}
           </h2>
-          {results.length + extras.length === 0 ? (
+          {resultsCount === 0 ? (
             <p className="mt-4" style={{ color: "var(--ink-muted)" }}>
               Nothing matched. Try “RAG”, “attention”, or browse the{" "}
               <Link href="/learn">full curriculum</Link>.

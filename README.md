@@ -39,6 +39,18 @@ npm run typecheck        # tsc --noEmit
 npm run validate:content # content schema + knowledge-graph checks
 ```
 
+## Website analytics
+
+Vercel Web Analytics provides the traffic baseline. To add Matomo reports:
+
+1. [Install Matomo On-Premise](https://matomo.org/faq/how-to-install/install-matomo-with-docker/) on a host with a public HTTPS URL, for example `https://analytics.example.com/`. Add `https://byheartai.com` as a website in Matomo and note its numeric site ID.
+2. Set `MATOMO_URL` to the installation's base URL and `MATOMO_SITE_ID` to the website ID in the Vercel project's Production environment. Redeploy so the build picks up the settings.
+3. Open the site, follow a link, and search for something. In Matomo, check Visits Log for navigation, Pages for engagement, and Site Search for keywords and zero-result searches. The heartbeat timer is enabled to improve duration reporting.
+
+Matomo uses no tracking cookies in this integration. Search result counts are reported with the keyword omitted by default. Set `MATOMO_RECORD_SEARCH_TERMS=true` to record normalized short phrases that pass the basic input filter. Searches with an email address, URL, or long number stay omitted. Vercel page events omit the search text.
+
+Use [Google Search Console](https://search.google.com/search-console) for queries that led people to ByHeart AI and [Google Trends](https://trends.google.com/) for broader search interest.
+
 ## Project structure
 
 ```

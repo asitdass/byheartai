@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader, JetBrains_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import { SiteHeader } from "@/components/nav/site-header";
 import { SiteFooter } from "@/components/nav/site-footer";
 import { JsonLd } from "@/components/seo/json-ld";
+import { MatomoPageViews } from "@/components/analytics/matomo";
+import { VercelAnalytics } from "@/components/analytics/vercel";
+import { getMatomoConfig } from "@/lib/matomo-config";
 import { organizationJsonLd, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL, websiteJsonLd } from "@/lib/site";
 import "./globals.css";
 
@@ -106,6 +108,8 @@ const themeInit = `(function(){try{
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const matomo = getMatomoConfig();
+
   return (
     <html
       lang="en"
@@ -128,7 +132,8 @@ export default function RootLayout({
         <SiteHeader />
         <div id="main">{children}</div>
         <SiteFooter />
-        <Analytics />
+        <VercelAnalytics />
+        {matomo && <MatomoPageViews config={matomo} />}
       </body>
     </html>
   );

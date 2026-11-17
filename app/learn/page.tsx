@@ -6,9 +6,9 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbJsonLd, itemListJsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Learn AI — the full curriculum",
+  title: "Free AI Curriculum: Foundations to AI Engineering",
   description:
-    "Browse 19 topic tracks: foundations, machine learning, deep learning, transformers, LLMs, embeddings, vector databases, RAG, agents, MCP, context engineering, memory, multimodal, fine-tuning, evaluation, observability, security, inference, and AI system design.",
+    "Learn AI through free lessons, interactive visuals, and quizzes on machine learning, LLMs, RAG, AI agents, MCP, and AI system design.",
   path: "/learn",
   keywords: ["AI curriculum", "learn RAG", "learn agents", "learn MCP", "AI engineering course"],
 });
@@ -30,10 +30,10 @@ export default function LearnHub() {
           tracks,
         )}
       />
-      <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold">Learn AI</h1>
+      <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold">Learn AI for free</h1>
       <p className="mt-3 max-w-2xl text-lg" style={{ color: "var(--ink-muted)" }}>
-        A world-class, prerequisite-driven curriculum. Start anywhere — every concept links to what you should
-        know first and what to read next.
+        Start with AI foundations or pick a topic like RAG, agents, or MCP. Each lesson points you to
+        the concepts you need first and what to read next.
       </p>
 
       <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">

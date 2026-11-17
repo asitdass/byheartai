@@ -6,9 +6,9 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbJsonLd, itemListJsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "AI setup guides: run, automate, and build with open-source AI",
+  title: "Open-Source AI Setup Guides",
   description:
-    "Step-by-step guides to set up open-source AI tools: local models with Ollama, a private ChatGPT, n8n automations, coding agents, MCP servers, browser agents, and agent memory.",
+    "Follow step-by-step AI setup guides for Ollama, Open WebUI, n8n and MCP servers, with commands and troubleshooting for each setup.",
   path: "/guides",
   keywords: ["AI setup guide", "how to install Ollama", "self-host AI", "n8n AI agent", "MCP server setup", "AI automation"],
 });
@@ -32,11 +32,11 @@ export default function GuidesHub() {
           className="mt-3 max-w-3xl font-[family-name:var(--font-display)] leading-[1.08]"
           style={{ fontSize: "var(--fs-h1)", fontWeight: 700, letterSpacing: "-0.02em" }}
         >
-          Stop reading about AI. <span className="grad-text">Set it up.</span>
+          Open-source AI setup guides
         </h1>
         <p className="mt-4 max-w-2xl text-lg" style={{ color: "var(--ink-muted)" }}>
-          Each guide takes one open-source tool from zero to working on your machine, with commands checked
-          against the project&apos;s own docs. Copy, paste, automate.
+          Install open-source AI tools and get a working setup with commands checked against each
+          project&apos;s own docs. New to local models? Follow the <Link href="/local-ai">guide to running AI locally</Link>.
         </p>
       </header>
 

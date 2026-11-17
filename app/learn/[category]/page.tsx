@@ -25,6 +25,7 @@ export async function generateMetadata({
     title: `${cat.title} lessons`,
     description: `${cat.description} Free, prerequisite-linked lessons in the ByHeart AI curriculum.`,
     path: `/learn/${category}`,
+    hasRouteImage: true,
     keywords: [cat.title, "learn AI", cat.id.replaceAll("-", " ")],
   });
 }

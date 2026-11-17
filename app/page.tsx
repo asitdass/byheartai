@@ -37,14 +37,15 @@ import { SearchForm } from "@/components/nav/search-form";
 import { GuideCard } from "@/components/home/guide-card";
 import { JsonLd } from "@/components/seo/json-ld";
 import { itemListJsonLd, pageMetadata } from "@/lib/seo";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: `${SITE_NAME} - ${SITE_TAGLINE}`,
+  title: `Learn AI for Free: Lessons & Setup Guides | ${SITE_NAME}`,
   description: SITE_DESCRIPTION,
   path: "/",
   keywords: ["learn AI", "AI setup guides", "open source AI tools", "AI agents", "RAG", "MCP", "AI automation"],
   absoluteTitle: true,
+  hasRouteImage: true,
 });
 
 const trackIcons: Record<string, LucideIcon> = {
@@ -142,12 +143,12 @@ export default function HomePage() {
             <span className="block text-balance">Know it <span className="home-tagline">by heart.</span></span>
           </h1>
           <p className="mt-6 max-w-xl text-lg" style={{ color: "var(--ink-muted)" }}>
-            Clear lessons on how modern AI works, hands-on guides to set up the open-source tools everyone is
-            using, and a weekly briefing so you never fall behind. All free.
+            Free lessons on how modern AI works, hands-on guides to run open-source AI on your own computer,
+            and a weekly briefing on what changed.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/guides" className="btn home-hero-primary">
-              <Terminal size={16} strokeWidth={1.5} aria-hidden /> Set something up
+            <Link href="/local-ai" className="btn home-hero-primary">
+              <Terminal size={16} strokeWidth={1.5} aria-hidden /> Run AI locally
             </Link>
             <Link href="/learn" className="btn">
               Start learning <ArrowRight size={16} strokeWidth={1.5} aria-hidden />

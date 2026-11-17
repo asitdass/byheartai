@@ -51,6 +51,8 @@ export default async function RadarIssuePage({ params }: { params: Promise<Param
           headline: issue.title,
           description: issue.summary,
           url,
+          image: [absoluteUrl("/opengraph-image")],
+          mainEntityOfPage: { "@type": "WebPage", "@id": url },
           datePublished: toIsoDate(issue.date),
           dateModified: toIsoDate(issue.date),
           author: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },

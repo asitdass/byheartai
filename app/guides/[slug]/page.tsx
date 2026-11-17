@@ -32,6 +32,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     path: `/guides/${slug}`,
     keywords: guide.tags,
     ogType: "article",
+    hasRouteImage: true,
+    noIndex: guide.status !== "published",
     publishedTime: toIsoDate(guide.datePublished),
     modifiedTime: toIsoDate(guide.lastVerified),
   });
@@ -64,12 +66,13 @@ export default async function GuidePage({ params }: { params: Promise<Params> })
       <JsonLd
         data={{
           "@context": "https://schema.org",
-          "@type": "TechArticle",
+          "@type": ["Article", "TechArticle"],
           "@id": `${url}#article`,
           mainEntityOfPage: { "@type": "WebPage", "@id": url },
           headline: guide.title,
           description: guide.summary,
           url,
+          image: [absoluteUrl(`/guides/${guide.slug}/opengraph-image`)],
           inLanguage: "en",
           isAccessibleForFree: true,
           proficiencyLevel: levelLabel[guide.level],

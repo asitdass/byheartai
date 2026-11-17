@@ -18,6 +18,7 @@ import { NextControl } from "@/components/reading/next-control";
 import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbJsonLd, lessonJsonLd, pageMetadata } from "@/lib/seo";
 import { toIsoDate } from "@/lib/site";
+import { getPublishedGuides } from "@/lib/guides";
 
 interface Params {
   category: string;
@@ -43,6 +44,8 @@ export async function generateMetadata({
     path: url,
     keywords: concept.keywords,
     ogType: "article",
+    hasRouteImage: true,
+    noIndex: concept.status !== "published",
     publishedTime: toIsoDate(concept.datePublished),
     modifiedTime: toIsoDate(concept.dateUpdated ?? concept.lastReviewed ?? concept.datePublished),
   });
@@ -59,6 +62,7 @@ export default async function LessonPage({ params }: { params: Promise<Params> }
   const toc = extractToc(concept.body);
   const content = await renderMdx(concept.body);
   const related = getRelated(concept.id);
+  const guides = getPublishedGuides().filter((guide) => guide.concepts.includes(concept.id));
 
   const crumbs = [
     { href: "/learn", label: "Learn" },
@@ -102,6 +106,17 @@ export default async function LessonPage({ params }: { params: Promise<Params> }
           </h1>
 
           {content}
+
+          {guides.length > 0 && (
+            <section className="mt-12">
+              <h2>Put it into practice</h2>
+              <ul>
+                {guides.map((guide) => (
+                  <li key={guide.slug}><Link href={`/guides/${guide.slug}`}>{guide.title}</Link></li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           {/* Auto-rendered: Related concepts */}
           {related.length > 0 && (

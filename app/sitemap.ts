@@ -1,61 +1,34 @@
 import type { MetadataRoute } from "next";
 import { getPublishedConcepts, conceptHref } from "@/lib/content";
 import { categories } from "@/data/categories";
-import { SITE_URL } from "@/lib/site";
+import { absoluteUrl, toIsoDate } from "@/lib/site";
 import { getPublishedGuides, getRadarIssues } from "@/lib/guides";
 
-function toLastmod(value?: string): Date {
-  if (!value) return new Date("2026-09-04T00:00:00.000Z");
-  const d = /^\d{4}-\d{2}-\d{2}$/.test(value)
-    ? new Date(`${value}T00:00:00.000Z`)
-    : new Date(value);
-  return Number.isNaN(d.getTime()) ? new Date("2026-09-04T00:00:00.000Z") : d;
-}
-
-function latestContentDate(): Date {
-  const dates = getPublishedConcepts()
-    .flatMap((c) => [c.lastReviewed, c.datePublished, c.dateUpdated])
-    .filter((d): d is string => Boolean(d))
-    .map(toLastmod)
-    .sort((a, b) => a.getTime() - b.getTime());
-  return dates[dates.length - 1] ?? new Date("2026-09-04T00:00:00.000Z");
+function lastModified(value?: string): string | undefined {
+  const date = toIsoDate(value);
+  return date && !Number.isNaN(Date.parse(date)) ? date : undefined;
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const contentDate = latestContentDate();
-
-  const staticRoutes = ["", "/learn", "/guides", "/tools", "/whats-new", "/roadmaps", "/glossary", "/search"].map((path) => ({
-    url: `${SITE_URL}${path}`,
-    lastModified: contentDate,
-    changeFrequency: "weekly" as const,
-    priority: path === "" ? 1 : path === "/learn" ? 0.9 : 0.8,
-  }));
+  const staticRoutes = ["/", "/learn", "/guides", "/local-ai", "/tools", "/whats-new", "/roadmaps", "/glossary"]
+    .map((path) => ({ url: absoluteUrl(path) }));
 
   const categoryRoutes = categories.map((c) => ({
-    url: `${SITE_URL}/learn/${c.id}`,
-    lastModified: contentDate,
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
+    url: absoluteUrl(`/learn/${c.id}`),
   }));
 
   const lessonRoutes = getPublishedConcepts().map((c) => ({
-    url: `${SITE_URL}${conceptHref(c)}`,
-    lastModified: toLastmod(c.lastReviewed ?? c.datePublished),
-    changeFrequency: "monthly" as const,
-    priority: 0.9,
+    url: absoluteUrl(conceptHref(c)),
+    lastModified: lastModified(c.dateUpdated ?? c.lastReviewed ?? c.datePublished),
   }));
 
   const guideRoutes = getPublishedGuides().map((g) => ({
-    url: `${SITE_URL}/guides/${g.slug}`,
-    lastModified: toLastmod(g.lastVerified),
-    changeFrequency: "monthly" as const,
-    priority: 0.9,
+    url: absoluteUrl(`/guides/${g.slug}`),
+    lastModified: lastModified(g.lastVerified || g.datePublished),
   }));
   const radarRoutes = getRadarIssues().map((r) => ({
-    url: `${SITE_URL}/whats-new/${r.slug}`,
-    lastModified: toLastmod(r.date),
-    changeFrequency: "yearly" as const,
-    priority: 0.6,
+    url: absoluteUrl(`/whats-new/${r.slug}`),
+    lastModified: lastModified(r.date),
   }));
   return [...staticRoutes, ...categoryRoutes, ...guideRoutes, ...radarRoutes, ...lessonRoutes];
 }

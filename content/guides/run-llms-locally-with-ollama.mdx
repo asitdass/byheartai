@@ -1,6 +1,6 @@
 ---
-title: "Run an LLM on your own computer with Ollama"
-summary: "Install Ollama, download an open model, chat with it offline, and call it from your own code through a local API."
+title: "How to Install Ollama and Run an LLM Locally"
+summary: "Install Ollama on Mac, Windows, or Linux, download a local LLM, chat offline, and call the Ollama API from Python or curl."
 outcome: "A private AI model running on your machine, with a local API at localhost:11434 that other tools in these guides can use."
 level: beginner
 minutes: 15
@@ -18,7 +18,7 @@ order: 1
 status: published
 ---
 
-Running a model locally means your prompts never leave your machine, there is no per-token bill, and it works on a plane. Ollama is the simplest way to do it: one install, one command per model.
+With a downloaded local model in Ollama, you can send prompts to a model on your own computer and chat offline. This guide takes you from installation to your first terminal chat and API request.
 
 <Note title="What you need">
 A laptop or desktop from the last few years. 8 GB of RAM runs small models; 16 GB or more (or any recent Apple Silicon Mac, or a PC with a GPU) is comfortable. Models are multi-gigabyte downloads.
@@ -115,3 +115,5 @@ Running `ollama` with no arguments shows the full menu of integrations.
 ### What to do next
 
 Put a proper chat interface on top with [Open WebUI](/guides/private-chatgpt-with-open-webui), or let it answer questions about your own files with [AnythingLLM](/guides/chat-with-your-documents-anythingllm).
+
+See the [local AI setup overview](/local-ai) to compare these options and learn when to use each one.

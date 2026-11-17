@@ -7,12 +7,16 @@ import { pageMetadata } from "@/lib/seo";
 import { searchConcepts, searchExtras } from "@/lib/search";
 
 interface Props {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string | string[] }>;
+}
+
+function searchQuery(value: string | string[] | undefined) {
+  return ((Array.isArray(value) ? value[0] : value) ?? "").trim();
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const { q } = await searchParams;
-  const query = (q ?? "").trim();
+  const query = searchQuery(q);
   if (query) {
     return pageMetadata({
       title: `Search results for “${query.slice(0, 80)}”`,
@@ -25,13 +29,13 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     title: "Search the AI curriculum",
     description: "Find ByHeart AI lessons by name, topic, or keyword — RAG, agents, MCP, transformers, evaluation, and more.",
     path: "/search",
-    keywords: ["search AI lessons", "AI glossary search", "what is RAG"],
+    noIndex: true,
   });
 }
 
 export default async function SearchPage({ searchParams }: Props) {
   const { q } = await searchParams;
-  const query = (q ?? "").trim();
+  const query = searchQuery(q);
   const results = query.length >= 2 ? searchConcepts(query) : [];
   const extras = query.length >= 2 ? searchExtras(query) : [];
   const total = getPublishedConcepts().length;

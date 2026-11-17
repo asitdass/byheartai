@@ -126,31 +126,31 @@ export default function HomePage() {
       />
 
       {/* Hero */}
-      <section className="aurora grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-        <div>
+      <section className="home-hero grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <div className="min-w-0">
           {latest && (
-            <Link href={`/whats-new/${latest.slug}`} className="chip mb-6">
-              <span className="grad-text font-semibold">New</span>
-              <span className="max-w-[16rem] truncate sm:max-w-none">{latest.title}</span>
-              <ArrowRight size={13} aria-hidden />
+            <Link href={`/whats-new/${latest.slug}`} className="home-hero-briefing mb-6 inline-flex max-w-full items-center gap-2 text-sm">
+              <span className="shrink-0 font-semibold">Weekly briefing</span>
+              <span className="truncate">{latest.title}</span>
+              <ArrowRight size={16} strokeWidth={1.5} className="shrink-0" aria-hidden />
             </Link>
           )}
           <h1
             className="font-[family-name:var(--font-display)] leading-[1.02]"
             style={{ fontSize: "var(--fs-hero)", fontWeight: 700, letterSpacing: "-0.025em" }}
           >
-            Learn AI. Run it. <span className="grad-text">Know it by heart.</span>
+            Learn AI. Run it. <span className="block">Know it by heart.</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg" style={{ color: "var(--ink-muted)" }}>
             Clear lessons on how modern AI works, hands-on guides to set up the open-source tools everyone is
             using, and a weekly briefing so you never fall behind. All free.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/guides" className="btn grad-bg">
-              <Terminal size={16} aria-hidden /> Set something up
+            <Link href="/guides" className="btn home-hero-primary">
+              <Terminal size={16} strokeWidth={1.5} aria-hidden /> Set something up
             </Link>
             <Link href="/learn" className="btn">
-              Start learning <ArrowRight size={16} aria-hidden />
+              Start learning <ArrowRight size={16} strokeWidth={1.5} aria-hidden />
             </Link>
           </div>
           <dl className="mt-10 grid max-w-xl grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">

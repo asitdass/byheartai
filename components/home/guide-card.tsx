@@ -10,7 +10,7 @@ export function GuideCard({ guide }: { guide: Guide }) {
   return (
     <Link href={`/guides/${guide.slug}`} className="card flex h-full flex-col p-5">
       <div className="flex items-center gap-3">
-        <span className="eyebrow grad-text">{levelLabel[guide.level]}</span>
+        <span className="eyebrow grad-text guide-level">{levelLabel[guide.level]}</span>
         <span className="inline-flex items-center gap-1 text-xs" style={{ color: "var(--ink-faint)" }}>
           <Clock size={12} aria-hidden /> {guide.minutes} min
         </span>

@@ -1,19 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
 
 /** A single shell command with a copy button. */
 export function CopyCommand({ command }: { command: string }) {
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const copying = useRef(false);
+  const copied = status === "copied";
+
+  useEffect(() => () => clearTimeout(resetTimer.current), []);
 
   async function copy() {
+    if (copying.current) return;
+    copying.current = true;
+    clearTimeout(resetTimer.current);
     try {
       await navigator.clipboard.writeText(command);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
+      setStatus("copied");
+      resetTimer.current = setTimeout(() => setStatus("idle"), 2000);
     } catch {
-      /* clipboard unavailable */
+      setStatus("error");
+    } finally {
+      copying.current = false;
     }
   }
 
@@ -32,12 +42,16 @@ export function CopyCommand({ command }: { command: string }) {
       <button
         type="button"
         onClick={copy}
-        aria-label={copied ? "Copied" : `Copy command: ${command}`}
-        className="shrink-0 cursor-pointer rounded-(--radius-sm) p-1"
-        style={{ color: copied ? "var(--accent)" : "var(--ink-faint)" }}
+        aria-label={`Copy command: ${command}`}
+        className="copy-command-button inline-flex min-h-9 min-w-[6rem] shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-(--radius-sm) px-2 text-xs font-semibold"
+        data-copied={copied || undefined}
       >
         {copied ? <Check size={14} aria-hidden /> : <Copy size={14} aria-hidden />}
+        <span>{copied ? "Copied" : status === "error" ? "Retry" : "Copy"}</span>
       </button>
+      <span role="status" className="sr-only">
+        {copied ? "Command copied" : status === "error" ? "Could not copy command. Try again." : ""}
+      </span>
     </div>
   );
 }

@@ -74,8 +74,7 @@ export default function HomePage() {
   const guides = getPublishedGuides();
   const radar = getRadarIssues();
   const latest = radar[0];
-  const topTools = [...tools].sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0));
-  const marquee = topTools.slice(0, 24);
+  const topTools = [...tools].sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0)).slice(0, 24);
 
   const stats = [
     { value: lessons.length, label: "lessons" },
@@ -116,7 +115,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="mx-auto max-w-[76rem] px-4">
+    <div className="home-page mx-auto max-w-[76rem] px-4">
       <JsonLd
         data={itemListJsonLd(
           "Explore ByHeart AI",
@@ -126,7 +125,7 @@ export default function HomePage() {
       />
 
       {/* Hero */}
-      <section className="home-hero grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+      <section className="home-hero grid items-center gap-8 py-10 sm:py-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-10">
         <div className="min-w-0">
           {latest && (
             <Link href={`/whats-new/${latest.slug}`} className="home-hero-briefing mb-6 inline-flex max-w-full items-center gap-2 text-sm">
@@ -139,7 +138,8 @@ export default function HomePage() {
             className="font-[family-name:var(--font-display)] leading-[1.02]"
             style={{ fontSize: "var(--fs-hero)", fontWeight: 700, letterSpacing: "-0.025em" }}
           >
-            Learn AI. Run it. <span className="block">Know it by heart.</span>
+            <span className="block text-balance">Learn AI. Run it.</span>
+            <span className="block text-balance">Know it <span className="home-tagline">by heart.</span></span>
           </h1>
           <p className="mt-6 max-w-xl text-lg" style={{ color: "var(--ink-muted)" }}>
             Clear lessons on how modern AI works, hands-on guides to set up the open-source tools everyone is
@@ -153,12 +153,12 @@ export default function HomePage() {
               Start learning <ArrowRight size={16} strokeWidth={1.5} aria-hidden />
             </Link>
           </div>
-          <dl className="mt-10 grid max-w-xl grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+          <dl className="mt-8 grid max-w-xl grid-cols-2 gap-x-4 gap-y-4 border-t border-(--rule) pt-4 sm:grid-cols-4">
             {stats.map((s) => (
               <div key={s.label}>
                 <dt className="sr-only">{s.label}</dt>
                 <dd>
-                  <span className="block font-[family-name:var(--font-display)] text-3xl font-bold">{s.value}</span>
+                  <span className="block font-[family-name:var(--font-display)] text-2xl font-semibold tabular-nums">{s.value}</span>
                   <span className="text-sm" style={{ color: "var(--ink-faint)" }}>
                     {s.label}
                   </span>
@@ -173,6 +173,7 @@ export default function HomePage() {
             <i />
             <i />
             <i />
+            <span className="dim ml-auto text-xs">Local AI · Ollama</span>
           </div>
           <div className="terminal-body">
             <span className="dim"># 1. install a local model runner</span>
@@ -198,14 +199,14 @@ export default function HomePage() {
       </section>
 
       {/* Four doors */}
-      <section className="py-12">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <nav aria-label="Explore ByHeart AI" className="py-12">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
           {doors.map((d) => (
-            <Link key={d.href} href={d.href} className="card flex flex-col p-6">
-              <span className="grad-bg inline-grid h-10 w-10 place-items-center rounded-xl">
-                <d.icon size={20} aria-hidden />
+            <Link key={d.href} href={d.href} className="home-index-link flex flex-col border-t border-(--rule) py-4">
+              <span className="flex items-center gap-3 font-[family-name:var(--font-display)] text-2xl font-semibold">
+                <d.icon size={19} strokeWidth={1.5} className="shrink-0 text-(--accent)" aria-hidden />
+                {d.title}
               </span>
-              <h2 className="mt-4 font-[family-name:var(--font-display)] text-xl font-bold">{d.title}</h2>
               <p className="mt-2 text-sm" style={{ color: "var(--ink-muted)" }}>
                 {d.text}
               </p>
@@ -215,16 +216,16 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
-      </section>
+      </nav>
 
       {/* Guides */}
       {guides.length > 0 && (
-        <section className="py-12">
+        <section className="home-section">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="eyebrow">Hands-on</p>
               <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl font-bold">
-                Build something <span className="grad-text">this afternoon</span>
+                Build something this afternoon
               </h2>
             </div>
             <Link href="/guides" className="inline-flex items-center gap-1 text-sm font-semibold">
@@ -239,40 +240,37 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Tools marquee */}
-      <section className="py-12">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="eyebrow">Open source</p>
-            <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl font-bold">The tools people are actually using</h2>
+      {/* Tools index */}
+      {topTools.length > 0 && (
+        <section className="home-section">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="eyebrow">Open source</p>
+              <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl font-bold">The tools people are actually using</h2>
+            </div>
+            <Link href="/tools" className="inline-flex items-center gap-1 text-sm font-semibold">
+              Full directory <ArrowRight size={15} aria-hidden />
+            </Link>
           </div>
-          <Link href="/tools" className="inline-flex items-center gap-1 text-sm font-semibold">
-            Full directory <ArrowRight size={15} aria-hidden />
-          </Link>
-        </div>
-        <div className="marquee" aria-hidden>
-          <div className="marquee-track">
-            {[...marquee, ...marquee].map((t, i) => (
-              <span key={`${t.id}-${i}`} className="chip" style={{ padding: "0.4rem 0.9rem", fontSize: "0.9375rem" }}>
-                <span style={{ color: "var(--ink)" }} className="font-semibold">
-                  {t.name}
-                </span>
-                <Star size={12} /> {formatStars(t.stars)}
-              </span>
+          <ul className="grid gap-x-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {topTools.map((t) => (
+              <li key={t.id} className="min-w-0 border-b border-(--rule)">
+                <Link href={`/tools#${t.id}`} className="home-index-link flex min-h-11 items-center justify-between gap-2 py-2 text-sm">
+                  <span className="font-semibold [overflow-wrap:anywhere]">{t.name}</span>
+                  {t.stars != null && (
+                    <span className="inline-flex shrink-0 items-center gap-1 text-xs text-(--ink-muted) tabular-nums">
+                      <Star size={12} aria-hidden /> {formatStars(t.stars)}<span className="sr-only"> GitHub stars</span>
+                    </span>
+                  )}
+                </Link>
+              </li>
             ))}
-          </div>
-        </div>
-        <ul className="sr-only">
-          {marquee.map((t) => (
-            <li key={t.id}>
-              <Link href={`/tools#${t.id}`}>{t.name}</Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+          </ul>
+        </section>
+      )}
 
       {/* Curriculum */}
-      <section className="py-12">
+      <section className="home-section">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="eyebrow">Curriculum</p>
@@ -282,19 +280,19 @@ export default function HomePage() {
             Full curriculum <ArrowRight size={15} aria-hidden />
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {categories.map((c) => {
             const Icon = trackIcons[c.id] ?? BookOpen;
             const count = getConceptsByCategory(c.id).filter((x) => x.status === "published").length;
             return (
               <Link key={c.id} href={`/learn/${c.id}`} className="card flex items-center gap-3 p-4">
-                <Icon size={20} className="shrink-0" style={{ color: "var(--g1)" }} aria-hidden />
+                <Icon size={20} strokeWidth={1.5} className="shrink-0 text-(--accent)" aria-hidden />
                 <span className="min-w-0">
-                  <span className="block truncate font-semibold" style={{ color: "var(--ink)" }}>
+                  <span className="block font-semibold [overflow-wrap:anywhere]" style={{ color: "var(--ink)" }}>
                     {c.title}
                   </span>
                   <span className="block text-xs" style={{ color: "var(--ink-faint)" }}>
-                    {count} lessons
+                    {`${count} ${count === 1 ? "lesson" : "lessons"}`}
                   </span>
                 </span>
               </Link>
@@ -304,7 +302,7 @@ export default function HomePage() {
       </section>
 
       {/* Paths */}
-      <section className="py-12">
+      <section className="home-section">
         <p className="eyebrow">Roadmaps</p>
         <h2 className="mb-6 mt-1 font-[family-name:var(--font-display)] text-3xl font-bold">Pick a path, follow the arrows</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -326,10 +324,10 @@ export default function HomePage() {
 
       {/* Radar */}
       {latest && (
-        <section className="py-12">
+        <section className="home-section">
           <Link href={`/whats-new/${latest.slug}`} className="card grid gap-6 p-6 sm:p-8 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
-            <span className="grad-bg inline-grid h-14 w-14 place-items-center rounded-2xl">
-              <Radar size={26} aria-hidden />
+            <span className="inline-grid h-14 w-14 place-items-center rounded-(--radius) bg-(--surface-2) text-(--accent)">
+              <Radar size={24} strokeWidth={1.5} aria-hidden />
             </span>
             <span>
               <span className="eyebrow">Weekly radar · {formatDate(latest.date)}</span>

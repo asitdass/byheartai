@@ -420,6 +420,12 @@ a.chip:hover { border-color: var(--accent); color: var(--ink); text-decoration: 
 
 .home-hero-briefing { color: var(--ink-muted); }
 .home-hero-briefing:hover { color: var(--ink); }
+.home-tagline {
+  text-decoration: underline;
+  text-decoration-color: var(--heart);
+  text-decoration-thickness: 0.045em;
+  text-underline-offset: 0.14em;
+}
 .home-hero .btn { border-radius: var(--radius); }
 .home-hero .home-hero-primary {
   border-color: var(--ink);
@@ -430,6 +436,29 @@ a.chip:hover { border-color: var(--accent); color: var(--ink); text-decoration: 
 .home-hero .home-hero-primary:hover {
   border-color: var(--ink-muted);
   background: var(--ink-muted);
+}
+.home-section {
+  border-top: 1px solid var(--rule);
+  padding-block: clamp(2rem, 5vw, 4rem);
+}
+.home-index-link { color: var(--ink); }
+.home-index-link:hover,
+.home-index-link:focus-visible {
+  color: var(--accent);
+  text-decoration: none;
+}
+.home-page .guide-level {
+  background: none;
+  color: var(--ink-muted);
+}
+.home-page a.card {
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+.home-page a.card:hover {
+  transform: none;
+  box-shadow: none;
+  background: var(--surface-2);
+  border-color: var(--ink-faint);
 }
 
 /* Terminal mock + code blocks with copy */
@@ -447,6 +476,7 @@ a.chip:hover { border-color: var(--accent); color: var(--ink); text-decoration: 
 }
 .terminal-bar {
   display: flex;
+  align-items: center;
   gap: 0.4rem;
   padding: 0.7rem 0.9rem;
   border-bottom: 1px solid oklch(1 0 0 / 0.08);
@@ -472,6 +502,39 @@ a.chip:hover { border-color: var(--accent); color: var(--ink); text-decoration: 
   vertical-align: text-bottom;
   background: currentColor;
 }
+
+.quiz-question { overflow-wrap: anywhere; }
+.quiz-option:not([data-graded]) { cursor: pointer; }
+.quiz-option:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.quiz-option input:focus-visible { outline: none; }
+.quiz-check {
+  background: var(--accent);
+  color: var(--accent-ink);
+  cursor: pointer;
+}
+.quiz-check:disabled { opacity: 0.5; cursor: default; }
+.quiz-check[aria-disabled="true"] {
+  background: var(--surface);
+  color: var(--ink-muted);
+  cursor: default;
+}
+.copy-command-button {
+  background: var(--surface);
+  color: var(--ink-muted);
+}
+.copy-command-button[data-copied] { color: var(--accent); }
+.quiz-check:active:not(:disabled, [aria-disabled="true"]),
+.copy-command-button:active { background: var(--ink); color: var(--paper); }
+@media (hover: hover) and (pointer: fine) {
+  .quiz-option:not([data-graded]):hover { box-shadow: inset 0 0 0 1px var(--rule); }
+  .copy-command-button:hover:not(:active) { background: var(--surface-2); }
+}
+.quiz-result {
+  --quiz-result-accent: oklch(0.6 0.18 20);
+  border-inline-start: 3px solid var(--quiz-result-accent);
+  background: color-mix(in oklab, var(--quiz-result-accent) 8%, var(--surface));
+}
+.quiz-result[data-correct="true"] { --quiz-result-accent: oklch(0.6 0.15 150); }
 
 .code-wrap { position: relative; }
 .code-wrap .copy-btn {
@@ -515,12 +578,6 @@ a.chip:hover { border-color: var(--accent); color: var(--ink); text-decoration: 
   background: linear-gradient(135deg, var(--g1), var(--g2));
   transform: translateY(-0.15rem);
 }
-
-/* Infinite logo/name marquee */
-.marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent); }
-.marquee-track { display: flex; gap: 0.6rem; width: max-content; animation: marquee 60s linear infinite; }
-.marquee:hover .marquee-track { animation-play-state: paused; }
-@keyframes marquee { to { transform: translateX(-50%); } }
 
 /* Reading mode hides the side rails for maximum focus */
 [data-reading-mode="on"] .lesson-aside {
